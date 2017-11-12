@@ -14,13 +14,13 @@ See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases
 
 ## Installation
 To use ngx-multi-level-push-menu in your project install it via [npm](https://www.npmjs.com/package/ngx-multi-level-push-menu):
-```
+```shell
 npm i ngx-multi-level-push-menu --save
-````
+```
 
 ## Usage
 
-#### 1. Update you `angular-cli.json`:
+#### 1. Update your `angular-cli.json`:
 ```json
 "styles": [
   "../node_modules/font-awesome/css/font-awesome.min.css",
@@ -193,18 +193,17 @@ Full list of options is provided below.
 </multi-level-push-menu>
 ```
 
-#### 5. Run your app from your project directory:
-```
-npm start
-```
-
-#### 6. Update your `src/style.css` (Optional step):
+#### 5. Update your `src/style.css` (Optional step):
 ```
 html, body {
     margin: 0;
 }
 ```
 
+#### 6. Run your app from your project directory:
+```
+npm start
+```
 
 ### Options
 

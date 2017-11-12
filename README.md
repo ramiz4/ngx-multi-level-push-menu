@@ -14,8 +14,8 @@ See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases
 
 ## Installation
 To use ngx-multi-level-push-menu in your project install it via [npm](https://www.npmjs.com/package/ngx-multi-level-push-menu):
-```shell
-npm i ngx-multi-level-push-menu --save
+```bash
+$ npm i ngx-multi-level-push-menu --save
 ```
 
 ## Usage
@@ -77,8 +77,8 @@ export class AppModule { }
 
 You need to add the RouterModule and define some routes. In this example there are defined 4 routes and therefor you need to create 4 components:
 
-```shell
-ng g component home && ng g component collections && ng g component credits && ng g component page-not-found
+```bash
+$ ng g component home && ng g component collections && ng g component credits && ng g component page-not-found
 ```
 
 #### 3. Add menu options and items to `app.component.ts`:
@@ -187,22 +187,22 @@ export class AppComponent {
 Full list of options is provided below.
 
 #### 4. Replace content in `app.component.html`:
-```
+```html
 <multi-level-push-menu [menu]="myMenuItems" [options]="myMenuOptions">
   <router-outlet></router-outlet>
 </multi-level-push-menu>
 ```
 
 #### 5. Update your `src/style.css` (Optional step):
-```
+```css
 html, body {
     margin: 0;
 }
 ```
 
 #### 6. Run your app from your project directory:
-```
-npm start
+```bash
+$ npm start
 ```
 
 ### Options

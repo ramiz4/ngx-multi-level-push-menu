@@ -1,7 +1,7 @@
 {
   "name": "ngx-multi-level-push-menu",
   "description": "Multi-level push menu is cross-browser compatible angular 4+ component allowing endless nesting of navigation elements.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "ISC",
   "scripts": {
     "ng": "ng",

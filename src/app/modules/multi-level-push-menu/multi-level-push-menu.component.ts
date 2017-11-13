@@ -1,6 +1,5 @@
-import { Component, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-
 declare var $: any;
 
 @Component({
@@ -24,12 +23,26 @@ export class MultiLevelPushMenuComponent {
     return this._menu;
   }
 
-  constructor(private router: Router) { }
+  constructor(private el: ElementRef, private router: Router) { }
 
   createMenu() {
-    $(this.elContent.nativeElement).css('padding-left', this.options.menuWidth + 50);
+    if (!this.options.menuWidth) {
+      this.options.menuWidth = 300;
+    }
+    if (Number.isInteger(this.options.menuWidth)) {
+      this.options.menuWidth = this.options.menuWidth + 'px';
+    }
+    let offsetLeft = 'calc(' + this.options.menuWidth + ' + 50px)';
+    $(this.elContent.nativeElement).css('left', offsetLeft);
+
+    if (Number.isInteger(this.options.menuHeight)) {
+      this.options.menuHeight = this.options.menuHeight + 'px';
+    }
+
+    let router = this.router;
 
     $(this.elMenu.nativeElement).multilevelpushmenu({
+      container: $(this.elMenu.nativeElement),                      // Holding container.
       containersToPush: [$(this.elContent.nativeElement)],          // Array of objects to push/slide together with menu.
       collapsed: this.options.collapsed,                            // Initialize menu in collapsed/expanded mode
       menuID: this.options.menuID,                                  // ID of <nav> element.
@@ -51,11 +64,21 @@ export class MultiLevelPushMenuComponent {
       swipe: this.options.swipe,                                     // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
 
       onItemClick: function () {
+        const event = arguments[0];
+        const $menuLevelHolder = arguments[1];
         const $item = arguments[2];
+        const options = arguments[3];
+        
         const itemHref = $item.find('a:first').attr('href');
-        this.router.navigate(itemHref);
+        router.navigateByUrl(itemHref);
       }
     });
+
+    // Base expand
+    // $( '#baseexpand' ).click(function(){
+    //   $( '#menu' ).multilevelpushmenu('expand');
+    // });
+
   }
 
 }

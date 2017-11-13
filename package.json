@@ -10,7 +10,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "packagr": "ng-packagr -p ng-package.json && cp -R src/assets package/dist"
+    "packagr:unix": "ng-packagr -p ng-package.json && cp -R src/assets package/dist",
+    "packagr:win": "ng-packagr -p ng-package.json && xcopy /S /Q /Y /F /I .\\src\\assets .\\package\\dist"
   },
   "private": false,
   "repository": {

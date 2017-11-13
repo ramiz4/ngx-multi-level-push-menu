@@ -23,7 +23,7 @@ export class MultiLevelPushMenuComponent {
     return this._menu;
   }
 
-  constructor(private el: ElementRef, private router: Router) { }
+  constructor(private router: Router) { }
 
   createMenu() {
     if (!this.options.menuWidth) {

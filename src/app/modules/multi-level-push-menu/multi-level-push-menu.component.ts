@@ -32,9 +32,10 @@ export class MultiLevelPushMenuComponent {
     if (Number.isInteger(this.options.menuWidth)) {
       this.options.menuWidth = this.options.menuWidth + 'px';
     }
-    let offsetLeft = 'calc(' + this.options.menuWidth + ' + 50px)';
+    let offsetLeft = 'calc(' + this.options.menuWidth + ' + 20px)';
     $(this.elContent.nativeElement).css('left', offsetLeft);
-
+    $(this.elContent.nativeElement).css('width', 'calc(100% - (' + this.options.menuWidth + ' + 20px))');
+    
     if (Number.isInteger(this.options.menuHeight)) {
       this.options.menuHeight = this.options.menuHeight + 'px';
     }
@@ -61,7 +62,7 @@ export class MultiLevelPushMenuComponent {
       preventGroupItemClick: this.options.preventGroupItemClick,    // set to false if you do not need event callback functionality per group item click
       direction: this.options.direction,                            // set to 'rtl' for reverse sliding direction
       fullCollapse: this.options.fullCollapse,                      // set to true to fully hide base level holder when collapsed
-      swipe: this.options.swipe,                                     // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
+      swipe: this.options.swipe,                                    // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
 
       onItemClick: function () {
         const event = arguments[0];

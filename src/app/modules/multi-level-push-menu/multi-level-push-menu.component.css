@@ -1,3 +1,7 @@
+::ng-deep app-root, ::ng-deep multi-level-push-menu, ::ng-deep app-credits {
+	display: block;
+}
+
 ::ng-deep .multilevelpushmenu_wrapper li {
     padding: 0 !important;
 }
@@ -9,7 +13,4 @@
 #content {
 	position: absolute;
 	top: 0;
-	left: 0;
-	height: 100%;
-	width: 100%;
 }

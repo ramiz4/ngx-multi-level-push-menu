@@ -1,100 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { 
+  MultiLevelPushMenuService, 
+  MultiLevelPushMenu, 
+  MultiLevelPushMenuOptions, 
+  MultiLevelPushMenuItem 
+} from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  myMenuOptions = {
-    // menuWidth: 500
-  };
-  myMenuItems = [
-    {
-      title: 'All Categories',
-      id: 'menuID',
-      icon: 'fa fa-reorder',
-      items: [
-        {
-          name: 'Devices',
-          id: 'itemID',
-          icon: 'fa fa-laptop',
-          link: '#',
-          items: [
-            {
-              title: 'Devices',
-              icon: 'fa fa-laptop',
-              items: [
-                {
-                  name: 'Mobile Phones',
-                  icon: 'fa fa-phone',
-                  link: '#',
-                  items: [
-                    {
-                      title: 'Mobile Phones',
-                      icon: 'fa fa-phone',
-                      link: '#',
-                      items: [
-                        {
-                          name: 'Super Smart Phone',
-                          link: '#'
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  name: 'Televisions',
-                  icon: 'fa fa-desktop',
-                  link: '#',
-                  items: [
-                    {
-                      title: 'Televisions',
-                      icon: 'fa fa-desktop',
-                      link: '#',
-                      items: [
-                        {
-                          name: 'Flat Super Screen',
-                          link: '#'
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          name: 'Magazines',
-          icon: 'fa fa-book',
-          link: '#',
-          items: [
-            {
-              title: 'Magazines',
-              icon: 'fa fa-book',
-              items: [
-                {
-                  name: 'National Geographics',
-                  link: '#'
-                },
-                {
-                  name: 'Scientific American',
-                  link: '#'
-                }
-              ]
-            }
-          ]
-        },
-        {
-          name: 'Collections',
-          link: 'collections'
-        },
-        {
-          name: 'Credits',
-          link: 'credits'
-        }
-      ]
-    }
-  ];
+export class AppComponent implements OnInit {
+
+  defaultItems: Array<MultiLevelPushMenuItem> = new Array<MultiLevelPushMenuItem>();
+
+  constructor(private mlpmService: MultiLevelPushMenuService) {}
+
+  ngOnInit() {
+    this.defaultItems.push(new MultiLevelPushMenuItem('Home', 'home'));
+    this.defaultItems.push(new MultiLevelPushMenuItem('About us', 'about-us'));
+    let options: MultiLevelPushMenuOptions = new MultiLevelPushMenuOptions();
+    options.mode = 'cover';
+    options.menu = new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-reorder', this.defaultItems);
+    this.mlpmService.initialize(options);
+  }
+
+  resetMenu(): void {
+    this.mlpmService.update(this.defaultItems);
+  }
+
+  updateMenu(): void {
+    let newItems = new Array<MultiLevelPushMenuItem>();
+    newItems.push(new MultiLevelPushMenuItem('Collections', 'collections'));
+    newItems.push(new MultiLevelPushMenuItem('Credits', 'credits'));
+    this.mlpmService.update(newItems);
+  }
+
 }

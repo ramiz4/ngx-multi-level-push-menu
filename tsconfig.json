@@ -15,6 +15,12 @@
     "lib": [
       "es2016",
       "dom"
-    ]
-  }
+    ],
+    "paths": {
+      "@ramiz4/ngx-multi-level-push-menu": [ "dist/ngx-multi-level-push-menu" ]
+    }
+  },
+  "exclude": [
+    ".ng_build"
+  ]
 }

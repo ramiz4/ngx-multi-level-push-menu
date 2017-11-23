@@ -6,7 +6,8 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "dist",
+      "name": "dev",
+      "outDir": "dist/app",
       "assets": [
         "assets",
         "favicon.ico"
@@ -20,12 +21,42 @@
       "prefix": "app",
       "styles": [
         "../node_modules/font-awesome/css/font-awesome.min.css",
-        "../src/assets/css/jquery.multilevelpushmenu.min.css",
+        "../ngx-multi-level-push-menu/src/assets/css/jquery.multilevelpushmenu.min.css",
         "styles.css"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",
-        "../src/assets/js/jquery.multilevelpushmenu.min.js"
+        "../ngx-multi-level-push-menu/src/assets/js/jquery.multilevelpushmenu.min.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    },
+    {
+      "root": "src",
+      "name": "packages",
+      "outDir": "dist/app",
+      "assets": [
+        "assets",
+        "favicon.ico"
+      ],
+      "index": "index.html",
+      "main": "main.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.packages.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "app",
+      "styles": [
+        "../node_modules/font-awesome/css/font-awesome.min.css",
+        "../ngx-multi-level-push-menu/src/assets/css/jquery.multilevelpushmenu.min.css",
+        "styles.css"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.min.js",
+        "../ngx-multi-level-push-menu/src/assets/js/jquery.multilevelpushmenu.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "angularCompilerOptions": {
     "paths": {
-      "@ramiz4/ngx-multi-level-push-menu": [ "../ngx-multi-level-push-menu/src/public_api.ts" ]
+      "@ramiz4/ngx-multi-level-push-menu": [ "../dist/ngx-multi-level-push-menu" ]
     }
   },
   "compilerOptions": {
@@ -11,7 +11,7 @@
     "baseUrl": "",
     "types": [],
     "paths": {
-      "@ramiz4/ngx-multi-level-push-menu": [ "../ngx-multi-level-push-menu/src/public_api.ts" ]
+      "@ramiz4/ngx-multi-level-push-menu": [ "../dist/ngx-multi-level-push-menu" ]
     }
   },
   "exclude": [

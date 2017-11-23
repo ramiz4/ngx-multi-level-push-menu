@@ -8,7 +8,10 @@
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
+    "paths": {
+      "@ramiz4/ngx-multi-level-push-menu": [ "../dist/ngx-multi-level-push-menu" ]
+    }
   },
   "files": [
     "test.ts"

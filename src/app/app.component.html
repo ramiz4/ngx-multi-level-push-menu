@@ -1,3 +1,5 @@
-<multi-level-push-menu [menu]="myMenuItems" [options]="myMenuOptions">
-  <router-outlet></router-outlet>
+<multi-level-push-menu>
+    <button (click)="updateMenu()">update menu</button>
+    <button (click)="resetMenu()">reset menu</button>
+    <router-outlet></router-outlet>
 </multi-level-push-menu>

@@ -1,0 +1,46 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      # - image: circleci/node:latest
+      - image: angular/ngcontainer:latest
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      # Build the libraries
+      - run: yarn build:lib
+      # Build the demo apps (from library packages)
+      - run: yarn build:app
+
+      # Run unit tests!
+      # - run: xvfb-run -a yarn ci:test
+
+      # Run e2e tests!
+      # - run: xvfb-run -a yarn ci:e2e
+
+      # Store build artefacts on circle
+      - store_artifacts:
+          path: ~/repo/dist
+          destination: dist

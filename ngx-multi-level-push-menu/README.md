@@ -50,7 +50,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { MultiLevelPushMenuModule } from '@ramiz4/ngx-multi-level-push-menu';
+import { MultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -78,7 +78,9 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes),
     MultiLevelPushMenuModule
   ],
-  providers: [],
+  providers: [
+    MultiLevelPushMenuService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

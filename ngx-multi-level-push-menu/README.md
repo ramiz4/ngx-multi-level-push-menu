@@ -48,35 +48,42 @@ Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
-
 import { MultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
+import { AboutUsComponent } from './about-us/about-us.component';
 import { CollectionsComponent } from './collections/collections.component';
 import { CreditsComponent } from './credits/credits.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
-const appRoutes: Routes = [
+const routes: Routes = [
   { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
+  { path: 'about-us', component: AboutUsComponent },
   { path: 'collections', component: CollectionsComponent },
   { path: 'credits', component: CreditsComponent },
   { path: '**', component: PageNotFoundComponent }
-];
+]
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
+    AboutUsComponent,
     CollectionsComponent,
     CreditsComponent,
     PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(appRoutes),
-    MultiLevelPushMenuModule
+    FormsModule,
+    HttpModule,
+    RouterModule.forRoot(routes),
+    MultiLevelPushMenuModule.forRoot()
   ],
   providers: [
     MultiLevelPushMenuService
@@ -89,7 +96,7 @@ export class AppModule { }
 You need to add the RouterModule and define some routes. In this example there are defined 4 routes and therefor you need to create 4 components:
 
 ```bash
-$ ng g component home && ng g component collections && ng g component credits && ng g component page-not-found
+$ ng g component home && ng g component about-us && ng g component collections && ng g component credits && ng g component page-not-found
 ```
 
 #### 3. Add menu options and items to `app.component.ts`:

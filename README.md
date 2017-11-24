@@ -3,7 +3,7 @@
 Multi-level push menu is cross-browser compatible angular 4+ component allowing endless nesting of navigation elements.
 
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg?style=flat-square)](https://renovateapp.com/)
-[![CircleCI](https://img.shields.io/circleci/project/github/dherges/ng-packaged/master.svg?style=flat-square&label=Circle%20CI)](https://circleci.com/gh/dherges/ng-packaged)
+[![CircleCI](https://img.shields.io/circleci/project/github/ramiz4/ngx-multi-level-push-menu/master.svg?style=flat-square&label=Circle%20CI)](https://circleci.com/gh/ramiz4/ngx-multi-level-push-menu)
 
 
 > `ngx-multi-level-push-menu` is an Angular component for generating a fancy push menu. It was built for modern browsers using _TypeScript, CSS3 and HTML5_ and Angular `>=4.0.0`.

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, Input, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import * as _ from 'lodash';
 
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 import { MultiLevelPushMenuOptions, MultiLevelPushMenuItem } from './multi-level-push-menu.model';
@@ -65,7 +64,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       swipe: options.swipe,                                    // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
 
       onItemClick: function () {
-        const $item = arguments[2];        
+        const $item = arguments[2];
         const itemHref = $item.find('a:first').attr('href');
         router.navigateByUrl(itemHref);
       }
@@ -81,7 +80,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   updateMenu(items: Array<MultiLevelPushMenuItem>): void {
-    if (!_.isEqual(this.oldMenuItems.sort(), items.sort())) {
+    if (!this.isEqual(this.oldMenuItems.sort(), items.sort())) {
       // Add new items
       var $addTo = $(this.elMenu.nativeElement).multilevelpushmenu('activemenu').first();
       $(this.elMenu.nativeElement).multilevelpushmenu('additems', items, $addTo, 0);
@@ -89,9 +88,33 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       this.oldMenuItems.forEach(item => {
         item = $(this.elMenu.nativeElement).multilevelpushmenu('finditemsbyname', item.name);
         $(this.elMenu.nativeElement).multilevelpushmenu('removeitems', item);
-      }); 
+      });
       this.oldMenuItems = items;
     }
+  }
+
+  private isEqual(array, array2) {
+    // if the other array is a falsy value, return
+    if (!array)
+      return false;
+
+    // compare lengths - can save a lot of time 
+    if (array2.length != array.length)
+      return false;
+
+    for (var i = 0, l = array2.length; i < l; i++) {
+      // Check if we have nested arrays
+      if (array2[i] instanceof Array && array[i] instanceof Array) {
+        // recurse into the nested arrays
+        if (!array2[i].equals(array[i]))
+          return false;
+      }
+      else if (array2[i] != array[i]) {
+        // Warning - two different object instances will never be equal: {x:20} != {x:20}
+        return false;
+      }
+    }
+    return true;
   }
 
   ngOnDestroy() {

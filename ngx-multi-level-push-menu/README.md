@@ -18,18 +18,27 @@ To use @ramiz4/ngx-multi-level-push-menu in your project install it via [npm](ht
 $ npm i @ramiz4/ngx-multi-level-push-menu --save
 ```
 
+## Install dependencies
+```bash
+$ npm i jquery --save
+```
+
+```bash
+$ npm i font-awesome --save
+```
+
 ## Usage
 
 #### 1. Update your `angular-cli.json`:
 ```json
 "styles": [
   "../node_modules/font-awesome/css/font-awesome.min.css",
-  "../node_modules/@ramiz4/ngx-multi-level-push-menu/dist/css/jquery.multilevelpushmenu.min.css",
+  "../node_modules/@ramiz4/ngx-multi-level-push-menu/assets/css/jquery.multilevelpushmenu.min.css",
   "styles.css"
 ],
 "scripts": [
   "../node_modules/jquery/dist/jquery.min.js",
-  "../node_modules/@ramiz4/ngx-multi-level-push-menu/dist/js/jquery.multilevelpushmenu.min.js"
+  "../node_modules/@ramiz4/ngx-multi-level-push-menu/assets/js/jquery.multilevelpushmenu.min.js"
 ],
 ```
 

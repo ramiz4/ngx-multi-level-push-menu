@@ -21,6 +21,8 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
   initializeSubscription: Subscription;
   updateSubscription: Subscription;
+  collapseSubscription: Subscription;
+  expandSubscription: Subscription;
 
   constructor(private router: Router, private mlpmService: MultiLevelPushMenuService) {
     this.initializeSubscription = this.mlpmService.initialized().subscribe(options => {
@@ -28,6 +30,12 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
     });
     this.updateSubscription = this.mlpmService.updated().subscribe(items => {
       this.updateMenu(items);
+    });
+    this.collapseSubscription = this.mlpmService.collapsed().subscribe(level => {
+      this.collapseMenu(level);
+    });
+    this.expandSubscription = this.mlpmService.expanded().subscribe(value => {
+      this.expandMenu();
     });
   }
 
@@ -91,6 +99,33 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       });
       this.oldMenuItems = items;
     }
+  }
+
+  collapseMenu(level: number) {
+    if(level) {
+      // Collapse menu down to level 1 (0 level represent root level expanded)
+      $(this.elMenu.nativeElement).multilevelpushmenu('collapse', level);
+    } else {
+      // Full collapse
+      $(this.elMenu.nativeElement).multilevelpushmenu('collapse');
+    }
+
+    // Collapse menu down to the level of $menuLevelObject
+    // $('#menu').multilevelpushmenu('collapse', $menuLevelObject);
+
+    // Collapse menu down to the level of menu level object with title 'Devices' (not really recommended since there could be many menu level objects with the same title; in such cases collasing will be unsuccessful)
+    // $('#menu').multilevelpushmenu('collapse', 'Devices');
+  }
+
+  expandMenu() {
+    // Menu expand from fully collapsed mode to level 0
+    $(this.elMenu.nativeElement).multilevelpushmenu('expand');
+
+    // // Expand menu up to the $menuLevelObject
+    // $('#menu').multilevelpushmenu('expand', $menuLevelObject);
+
+    // // Expand menu up to the menu level object with title 'Devices' (not recommended since there could be many menu level objects with the same title; in such cases expanding will be unsuccessful)
+    // $('#menu').multilevelpushmenu('expand', 'Devices');
   }
 
   ngOnDestroy() {

@@ -11,6 +11,8 @@ export class MultiLevelPushMenuService {
 
   private initSubject = new Subject<MultiLevelPushMenuOptions>();
   private updateSubject = new Subject<Array<MultiLevelPushMenuItem>>();
+  private collapseSubject = new Subject<number>();
+  private expandSubject = new Subject();
 
   initialize(options: MultiLevelPushMenuOptions) {
     this.initSubject.next(options);
@@ -26,5 +28,21 @@ export class MultiLevelPushMenuService {
 
   updated(): Observable<Array<MultiLevelPushMenuItem>> {
     return this.updateSubject.asObservable();
+  }
+
+  collapse(level?: number) {
+    this.collapseSubject.next(level);
+  }
+
+  collapsed(): Observable<number> {
+    return this.collapseSubject.asObservable();
+  }
+
+  expand() {
+    this.expandSubject.next();
+  }
+
+  expanded(): Observable<any> {
+    return this.expandSubject.asObservable();
   }
 }

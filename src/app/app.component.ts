@@ -37,4 +37,12 @@ export class AppComponent implements OnInit {
     this.mlpmService.update(newItems);
   }
 
+  collapseMenu(): void {
+    this.mlpmService.collapse();
+  }
+
+  expandMenu(): void {
+    this.mlpmService.expand();
+  }
+
 }

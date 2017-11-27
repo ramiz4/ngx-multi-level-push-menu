@@ -9,6 +9,7 @@
     "build": "ng build",
     "build:app": "cpr dist/ngx-multi-level-push-menu src/@ramiz4/ngx-multi-level-push-menu && ng build --app packages && rimraf src/@ramiz4",
     "build:lib": "ng-packagr && cpr ngx-multi-level-push-menu/src/assets dist/ngx-multi-level-push-menu/assets",
+    "version:patch": "npm version patch & cd ngx-multi-level-push-menu && npm version patch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

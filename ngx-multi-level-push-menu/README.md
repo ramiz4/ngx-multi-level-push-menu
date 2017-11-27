@@ -147,6 +147,14 @@ export class AppComponent implements OnInit {
   expandMenu(): void {
     this.multiLevelPushMenuService.expand();
   }
+  
+  collapseMenu() {
+    this.mlpmService.collapse();
+  }
+
+  expandMenu() {
+    this.mlpmService.expand();
+  }
 }
 ```
 Full list of options is provided below.
@@ -156,6 +164,8 @@ Full list of options is provided below.
 <multi-level-push-menu>
   <button (click)="updateMenu()">update menu</button>
   <button (click)="resetMenu()">reset menu</button>
+  <button (click)="collapseMenu()">collapse menu</button>
+  <button (click)="expandMenu()">expand menu</button>
   <router-outlet></router-outlet>
 </multi-level-push-menu>
 ```

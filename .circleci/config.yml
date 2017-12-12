@@ -8,12 +8,6 @@ jobs:
     docker:
       - image: angular/ngcontainer:latest
     working_directory: ~/repo
-    
-    dependencies:
-      pre:
-        - echo "scope=ramiz4" >> ~/.npmrc
-        - echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
-        - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
 
     steps:
       - checkout
@@ -52,6 +46,12 @@ jobs:
           path: ~/repo/dist
           destination: dist
           
+dependencies:
+  pre:
+    - echo "scope=ramiz4" >> ~/.npmrc
+    - echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        
   deployment:
     npm:
       tag: /v[0-9]+(\.[0-9]+)*/

@@ -51,9 +51,9 @@ dependencies:
     - echo "scope=ramiz4" >> ~/.npmrc
     - echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
     - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-        
+      
 deployment:
   npm:
     tag: /v[0-9]+(\.[0-9]+)*/
-        commands:
+    commands:
       - npm publish dist/ngx-multi-level-push-menu/

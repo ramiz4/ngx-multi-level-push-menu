@@ -60,3 +60,5 @@ typings/
 dist/
 .ng_build/
 /src/@ramiz4
+
+.DS_Store

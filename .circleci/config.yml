@@ -6,11 +6,14 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      # - image: circleci/node:latest
       - image: angular/ngcontainer:latest
-
     working_directory: ~/repo
+    
+    dependencies:
+      pre:
+        - echo "scope=ramiz4" >> ~/.npmrc
+        - echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
+        - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
 
     steps:
       - checkout
@@ -18,16 +21,20 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - v1-dependencies-{{ checksum "yarn.lock" }}
 
+      - run:
+          name: Version Info
+          command: |
+            node --version \
+              && yarn --version \
+              && git --version
       - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
 
       # Build the libraries
       - run: yarn build:lib
@@ -44,3 +51,9 @@ jobs:
       - store_artifacts:
           path: ~/repo/dist
           destination: dist
+          
+  deployment:
+    npm:
+      tag: /v[0-9]+(\.[0-9]+)*/
+          commands:
+        - npm publish dist/ngx-multi-level-push-menu/

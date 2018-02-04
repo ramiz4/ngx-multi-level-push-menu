@@ -4436,9 +4436,9 @@ netmask@~1.0.4:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
 
-ng-packagr@1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-1.6.0.tgz#935ff56b070925376df840bb87d4e64e0aeb1cf5"
+ng-packagr@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-1.7.0.tgz#f3c594255faa9b22b4fddfe8243e9f0f04f79515"
   dependencies:
     "@angular/tsc-wrapped" "^4.4.5"
     "@ngtools/json-schema" "^1.1.0"

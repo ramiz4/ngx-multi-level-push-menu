@@ -1,9 +1,8 @@
 {
   "$schema": "./node_modules/ng-packagr/ng-package.schema.json",
-  "src": "ngx-multi-level-push-menu",
   "dest": "dist/ngx-multi-level-push-menu",
   "workingDirectory": ".ng_build",
   "lib": {
-    "entryFile": "src/public_api.ts"
+    "entryFile": "ngx-multi-level-push-menu/src/public_api.ts"
   }
 }

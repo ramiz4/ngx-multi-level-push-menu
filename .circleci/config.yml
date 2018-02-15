@@ -30,16 +30,14 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
 
+      # Run unit tests!
+      - run: yarn test
+
       # Build the libraries
       - run: yarn build:lib
+
       # Build the demo apps (from library packages)
       - run: yarn build:app
-
-      # Run unit tests!
-      # - run: xvfb-run -a yarn ci:test
-
-      # Run e2e tests!
-      # - run: xvfb-run -a yarn ci:e2e
 
       # Store build artefacts on circle
       - store_artifacts:

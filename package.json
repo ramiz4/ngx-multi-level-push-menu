@@ -4,7 +4,6 @@
   "private": false,
   "license": "ISC",
   "scripts": {
-    "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "build:app": "cpr dist/ngx-multi-level-push-menu src/@ramiz4/ngx-multi-level-push-menu && ng build --app packages && rimraf src/@ramiz4",

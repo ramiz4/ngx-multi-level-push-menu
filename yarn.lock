@@ -6747,13 +6747,13 @@ tsickle@^0.26.0:
     source-map "^0.5.6"
     source-map-support "^0.4.2"
 
-tsickle@^0.27.1:
-  version "0.27.1"
-  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.27.1.tgz#5eb8df9cccf1a765c82228038bbe96bf32787599"
+tsickle@^0.28.0:
+  version "0.28.0"
+  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.28.0.tgz#6cd6fa004766c6ad9261b599c83866ee97cc7875"
   dependencies:
     minimist "^1.2.0"
     mkdirp "^0.5.1"
-    source-map "^0.5.6"
+    source-map "^0.6.0"
     source-map-support "^0.5.0"
 
 tslib@^1.7.1:

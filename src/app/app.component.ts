@@ -18,8 +18,19 @@ export class AppComponent implements OnInit {
   constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
-    this.defaultItems.push(new MultiLevelPushMenuItem('Home', 'home'));
-    this.defaultItems.push(new MultiLevelPushMenuItem('About us', 'about-us'));
+    this.defaultItems.push(new MultiLevelPushMenuItem('Home', 'Home', null, 'home'));
+    this.defaultItems.push(new MultiLevelPushMenuItem('About us', 'About us', null, 'about-us'));
+
+    const company = new MultiLevelPushMenuItem('Company', 'Company', null, 'company');
+    company.items = new Array<MultiLevelPushMenuItem>();
+    const companySubMenu = new MultiLevelPushMenuItem('Company', 'Company', null, '#');
+    companySubMenu.items = new Array<MultiLevelPushMenuItem>();
+    companySubMenu.items.push(new MultiLevelPushMenuItem('Contact', 'Contact', null, 'contact'));
+    companySubMenu.items.push(new MultiLevelPushMenuItem('Imprint', 'Imprint',  null, 'imprint'));
+    company.items.push(companySubMenu);
+
+    this.defaultItems.push(company);
+
     const options: MultiLevelPushMenuOptions = new MultiLevelPushMenuOptions();
     options.mode = 'cover';
     options.menu = new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-reorder', this.defaultItems);

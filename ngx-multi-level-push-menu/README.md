@@ -20,11 +20,7 @@ $ npm i @ramiz4/ngx-multi-level-push-menu --save
 
 ## Install dependencies
 ```bash
-$ npm i jquery --save
-```
-
-```bash
-$ npm i font-awesome --save
+$ npm i jquery font-awesome --save
 ```
 
 ## Usage
@@ -123,7 +119,6 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.defaultItems.push(new MultiLevelPushMenuItem('Home', 'Home', null, 'home'));
     this.defaultItems.push(new MultiLevelPushMenuItem('About us', 'About us', null, 'about-us'));
-
     const company = new MultiLevelPushMenuItem('Company', 'Company', null, 'company');
     company.items = new Array<MultiLevelPushMenuItem>();
     const companySubMenu = new MultiLevelPushMenuItem('Company', 'Company', null, '#');
@@ -131,9 +126,7 @@ export class AppComponent implements OnInit {
     companySubMenu.items.push(new MultiLevelPushMenuItem('Contact', 'Contact', null, 'contact'));
     companySubMenu.items.push(new MultiLevelPushMenuItem('Imprint', 'Imprint',  null, 'imprint'));
     company.items.push(companySubMenu);
-
     this.defaultItems.push(company);
-
     const options: MultiLevelPushMenuOptions = new MultiLevelPushMenuOptions();
     options.mode = 'cover';
     options.menu = new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-reorder', this.defaultItems);
@@ -157,14 +150,6 @@ export class AppComponent implements OnInit {
 
   expandMenu(): void {
     this.multiLevelPushMenuService.expand();
-  }
-  
-  collapseMenu() {
-    this.mlpmService.collapse();
-  }
-
-  expandMenu() {
-    this.mlpmService.expand();
   }
 }
 ```
@@ -194,7 +179,6 @@ $ npm start
 ```
 
 ### Options
-
     collapsed: false,                                          // Initialize menu in collapsed/expanded mode
     menuID: 'multilevelpushmenu',                              // ID of <nav> element.
     wrapperClass: 'multilevelpushmenu_wrapper',                // Wrapper CSS class.

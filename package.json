@@ -36,7 +36,7 @@
     "@angular/tsc-wrapped": "~4.4.6",
     "@types/jasmine": "~2.8.6",
     "@types/node": "~10.9.0",
-    "codelyzer": "~4.4.0",
+    "codelyzer": "~4.5.0",
     "cpr": "^3.0.1",
     "jasmine-core": "~3.2.0",
     "jasmine-spec-reporter": "~4.2.1",

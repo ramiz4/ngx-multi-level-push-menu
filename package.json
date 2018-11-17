@@ -34,7 +34,7 @@
     "@angular/compiler-cli": "^5.2.10",
     "@angular/language-service": "~5.2.10",
     "@angular/tsc-wrapped": "~4.4.6",
-    "@types/jasmine": "~2.8.6",
+    "@types/jasmine": "~3.0.0",
     "@types/node": "~10.9.0",
     "codelyzer": "~4.4.0",
     "cpr": "^3.0.1",

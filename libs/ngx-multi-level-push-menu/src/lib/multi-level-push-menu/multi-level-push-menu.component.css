@@ -1,0 +1,18 @@
+::ng-deep app-root,
+::ng-deep multi-level-push-menu,
+::ng-deep app-credits {
+  display: block;
+}
+
+::ng-deep .multilevelpushmenu_wrapper li {
+  padding: 0 !important;
+}
+
+::ng-deep .multilevelpushmenu_wrapper a {
+  padding: .4em !important;
+}
+
+#content {
+  position: absolute;
+  top: 0;
+}

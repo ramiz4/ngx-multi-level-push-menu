@@ -1,0 +1,21 @@
+{
+  "npmScope": "ramiz4",
+  "implicitDependencies": {
+    "angular.json": "*",
+    "package.json": "*",
+    "tsconfig.json": "*",
+    "tslint.json": "*",
+    "nx.json": "*"
+  },
+  "projects": {
+    "multi-level-push-menu-example-e2e": {
+      "tags": []
+    },
+    "multi-level-push-menu-example": {
+      "tags": []
+    },
+    "ngx-multi-level-push-menu": {
+      "tags": []
+    }
+  }
+}

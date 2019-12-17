@@ -7,7 +7,7 @@ Multi-level push menu is cross-browser compatible angular 6+ component allowing 
 * [Options](#options)
 * [Features](#features)
 
-`@ramiz4/ngx-multi-level-push-menu` is an Angular component for generating a fancy push menu. It was built for modern browsers using _TypeScript, CSS3 and HTML5_ and Angular `>=4.0.0`.
+`@ramiz4/ngx-multi-level-push-menu` is an Angular component for generating a fancy push menu. It was built for modern browsers using _TypeScript, CSS3 and HTML5_ and Angular `>=6.0.0`.
 
 See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases) for recent changes.
 
@@ -28,13 +28,13 @@ $ npm i jquery font-awesome --save
 #### 1. Update your `angular.json`:
 ```json
 "styles": [
-  "../node_modules/font-awesome/css/font-awesome.min.css",
-  "../node_modules/@ramiz4/ngx-multi-level-push-menu/assets/css/jquery.multilevelpushmenu.min.css",
+  "node_modules/font-awesome/css/font-awesome.min.css",
+  "node_modules/@ramiz4/ngx-multi-level-push-menu/assets/css/jquery.multilevelpushmenu.css",
   "styles.css"
 ],
 "scripts": [
-  "../node_modules/jquery/dist/jquery.min.js",
-  "../node_modules/@ramiz4/ngx-multi-level-push-menu/assets/js/jquery.multilevelpushmenu.min.js"
+  "node_modules/jquery/dist/jquery.min.js",
+  "node_modules/@ramiz4/ngx-multi-level-push-menu/assets/js/jquery.multilevelpushmenu.js"
 ],
 ```
 
@@ -44,42 +44,19 @@ Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { RouterModule, Routes } from '@angular/router';
-import { MultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
+import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { AboutUsComponent } from './about-us/about-us.component';
-import { CollectionsComponent } from './collections/collections.component';
-import { CreditsComponent } from './credits/credits.component';
-import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-
-const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'about-us', component: AboutUsComponent },
-  { path: 'collections', component: CollectionsComponent },
-  { path: 'credits', component: CreditsComponent },
-  { path: '**', component: PageNotFoundComponent }
-]
 
 @NgModule({
   declarations: [
-    AppComponent,
-    HomeComponent,
-    AboutUsComponent,
-    CollectionsComponent,
-    CreditsComponent,
-    PageNotFoundComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
-    FormsModule,
-    HttpModule,
-    RouterModule.forRoot(routes),
-    MultiLevelPushMenuModule.forRoot()
+    AppRoutingModule,
+    NgxMultiLevelPushMenuModule.forRoot()
   ],
   providers: [
     MultiLevelPushMenuService
@@ -95,13 +72,48 @@ You need to add the RouterModule and define some routes. In this example there a
 $ ng g component home && ng g component about-us && ng g component collections && ng g component credits && ng g component page-not-found
 ```
 
+Edit the generated app-routing.module.ts to this:
+
+```ts
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HomeComponent } from './home/home.component';
+import { AboutUsComponent } from './about-us/about-us.component';
+import { CollectionsComponent } from './collections/collections.component';
+import { CreditsComponent } from './credits/credits.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
+  { path: 'about-us', component: AboutUsComponent },
+  { path: 'collections', component: CollectionsComponent },
+  { path: 'credits', component: CreditsComponent },
+  { path: '**', component: PageNotFoundComponent }
+];
+
+@NgModule({
+  declarations: [
+    HomeComponent,
+    AboutUsComponent,
+    CollectionsComponent,
+    CreditsComponent,
+    PageNotFoundComponent
+  ],
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
 #### 3. Add menu options and items to `app.component.ts`:
 ```ts
 import { Component, OnInit } from '@angular/core';
 import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
-  selector: 'ramiz4-root',
+  selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -385,11 +397,11 @@ Full list of options is provided below.
 
 #### 4. Replace content in `app.component.html`:
 ```html
-<multi-level-push-menu>
+<ramiz4-multi-level-push-menu [options]="options">
   <button (click)="collapseMenu()">collapse menu</button>
   <button (click)="expandMenu()">expand menu</button>
   <router-outlet></router-outlet>
-</multi-level-push-menu>
+</ramiz4-multi-level-push-menu>
 ```
 
 #### 5. Add to `styles.css` (optional):

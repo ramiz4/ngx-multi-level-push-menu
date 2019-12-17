@@ -1,14 +1,14 @@
 import { async, TestBed } from '@angular/core/testing';
-import { NgMultiLevelPushMenuModule } from './ngx-multi-level-push-menu.module';
+import { NgxMultiLevelPushMenuModule } from './ngx-multi-level-push-menu.module';
 
 describe('NgMultiLevelPushMenuModule', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [NgMultiLevelPushMenuModule]
+      imports: [NgxMultiLevelPushMenuModule]
     }).compileComponents();
   }));
 
   it('should create', () => {
-    expect(NgMultiLevelPushMenuModule).toBeDefined();
+    expect(NgxMultiLevelPushMenuModule).toBeDefined();
   });
 });

@@ -9,10 +9,10 @@ import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-p
   declarations: [MultiLevelPushMenuComponent],
   exports: [MultiLevelPushMenuComponent]
 })
-export class NgMultiLevelPushMenuModule {
+export class NgxMultiLevelPushMenuModule {
   public static forRoot(): ModuleWithProviders {
     return {
-      ngModule: NgMultiLevelPushMenuModule,
+      ngModule: NgxMultiLevelPushMenuModule,
       providers: [
         MultiLevelPushMenuService
       ]

@@ -43,12 +43,6 @@ jobs:
           path: ~/repo/dist
           destination: dist
 
-  deploy:
-    docker:
-      - image: circleci/node:12-browsers
-    steps:
-      - attach_workspace:
-          at: ~/repo
       - run:
           name: Set scope
           command: echo "scope=ramiz4" >> ~/repo/.npmrc
@@ -61,17 +55,3 @@ jobs:
       - run:
           name: Publish package
           command: npm publish dist/libs/ngx-multi-level-push-menu/
-
-workflows:
-  version: 2
-  only_build:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/

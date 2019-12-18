@@ -2,21 +2,19 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
 
 jobs:
   build:
     working_directory: ~/repo
     docker:
       - image: circleci/node:12-browsers
-
+      
     steps:
       - checkout
 
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package-lock.json" }}
+          key: dependency-cache-{{ checksum "package-lock.json" }}
 
       - run:
           name: Version Info
@@ -24,12 +22,15 @@ jobs:
             node --version \
               && yarn --version \
               && git --version
-      - run: yarn install
+
+      - run:
+          name: Install dependencies
+          command: yarn install
 
       - save_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package-lock.json" }}
 
       # Run unit tests!
       # - run: yarn test
@@ -41,15 +42,37 @@ jobs:
       - store_artifacts:
           path: ~/repo/dist
           destination: dist
-          
-    dependencies:
-      pre:
-        - echo "scope=ramiz4" >> ~/.npmrc
-        - echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
-        - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      
-    deployment:
-      npm:
-        tag: /v[0-9]+(\.[0-9]+)*/
-        commands:
-          - npm publish dist/libs/ngx-multi-level-push-menu/
+
+  deploy:
+    docker:
+      - image: circleci/node:12-browsers
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Set scope
+          command: echo "scope=ramiz4" >> ~/repo/.npmrc
+      - run:
+          name: Set registry URL
+          command: echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/repo/.npmrc
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+      - npm:
+          name: Publish package
+          tag: /v[0-9]+(\.[0-9]+)*/
+          command: npm publish dist/libs/ngx-multi-level-push-menu/
+
+workflows:
+  version: 2
+  only_build:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/

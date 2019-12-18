@@ -35,7 +35,7 @@ jobs:
       # - run: yarn test
 
       # Build affected apps and libraries
-      - run: yarn affected:build
+      - run: yarn affected:build --all
 
       # Store build artefacts on circle
       - store_artifacts:

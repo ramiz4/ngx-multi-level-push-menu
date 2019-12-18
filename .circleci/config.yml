@@ -58,9 +58,8 @@ jobs:
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
-      - npm:
+      - run:
           name: Publish package
-          tag: /v[0-9]+(\.[0-9]+)*/
           command: npm publish dist/libs/ngx-multi-level-push-menu/
 
 workflows:

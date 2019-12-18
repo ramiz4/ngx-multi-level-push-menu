@@ -70,7 +70,7 @@ workflows:
       - build
       - deploy:
           requires:
-            - test
+            - build
           filters:
             tags:
               only: /^v.*/

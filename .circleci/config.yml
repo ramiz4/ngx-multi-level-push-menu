@@ -33,11 +33,8 @@ jobs:
       # Run unit tests!
       # - run: yarn test
 
-      # Build the libraries
-      - run: yarn build:lib
-
-      # Build the demo apps (from library packages)
-      - run: yarn build:app
+      # Build affected apps and libraries
+      - run: yarn affected:build
 
       # Store build artefacts on circle
       - store_artifacts:
@@ -54,4 +51,4 @@ jobs:
       npm:
         tag: /v[0-9]+(\.[0-9]+)*/
         commands:
-          - npm publish dist/ngx-multi-level-push-menu/
+          - npm publish dist/libs/ngx-multi-level-push-menu/

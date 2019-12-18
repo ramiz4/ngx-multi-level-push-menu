@@ -1,6 +1,6 @@
 {
   "name": "ramiz4",
-  "version": "0.0.0",
+  "version": "2.0.3",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -27,7 +27,7 @@
     "dep-graph": "nx dep-graph",
     "help": "nx help"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^8.2.0",
     "@angular/common": "^8.2.0",

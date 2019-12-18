@@ -38,8 +38,8 @@ $ npm i jquery font-awesome --save
 ],
 ```
 
-#### 2. Import the `MultiLevelPushMenuModule` to `app.module.ts`:
-Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. You have to import `NgMultiLevelPushMenuModule.forRoot()` in the root NgModule `app.module.ts` of your application.
+#### 2. Import the `NgxMultiLevelPushMenuModule` to `app.module.ts`:
+Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. You have to import `NgxMultiLevelPushMenuModule.forRoot()` in the root NgModule `app.module.ts` of your application.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';

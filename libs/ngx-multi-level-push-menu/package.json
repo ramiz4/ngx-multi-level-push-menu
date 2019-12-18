@@ -1,6 +1,17 @@
 {
   "name": "@ramiz4/ngx-multi-level-push-menu",
-  "version": "2.0.2",
+  "version": "2.0.3",
+  "description": "a package manager for JavaScript",
+  "homepage": "https://github.com/ramiz4/ngx-multi-level-push-menu#readme",
+  "author": "Ramiz Loki <me@ramizloki.com> (https://ramizloki.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramiz4/ngx-multi-level-push-menu"
+  },
+  "bugs": { 
+    "url" : "https://github.com/ramiz4/ngx-multi-level-push-menu/issues"
+  },
+  "license": "MIT",
   "peerDependencies": {
     "@angular/common": "^8.2.11",
     "@angular/core": "^8.2.11",

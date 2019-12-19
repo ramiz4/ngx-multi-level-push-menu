@@ -8,7 +8,7 @@ jobs:
   build:
     working_directory: ~/repo
     docker:
-      - image: circleci/node:12-browsers
+      - image: circleci/node:12
       
     steps:
       - checkout
@@ -36,7 +36,7 @@ jobs:
       # - run: npm test
 
       # Build affected apps and libraries
-      - run: npm run affected:build --all
+      - run: npm run affected:build
 
       # Store build artefacts on circle
       - store_artifacts:

@@ -38,6 +38,10 @@ jobs:
       # Build affected apps and libraries
       - run: yarn affected:build --all
 
+      - run:
+        name: Copy assets to lib
+        command: cp -a ~/repo/libs/ngx-multi-level-push-menu/src/assets ~/repo/dist/libs/ngx-multi-level-push-menu/
+
       # Store build artefacts on circle
       - store_artifacts:
           path: ~/repo/dist

@@ -35,8 +35,11 @@ jobs:
       # Run unit tests!
       # - run: npm test
 
-      # Build affected apps and libraries
-      - run: npm run affected:build
+      # Build ngx-multi-level-push-menu library
+      - run: npm run build ngx-multi-level-push-menu
+
+      # Copy asssets to dist of ngx-multi-level-push-menu library
+      - run: npm run copy:lib:assets
 
       # Store build artefacts on circle
       - store_artifacts:

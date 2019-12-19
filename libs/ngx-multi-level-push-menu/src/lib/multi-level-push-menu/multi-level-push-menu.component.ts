@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, OnDestroy, Input, ViewChild, OnInit, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -36,6 +36,9 @@ export class MultiLevelPushMenuComponent implements OnInit, OnDestroy {
   expandSubscription: Subscription;
 
   constructor(private router: Router, private multiLevelPushMenuService: MultiLevelPushMenuService) {
+    this.menu = new ElementRef({});
+    this.content = new ElementRef({});
+
     this.collapseSubscription = this.multiLevelPushMenuService.collapsed().subscribe(level => {
       this.collapseMenu(level);
     });

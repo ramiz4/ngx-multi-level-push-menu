@@ -8,6 +8,8 @@ import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ng
 })
 export class AppComponent implements OnInit {
 
+  title = 'multi-level-push-menu-example';
+  
   options = new MultiLevelPushMenuOptions();
 
   constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) { }

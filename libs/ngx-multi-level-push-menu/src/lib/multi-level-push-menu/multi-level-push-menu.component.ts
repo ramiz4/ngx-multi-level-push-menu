@@ -1,10 +1,12 @@
-import { Component, OnDestroy, Input, ViewChild, OnInit, ElementRef } from '@angular/core';
+import { Component, OnDestroy, Input, ViewChild, OnInit, ElementRef, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 import { MultiLevelPushMenuOptions } from './multi-level-push-menu.model';
 
+// todo: add jquery plugin typings for multilevelpushmenu
+// import * as $ from 'jquery';
 declare var $: any;
 
 @Component({
@@ -35,7 +37,9 @@ export class MultiLevelPushMenuComponent implements OnInit, OnDestroy {
   collapseSubscription: Subscription;
   expandSubscription: Subscription;
 
-  constructor(private router: Router, private multiLevelPushMenuService: MultiLevelPushMenuService) {
+  constructor(private renderer: Renderer2,
+              private router: Router, 
+              private multiLevelPushMenuService: MultiLevelPushMenuService) {
     this.menu = new ElementRef({});
     this.content = new ElementRef({});
 
@@ -57,9 +61,9 @@ export class MultiLevelPushMenuComponent implements OnInit, OnDestroy {
     if (!options.menuWidth) {
       options.menuWidth = '300px';
     }
-    const offsetLeft = 'calc(' + options.menuWidth + ' + 20px)';
-    $(this.content.nativeElement).css('left', offsetLeft);
-    $(this.content.nativeElement).css('width', 'calc(100% - (' + options.menuWidth + ' + 20px))');
+
+    this.renderer.setStyle(this.content.nativeElement, 'left', 'calc(' + options.menuWidth + ' + 20px)');
+    this.renderer.setStyle(this.content.nativeElement, 'width', 'calc(100% - (' + options.menuWidth + ' + 20px))');
 
     const router = this.router;
 

@@ -45,7 +45,7 @@
     "@nrwl/angular": "^8.9.0",
     "core-js": "^3.6.1",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "rxjs": "^6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"

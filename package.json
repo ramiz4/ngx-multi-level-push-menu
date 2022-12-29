@@ -42,7 +42,7 @@
     "@angular/platform-browser": "^8.2.0",
     "@angular/platform-browser-dynamic": "^8.2.0",
     "@angular/router": "^8.2.0",
-    "@nrwl/angular": "^8.9.0",
+    "@nrwl/angular": "^15.4.2",
     "core-js": "^3.6.1",
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",
@@ -51,12 +51,12 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.803.21",
+    "@angular-devkit/build-angular": "^15.0.4",
     "@angular-devkit/build-ng-packagr": "^0.803.21",
     "@angular/cli": "8.3.21",
     "@angular/compiler-cli": "^8.2.0",
     "@angular/language-service": "^8.2.0",
-    "@nrwl/cypress": "8.9.0",
+    "@nrwl/cypress": "15.4.2",
     "@nrwl/jest": "8.9.0",
     "@nrwl/workspace": "8.9.0",
     "@types/jest": "^24.0.25",

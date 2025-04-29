@@ -46,6 +46,16 @@ jobs:
           destination: dist
 
       - run:
+          name: Verify NPM_TOKEN is set
+          command: |
+            if [ -z "$NPM_TOKEN" ]; then
+              echo "ERROR: NPM_TOKEN is not set"
+              exit 1
+            else
+              echo "NPM_TOKEN is set (value not shown for security)"
+            fi
+
+      - run:
           name: Set scope
           command: echo "scope=ramiz4" >> ~/.npmrc
 

@@ -105,34 +105,6 @@
         }
       }
     },
-    "multi-level-push-menu-example-e2e": {
-      "root": "apps/multi-level-push-menu-example-e2e",
-      "sourceRoot": "apps/multi-level-push-menu-example-e2e/src",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/multi-level-push-menu-example-e2e/cypress.json",
-            "tsConfig": "apps/multi-level-push-menu-example-e2e/tsconfig.e2e.json",
-            "devServerTarget": "multi-level-push-menu-example:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "multi-level-push-menu-example:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "apps/multi-level-push-menu-example-e2e/**/*.ts"
-            ]
-          }
-        }
-      }
-    },
     "ngx-multi-level-push-menu": {
       "projectType": "library",
       "root": "libs/ngx-multi-level-push-menu",

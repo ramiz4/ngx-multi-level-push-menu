@@ -69,10 +69,11 @@ export class MultiLevelPushMenuComponent
   private _options = new MultiLevelPushMenuOptions();
   private activeLevelHolders: HTMLElement[] = [];
   private menuLevels: Map<string, any> = new Map();
-  private isMobile: boolean = false;
-  private startX: number = 0;
-  private currentLevel: number = 0;
+  private isMobile = false;
+  private startX = 0;
+  private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
+  private lastReflowValue = 0; // Property to store reflow values
 
   collapseSubscription: Subscription;
   expandSubscription: Subscription;
@@ -442,7 +443,7 @@ export class MultiLevelPushMenuComponent
           });
 
           // Force a reflow to ensure styles are applied before animation
-          subLevelHolder.offsetWidth;
+          this.forceReflow(subLevelHolder);
         }
 
         // Add a small delay before showing the sublevel to ensure browser has time to process
@@ -534,14 +535,14 @@ export class MultiLevelPushMenuComponent
         // Set up the initial state to ensure animation will trigger
         this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
         // Force a reflow
-        levelHolder.offsetWidth;
+        const reflowValue = this.forceReflow(levelHolder);
         // Apply the animation direction
         this.renderer.setStyle(levelHolder, 'transform', 'translateX(100%)');
       } else {
         // Set up the initial state to ensure animation will trigger
         this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
         // Force a reflow
-        levelHolder.offsetWidth;
+        const reflowValue = this.forceReflow(levelHolder);
         // Apply the animation direction
         this.renderer.setStyle(levelHolder, 'transform', 'translateX(-100%)');
       }
@@ -657,6 +658,14 @@ export class MultiLevelPushMenuComponent
     }
   }
 
+  // Helper method to force a reflow without triggering linter warnings
+  private forceReflow(element: HTMLElement): number {
+    // Reading a property like offsetWidth forces a reflow
+    // Storing and using the result prevents linter warnings
+    this.lastReflowValue = element.offsetWidth;
+    return this.lastReflowValue;
+  }
+
   expandSubMenu(sublevelKey: string, level: number) {
     const sublevel = this.menuLevels.get(sublevelKey);
     if (!sublevel) return;
@@ -667,7 +676,7 @@ export class MultiLevelPushMenuComponent
     this.renderer.setStyle(element, 'visibility', 'visible');
 
     // Force a reflow before changing transform to ensure animation works
-    element.offsetWidth; // This forces a reflow
+    const reflowValue = this.forceReflow(element);
 
     // Now apply the animation by changing transform
     this.renderer.setProperty(element, '_slideState', 'in');
@@ -717,7 +726,7 @@ export class MultiLevelPushMenuComponent
         const element = value.element;
 
         // Force a reflow before changing transform to ensure animation works
-        element.offsetWidth; // This forces a reflow
+        const reflowValue = this.forceReflow(element);
 
         // Apply animation by directly modifying transform style with proper timing
         const animState = this._options.direction === 'rtl' ? 'outRtl' : 'out';

@@ -59,7 +59,7 @@
     "@angular/language-service": "^8.2.0",
     "@nrwl/cypress": "8.9.0",
     "@nrwl/jest": "8.9.0",
-    "@nrwl/workspace": "8.9.0",
+    "@nrwl/workspace": "^9.8.0",
     "@types/jest": "^24.0.25",
     "@types/node": "^13.1.2",
     "codelyzer": "^5.2.1",

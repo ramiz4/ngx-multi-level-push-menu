@@ -24,7 +24,7 @@
   min-height: 100%;
   margin: 0;
   padding: 0;
-  
+
   // Level holders
   .levelHolderClass {
     position: absolute;
@@ -37,26 +37,26 @@
     font-size: 1em;
     zoom: 1;
     transition: margin 0.4s ease-in-out;
-    
+
     // LTR (left-to-right) styling
     &.ltr {
       margin-left: -100%;
       left: 0;
       box-shadow: 5px 0 5px -5px #1f4164;
     }
-    
+
     // RTL (right-to-left) styling
     &.rtl {
       margin-right: -100%;
       right: 0;
       box-shadow: -5px 0 5px -5px #1f4164;
     }
-    
+
     // Inactive state
     &.multilevelpushmenu_inactive {
       background: #2e6196;
     }
-    
+
     // Headings
     h2 {
       font-size: 1.5em;
@@ -66,26 +66,26 @@
       padding: 0 0.4em;
       margin: 0;
     }
-    
+
     // Item lists
     ul {
       list-style: none;
       padding: 0;
       margin: 0;
-      
+
       li {
         cursor: pointer;
         border-top: 1px solid #295685;
         padding: 0.4em;
-        
+
         &:last-child {
           border-bottom: 1px solid #295685;
         }
-        
+
         &:hover {
           background-color: #295685;
         }
-        
+
         // Links
         a {
           display: block;
@@ -96,14 +96,14 @@
           padding: 0.2em;
           text-decoration: none;
           color: #fff;
-          
+
           &:hover {
             color: #ffe;
           }
         }
       }
     }
-    
+
     // Back button
     .backItemClass {
       display: block;
@@ -112,28 +112,28 @@
       border-top: 1px solid #295685;
     }
   }
-  
+
   // Utility classes
   .floatRight {
     float: right;
   }
-  
+
   .floatLeft {
     float: left;
   }
-  
+
   .cursorPointer {
     cursor: pointer;
   }
-  
+
   .iconSpacing_ltr {
     padding: 0 0.4em 0 0;
   }
-  
+
   .iconSpacing_rtl {
     padding: 0 0 0 0.4em;
   }
-  
+
   // Images in headings and links
   h2 > img,
   a > img {
@@ -145,7 +145,9 @@
 #content {
   position: absolute;
   top: 0;
-  width: calc(100% - 300px); /* Default - will be overridden by component logic */
+  width: calc(
+    100% - 300px
+  ); /* Default - will be overridden by component logic */
   height: 100%;
   transition: left 0.4s ease, width 0.4s ease;
   overflow: auto;

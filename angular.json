@@ -140,8 +140,8 @@
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-              "project": "libs/ngx-multi-level-push-menu/ng-package.json",
-              "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
+            "project": "libs/ngx-multi-level-push-menu/ng-package.json",
+            "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
           }
         },
         "lint": {

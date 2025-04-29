@@ -174,10 +174,11 @@ export class MultiLevelPushMenuComponent
     const levelHolder = this.renderer.createElement('div');
     this.renderer.addClass(levelHolder, 'levelHolderClass');
     this.renderer.setAttribute(levelHolder, 'data-level', level.toString());
-    
+
     // Don't apply animation trigger attribute directly with @ symbol
     // Instead, track animation state in a property
-    const initialState = level === 0 ? 'in' : (this._options.direction === 'rtl' ? 'outRtl' : 'out');
+    const initialState =
+      level === 0 ? 'in' : this._options.direction === 'rtl' ? 'outRtl' : 'out';
     this.renderer.setProperty(levelHolder, '_slideState', initialState);
 
     // Add direct styles to ensure they're applied
@@ -193,7 +194,7 @@ export class MultiLevelPushMenuComponent
     );
     this.renderer.setStyle(levelHolder, 'font-size', '1em');
     this.renderer.setStyle(levelHolder, 'zoom', '1');
-    
+
     // Apply proper animation styles directly
     if (initialState === 'in') {
       this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
@@ -202,9 +203,13 @@ export class MultiLevelPushMenuComponent
     } else if (initialState === 'outRtl') {
       this.renderer.setStyle(levelHolder, 'transform', 'translateX(100%)');
     }
-    
-    this.renderer.setStyle(levelHolder, 'transition', 'transform 400ms ease-in-out');
-    
+
+    this.renderer.setStyle(
+      levelHolder,
+      'transition',
+      'transform 400ms ease-in-out'
+    );
+
     this.renderer.setStyle(
       levelHolder,
       'width',
@@ -404,29 +409,37 @@ export class MultiLevelPushMenuComponent
             subLevelData,
             nextLevel
           );
-          
+
           // Force immediate visibility and proper initial positioning
           // This ensures the element is in the DOM and ready to be animated
           this.renderer.setStyle(subLevelHolder, 'visibility', 'visible');
-          
+
           // Position it properly first - off screen initially
           if (this._options.direction === 'rtl') {
-            this.renderer.setStyle(subLevelHolder, 'transform', 'translateX(100%)');
+            this.renderer.setStyle(
+              subLevelHolder,
+              'transform',
+              'translateX(100%)'
+            );
           } else {
-            this.renderer.setStyle(subLevelHolder, 'transform', 'translateX(-100%)');
+            this.renderer.setStyle(
+              subLevelHolder,
+              'transform',
+              'translateX(-100%)'
+            );
           }
-          
+
           this.renderer.appendChild(
             this.menuContainer.nativeElement,
             subLevelHolder
           );
-          
+
           this.menuLevels.set(sublevelKey, {
             element: subLevelHolder,
             data: subLevelData,
             parent: levelHolder
           });
-          
+
           // Force a reflow to ensure styles are applied before animation
           subLevelHolder.offsetWidth;
         }
@@ -501,20 +514,20 @@ export class MultiLevelPushMenuComponent
     this.renderer.listen(backAnchor, 'click', event => {
       event.preventDefault();
       event.stopPropagation();
-      
+
       // Get the current level
       const level = parseInt(levelHolder.getAttribute('data-level'), 10);
       const targetLevel = level - 1;
-      
+
       // Get target level element
       const targetLevelKey = `level-${targetLevel}`;
       const targetLevelData = this.menuLevels.get(targetLevelKey);
-      
+
       if (!targetLevelData) return;
-      
+
       // Make sure the target level is visible
       this.renderer.setStyle(targetLevelData.element, 'visibility', 'visible');
-      
+
       // Start the animation directly on the current level holder
       if (this._options.direction === 'rtl') {
         // Set up the initial state to ensure animation will trigger
@@ -531,31 +544,33 @@ export class MultiLevelPushMenuComponent
         // Apply the animation direction
         this.renderer.setStyle(levelHolder, 'transform', 'translateX(-100%)');
       }
-      
+
       // Update navigation state after animation completes
       setTimeout(() => {
         // Update the holder visibility
         this.renderer.setStyle(levelHolder, 'visibility', 'hidden');
-        
+
         // Update the current level
         this.currentLevel = targetLevel;
-        
+
         // Update active level holders
         this.activeLevelHolders = this.activeLevelHolders.filter(
-          holder => parseInt(holder.getAttribute('data-level'), 10) <= targetLevel
+          holder =>
+            parseInt(holder.getAttribute('data-level'), 10) <= targetLevel
         );
-        
+
         // Update visible holders
         this.visibleLevelHolders = this.visibleLevelHolders.filter(
-          holder => parseInt(holder.getAttribute('data-level'), 10) <= targetLevel
+          holder =>
+            parseInt(holder.getAttribute('data-level'), 10) <= targetLevel
         );
-        
+
         // Adjust content position if in overlap mode
         if (this._options.mode === 'overlap') {
           const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
           this.pushContent(overlapWidth * targetLevel);
         }
-        
+
         // Update change detection
         this.cdr.detectChanges();
       }, 400); // Match the animation duration
@@ -649,14 +664,14 @@ export class MultiLevelPushMenuComponent
 
     // Ensure element is in the DOM and visible first
     this.renderer.setStyle(element, 'visibility', 'visible');
-    
+
     // Force a reflow before changing transform to ensure animation works
     element.offsetWidth; // This forces a reflow
-    
+
     // Now apply the animation by changing transform
     this.renderer.setProperty(element, '_slideState', 'in');
     this.renderer.setStyle(element, 'transform', 'translateX(0)');
-    
+
     // Show this level - set margins after transform to avoid conflicts
     if (this._options.direction === 'rtl') {
       this.renderer.setStyle(element, 'margin-right', '0');
@@ -684,7 +699,7 @@ export class MultiLevelPushMenuComponent
       const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
       this.pushContent(overlapWidth * level);
     }
-    
+
     // Trigger change detection to apply animations
     this.cdr.detectChanges();
   }
@@ -699,21 +714,21 @@ export class MultiLevelPushMenuComponent
       .forEach(([key, value]) => {
         // Hide these levels
         const element = value.element;
-        
+
         // Force a reflow before changing transform to ensure animation works
         element.offsetWidth; // This forces a reflow
-        
+
         // Apply animation by directly modifying transform style with proper timing
         const animState = this._options.direction === 'rtl' ? 'outRtl' : 'out';
         this.renderer.setProperty(element, '_slideState', animState);
-        
+
         // Set transform immediately to trigger animation
         if (this._options.direction === 'rtl') {
           this.renderer.setStyle(element, 'transform', 'translateX(100%)');
         } else {
           this.renderer.setStyle(element, 'transform', 'translateX(-100%)');
         }
-        
+
         // Set margins after transform is applied
         const width = this.getElementWidth(element);
         if (this._options.direction === 'rtl') {
@@ -739,7 +754,7 @@ export class MultiLevelPushMenuComponent
       const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
       this.pushContent(overlapWidth * level);
     }
-    
+
     // Trigger change detection to apply animations
     this.cdr.detectChanges();
   }

@@ -2,11 +2,11 @@
 
 Multi-level push menu is cross-browser compatible angular 6+ component allowing endless nesting of navigation elements.
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Options](#options)
-* [Features](#features)
-* [Common Issues & Solutions](#common-issues--solutions)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Options](#options)
+- [Features](#features)
+- [Common Issues & Solutions](#common-issues--solutions)
 
 `@ramiz4/ngx-multi-level-push-menu` is an Angular component for generating a fancy push menu. It was built for modern browsers using _TypeScript, CSS3 and HTML5_ and Angular `>=6.0.0`.
 
@@ -45,26 +45,25 @@ Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
+import {
+  NgxMultiLevelPushMenuModule,
+  MultiLevelPushMenuService
+} from '@ramiz4/ngx-multi-level-push-menu';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgxMultiLevelPushMenuModule.forRoot()
   ],
-  providers: [
-    MultiLevelPushMenuService
-  ],
+  providers: [MultiLevelPushMenuService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}
 ```
 
 You need to add the RouterModule and define some routes. In this example there are defined 4 routes and therefor you need to create 4 components:
@@ -108,14 +107,17 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
 ```
 
 ### 3. Add menu options and items to `app.component.ts`
 
 ```ts
 import { Component, OnInit } from '@angular/core';
-import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
+import {
+  MultiLevelPushMenuService,
+  MultiLevelPushMenuOptions
+} from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
   selector: 'app-root',
@@ -123,16 +125,24 @@ import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ng
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-
   options = new MultiLevelPushMenuOptions();
 
-  constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) { }
+  constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
-    this.options.menu = { title: 'Company Name', id: 'menuID', icon: 'fa fa-reorder' };
+    this.options.menu = {
+      title: 'Company Name',
+      id: 'menuID',
+      icon: 'fa fa-reorder'
+    };
     this.options.menu.items = [
       { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },
-      { name: 'About Us', id: 'about-us', icon: 'fa fa-user', link: 'about-us' },
+      {
+        name: 'About Us',
+        id: 'about-us',
+        icon: 'fa fa-user',
+        link: 'about-us'
+      },
       {
         name: 'Devices',
         id: 'devices',
@@ -207,7 +217,8 @@ export class AppComponent implements OnInit {
 ### 5. Add to `styles.css` (optional)
 
 ```css
-html, body {
+html,
+body {
   margin: 0;
   height: 100%;
   overflow: hidden;
@@ -245,23 +256,23 @@ swipe: 'both'                                              // or 'touchscreen', 
 
 ## Features
 
-* Multi-level menu support
-* Endless nesting of navigation elements
-* Expand/Collapse navigation with a left/right swipe gesture
-* Push/Slide DOM elements of choice
-* Left-to-right and Right-to-left sliding directions
-* Flexible, simple markup
-* JS Array input, as HTML markup replacement
-* A number of exposed Options, Methods and Events
-* Cross-browser compatibility
-  * Chrome
-  * Firefox
-  * Safari
-  * IE11+
-  * Edge
-  * Android Browser
-  * iOS Safari
-* AoT Compilation Support
+- Multi-level menu support
+- Endless nesting of navigation elements
+- Expand/Collapse navigation with a left/right swipe gesture
+- Push/Slide DOM elements of choice
+- Left-to-right and Right-to-left sliding directions
+- Flexible, simple markup
+- JS Array input, as HTML markup replacement
+- A number of exposed Options, Methods and Events
+- Cross-browser compatibility
+  - Chrome
+  - Firefox
+  - Safari
+  - IE11+
+  - Edge
+  - Android Browser
+  - iOS Safari
+- AoT Compilation Support
 
 ## Common Issues & Solutions
 
@@ -274,6 +285,7 @@ If your menu is not visible when the application loads (shows as a collapsed men
 If clicking on menu items with children doesn't show the child menu items, check your menu structure. Each menu item with children should have an `items` array directly containing the child items. Avoid adding extra wrapper objects between a parent and its child items.
 
 Correct structure:
+
 ```typescript
 {
   name: 'Devices',
@@ -300,6 +312,7 @@ Correct structure:
 ### Mobile Support
 
 The menu supports both touch and mouse interactions. You can customize this with the `swipe` option:
+
 - `both`: Support both touch and mouse (default)
 - `touchscreen`: Support only touch devices
 - `desktop`: Support only mouse interactions

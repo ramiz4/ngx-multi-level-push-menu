@@ -1,4 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+/* For FontAwesome icons - if you're using them */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
 html,
 body {
   margin: 0;
@@ -9,6 +12,3 @@ body {
 body {
   font-family: Arial, sans-serif;
 }
-
-/* For FontAwesome icons - if you're using them */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');

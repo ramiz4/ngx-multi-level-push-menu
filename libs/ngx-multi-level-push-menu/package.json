@@ -8,8 +8,8 @@
     "type": "git",
     "url": "https://github.com/ramiz4/ngx-multi-level-push-menu"
   },
-  "bugs": { 
-    "url" : "https://github.com/ramiz4/ngx-multi-level-push-menu/issues"
+  "bugs": {
+    "url": "https://github.com/ramiz4/ngx-multi-level-push-menu/issues"
   },
   "license": "MIT",
   "peerDependencies": {

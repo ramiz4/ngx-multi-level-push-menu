@@ -16,7 +16,6 @@
             "main": "apps/multi-level-push-menu-example/src/main.ts",
             "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
             "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
-            "aot": true,
             "assets": [
               "apps/multi-level-push-menu-example/src/favicon.ico",
               "apps/multi-level-push-menu-example/src/assets"
@@ -25,7 +24,13 @@
               "node_modules/font-awesome/css/font-awesome.min.css",
               "apps/multi-level-push-menu-example/src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -56,7 +61,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",

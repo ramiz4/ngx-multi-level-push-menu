@@ -5,9 +5,7 @@
     {
       "files": ["*.ts"],
       "parserOptions": {
-        "project": [
-          "apps/multi-level-push-menu-example-e2e/tsconfig.e2e.json"
-        ],
+        "project": ["apps/multi-level-push-menu-example-e2e/tsconfig.e2e.json"],
         "createDefaultProgram": true
       },
       "rules": {

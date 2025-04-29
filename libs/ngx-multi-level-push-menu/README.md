@@ -45,23 +45,16 @@ Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import {
-  NgxMultiLevelPushMenuModule,
-  MultiLevelPushMenuService
-} from '@ramiz4/ngx-multi-level-push-menu';
+import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    NgxMultiLevelPushMenuModule.forRoot()
-  ],
+  imports: [BrowserModule, AppRoutingModule, NgxMultiLevelPushMenuModule.forRoot()],
   providers: [MultiLevelPushMenuService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}
 ```
@@ -93,19 +86,13 @@ const routes: Routes = [
   { path: 'about-us', component: AboutUsComponent },
   { path: 'collections', component: CollectionsComponent },
   { path: 'credits', component: CreditsComponent },
-  { path: '**', component: PageNotFoundComponent }
+  { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({
-  declarations: [
-    HomeComponent,
-    AboutUsComponent,
-    CollectionsComponent,
-    CreditsComponent,
-    PageNotFoundComponent
-  ],
+  declarations: [HomeComponent, AboutUsComponent, CollectionsComponent, CreditsComponent, PageNotFoundComponent],
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}
 ```
@@ -114,15 +101,12 @@ export class AppRoutingModule {}
 
 ```ts
 import { Component, OnInit } from '@angular/core';
-import {
-  MultiLevelPushMenuService,
-  MultiLevelPushMenuOptions
-} from '@ramiz4/ngx-multi-level-push-menu';
+import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   options = new MultiLevelPushMenuOptions();
@@ -133,7 +117,7 @@ export class AppComponent implements OnInit {
     this.options.menu = {
       title: 'Company Name',
       id: 'menuID',
-      icon: 'fa fa-reorder'
+      icon: 'fa fa-reorder',
     };
     this.options.menu.items = [
       { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },
@@ -141,7 +125,7 @@ export class AppComponent implements OnInit {
         name: 'About Us',
         id: 'about-us',
         icon: 'fa fa-user',
-        link: 'about-us'
+        link: 'about-us',
       },
       {
         name: 'Devices',
@@ -156,13 +140,13 @@ export class AppComponent implements OnInit {
             items: [
               {
                 name: 'Super Smart Phone',
-                link: 'xxx'
+                link: 'xxx',
               },
               {
                 name: 'Thin Magic Mobile',
-                link: 'xxx'
-              }
-            ]
+                link: 'xxx',
+              },
+            ],
           },
           {
             name: 'Televisions',
@@ -171,24 +155,24 @@ export class AppComponent implements OnInit {
             items: [
               {
                 name: 'Flat Super Screen',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Gigantic LED',
-                link: '#'
-              }
-            ]
-          }
-        ]
+                link: '#',
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'Collections',
-        link: 'collections'
+        link: 'collections',
       },
       {
         name: 'Credits',
-        link: 'credits'
-      }
+        link: 'credits',
+      },
     ];
   }
 

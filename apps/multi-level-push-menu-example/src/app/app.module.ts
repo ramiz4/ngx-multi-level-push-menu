@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
   NgxMultiLevelPushMenuModule,
-  MultiLevelPushMenuService
+  MultiLevelPushMenuService,
 } from '@ramiz4/ngx-multi-level-push-menu';
 
 import { AppComponent } from './app.component';
@@ -21,7 +21,7 @@ const routes: Routes = [
   { path: 'about-us', component: AboutUsComponent },
   { path: 'collections', component: CollectionsComponent },
   { path: 'credits', component: CreditsComponent },
-  { path: '**', component: PageNotFoundComponent }
+  { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({
@@ -31,15 +31,15 @@ const routes: Routes = [
     AboutUsComponent,
     CollectionsComponent,
     CreditsComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(routes, { initialNavigation: 'enabled' }),
-    NgxMultiLevelPushMenuModule.forRoot()
+    NgxMultiLevelPushMenuModule.forRoot(),
   ],
   providers: [MultiLevelPushMenuService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

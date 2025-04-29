@@ -8,8 +8,8 @@ jobs:
   build:
     working_directory: ~/repo
     docker:
-      - image: circleci/node:12
-      
+      - image: circleci/node:18
+
     steps:
       - checkout
 
@@ -36,9 +36,9 @@ jobs:
       #     name: Run unit tests
       #     command: npm test
 
-      - run: 
+      - run:
           name: Build ngx-multi-level-push-menu
-          command: npm run build ngx-multi-level-push-menu
+          command: npm run build:lib
 
       - store_artifacts:
           name: Store build artefacts on circle
@@ -48,15 +48,15 @@ jobs:
       - run:
           name: Set scope
           command: echo "scope=ramiz4" >> ~/.npmrc
-      
+
       - run:
           name: Set registry URL
           command: echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
-      
+
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      
+
       - run:
           name: Publish package
           command: npm publish dist/libs/ngx-multi-level-push-menu/

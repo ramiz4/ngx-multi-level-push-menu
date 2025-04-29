@@ -55,9 +55,12 @@
         "@typescript-eslint/no-unused-expressions": "error",
         "@typescript-eslint/no-var-requires": "error",
         "no-bitwise": "error",
-        "no-console": ["error", {
-          "allow": ["warn", "error"]
-        }],
+        "no-console": [
+          "error",
+          {
+            "allow": ["warn", "error"]
+          }
+        ],
         "no-eval": "error",
         "no-new": "error",
         "no-throw-literal": "error",

@@ -3,23 +3,22 @@ import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class MultiLevelPushMenuService {
+  private collapseSubject = new Subject<number>();
+  private expandSubject = new Subject();
 
-    private collapseSubject = new Subject<number>();
-    private expandSubject = new Subject();
+  collapse(level?: number) {
+    this.collapseSubject.next(level);
+  }
 
-    collapse(level?: number) {
-        this.collapseSubject.next(level);
-    }
+  collapsed(): Observable<number> {
+    return this.collapseSubject.asObservable();
+  }
 
-    collapsed(): Observable<number> {
-        return this.collapseSubject.asObservable();
-    }
+  expand() {
+    this.expandSubject.next();
+  }
 
-    expand() {
-        this.expandSubject.next();
-    }
-
-    expanded(): Observable<any> {
-        return this.expandSubject.asObservable();
-    }
+  expanded(): Observable<any> {
+    return this.expandSubject.asObservable();
+  }
 }

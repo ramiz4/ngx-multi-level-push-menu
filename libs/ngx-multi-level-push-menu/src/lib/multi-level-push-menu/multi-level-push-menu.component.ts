@@ -3,7 +3,7 @@ import {
   state,
   style,
   transition,
-  trigger
+  trigger,
 } from '@angular/animations';
 import {
   AfterViewInit,
@@ -16,14 +16,14 @@ import {
   OnInit,
   Renderer2,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
   MultiLevelPushMenuItem,
-  MultiLevelPushMenuOptions
+  MultiLevelPushMenuOptions,
 } from './multi-level-push-menu.model';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 
@@ -37,30 +37,31 @@ import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
       state(
         'in',
         style({
-          transform: 'translateX(0)'
+          transform: 'translateX(0)',
         })
       ),
       state(
         'out',
         style({
-          transform: 'translateX(-100%)'
+          transform: 'translateX(-100%)',
         })
       ),
       state(
         'outRtl',
         style({
-          transform: 'translateX(100%)'
+          transform: 'translateX(100%)',
         })
       ),
       transition('in => out', [animate('400ms ease-in-out')]),
       transition('out => in', [animate('400ms ease-in-out')]),
       transition('in => outRtl', [animate('400ms ease-in-out')]),
-      transition('outRtl => in', [animate('400ms ease-in-out')])
-    ])
-  ]
+      transition('outRtl => in', [animate('400ms ease-in-out')]),
+    ]),
+  ],
 })
 export class MultiLevelPushMenuComponent
-  implements OnInit, OnDestroy, AfterViewInit {
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @ViewChild('menuContainer') menuContainer: ElementRef;
   @ViewChild('contentContainer')
   contentContainer: ElementRef;
@@ -82,7 +83,7 @@ export class MultiLevelPushMenuComponent
       ...this._options,
       ...options,
       mode: options.mode || this._options.mode,
-      menu: options.menu || this._options.menu
+      menu: options.menu || this._options.menu,
     };
 
     if (this.menuContainer) {
@@ -104,7 +105,7 @@ export class MultiLevelPushMenuComponent
 
     this.collapseSubscription = this.multiLevelPushMenuService
       .collapsed()
-      .subscribe(level => {
+      .subscribe((level) => {
         this.collapseMenu(level);
       });
 
@@ -219,7 +220,7 @@ export class MultiLevelPushMenuComponent
     // Add to menu levels map
     this.menuLevels.set(`level-${level}`, {
       element: levelHolder,
-      data: menuData
+      data: menuData,
     });
 
     if (this._options.direction === 'rtl') {
@@ -264,7 +265,7 @@ export class MultiLevelPushMenuComponent
     if (menuData.icon) {
       const titleIcon = this.renderer.createElement('i');
       // Split class names and add them individually
-      menuData.icon.split(' ').forEach(className => {
+      menuData.icon.split(' ').forEach((className) => {
         if (className) this.renderer.addClass(titleIcon, className);
       });
       this.renderer.addClass(
@@ -281,7 +282,7 @@ export class MultiLevelPushMenuComponent
       }
       this.renderer.setStyle(titleIcon, 'cursor', 'pointer');
 
-      this.renderer.listen(titleIcon, 'click', event =>
+      this.renderer.listen(titleIcon, 'click', (event) =>
         this.titleIconClick(event, levelHolder)
       );
       this.renderer.appendChild(title, titleIcon);
@@ -352,7 +353,7 @@ export class MultiLevelPushMenuComponent
     if (item.icon) {
       const itemIcon = this.renderer.createElement('i');
       // Split class names and add them individually
-      item.icon.split(' ').forEach(className => {
+      item.icon.split(' ').forEach((className) => {
         if (className) this.renderer.addClass(itemIcon, className);
       });
 
@@ -371,7 +372,7 @@ export class MultiLevelPushMenuComponent
       const groupIcon = this.renderer.createElement('i');
       // Split class names and add them individually
       const groupIconClasses = this._options.groupIcon || 'fa fa-angle-left';
-      groupIconClasses.split(' ').forEach(className => {
+      groupIconClasses.split(' ').forEach((className) => {
         if (className) this.renderer.addClass(groupIcon, className);
       });
 
@@ -387,7 +388,7 @@ export class MultiLevelPushMenuComponent
       this.renderer.appendChild(anchor, groupIcon);
 
       // Handle click on item with sub-items
-      this.renderer.listen(anchor, 'click', event => {
+      this.renderer.listen(anchor, 'click', (event) => {
         event.preventDefault();
         if (this._options.preventGroupItemClick) {
           event.stopPropagation();
@@ -402,7 +403,7 @@ export class MultiLevelPushMenuComponent
             title: item.name,
             id: item.id || item.name,
             icon: item.icon,
-            items: item.items
+            items: item.items,
           };
 
           const subLevelHolder = this.createLevelHolder(
@@ -437,7 +438,7 @@ export class MultiLevelPushMenuComponent
           this.menuLevels.set(sublevelKey, {
             element: subLevelHolder,
             data: subLevelData,
-            parent: levelHolder
+            parent: levelHolder,
           });
 
           // Force a reflow to ensure styles are applied before animation
@@ -452,7 +453,7 @@ export class MultiLevelPushMenuComponent
       });
     } else {
       // Normal item click
-      this.renderer.listen(anchor, 'click', event => {
+      this.renderer.listen(anchor, 'click', (event) => {
         if (this._options.preventItemClick) {
           event.preventDefault();
         }
@@ -498,7 +499,7 @@ export class MultiLevelPushMenuComponent
     const backIcon = this.renderer.createElement('i');
     // Split class names and add them individually
     const backIconClasses = this._options.backItemIcon || 'fa fa-angle-right';
-    backIconClasses.split(' ').forEach(className => {
+    backIconClasses.split(' ').forEach((className) => {
       if (className) this.renderer.addClass(backIcon, className);
     });
 
@@ -511,7 +512,7 @@ export class MultiLevelPushMenuComponent
 
     this.renderer.appendChild(backAnchor, backIcon);
 
-    this.renderer.listen(backAnchor, 'click', event => {
+    this.renderer.listen(backAnchor, 'click', (event) => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -555,13 +556,13 @@ export class MultiLevelPushMenuComponent
 
         // Update active level holders
         this.activeLevelHolders = this.activeLevelHolders.filter(
-          holder =>
+          (holder) =>
             parseInt(holder.getAttribute('data-level'), 10) <= targetLevel
         );
 
         // Update visible holders
         this.visibleLevelHolders = this.visibleLevelHolders.filter(
-          holder =>
+          (holder) =>
             parseInt(holder.getAttribute('data-level'), 10) <= targetLevel
         );
 
@@ -746,7 +747,7 @@ export class MultiLevelPushMenuComponent
     // Update active level
     this.currentLevel = level;
     this.activeLevelHolders = this.activeLevelHolders.filter(
-      holder => parseInt(holder.getAttribute('data-level'), 10) <= level
+      (holder) => parseInt(holder.getAttribute('data-level'), 10) <= level
     );
 
     // Adjust the push content based on the active level
@@ -883,7 +884,7 @@ export class MultiLevelPushMenuComponent
   // Mobile detection
   mobileCheck(): boolean {
     let check = false;
-    (function(a) {
+    (function (a) {
       if (
         /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
           a

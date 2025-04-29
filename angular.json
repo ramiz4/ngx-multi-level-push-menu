@@ -16,9 +16,7 @@
             "main": "apps/multi-level-push-menu-example/src/main.ts",
             "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
             "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
-            "assets": [
-              "apps/multi-level-push-menu-example/src/favicon.ico"
-            ],
+            "assets": ["apps/multi-level-push-menu-example/src/favicon.ico"],
             "styles": [
               "node_modules/font-awesome/css/font-awesome.min.css",
               "apps/multi-level-push-menu-example/src/styles.css"
@@ -137,13 +135,13 @@
           "options": {
             "project": "libs/ngx-multi-level-push-menu/ng-package.json",
             "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
-          }
-        ,          "configurations": {
+          },
+          "configurations": {
             "production": {
               "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.prod.json"
             }
           }
-},
+        },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {

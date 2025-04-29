@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import {
   MultiLevelPushMenuOptions,
-  MultiLevelPushMenuService
+  MultiLevelPushMenuService,
 } from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
   selector: 'ramiz4-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'multi-level-push-menu-example';
@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
     this.options.menu = {
       title: 'Company Name',
       id: 'menuID',
-      icon: 'fa fa-reorder'
+      icon: 'fa fa-reorder',
     };
     this.options.menu.items = [
       { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },
@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
         name: 'About Us',
         id: 'about-us',
         icon: 'fa fa-user',
-        link: 'about-us'
+        link: 'about-us',
       },
       {
         name: 'Devices',
@@ -43,21 +43,21 @@ export class AppComponent implements OnInit {
             items: [
               {
                 name: 'Super Smart Phone',
-                link: 'xxx'
+                link: 'xxx',
               },
               {
                 name: 'Thin Magic Mobile',
-                link: 'xxx'
+                link: 'xxx',
               },
               {
                 name: 'Performance Crusher',
-                link: 'xxx'
+                link: 'xxx',
               },
               {
                 name: 'Futuristic Experience',
-                link: 'xxx'
-              }
-            ]
+                link: 'xxx',
+              },
+            ],
           },
           {
             name: 'Televisions',
@@ -66,25 +66,25 @@ export class AppComponent implements OnInit {
             items: [
               {
                 name: 'Flat Super Screen',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Gigantic LED',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Power Eater',
-                link: '#'
+                link: '#',
               },
               {
                 name: '3D Experience',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Classic Comfort',
-                link: '#'
-              }
-            ]
+                link: '#',
+              },
+            ],
           },
           {
             name: 'Cameras',
@@ -93,23 +93,23 @@ export class AppComponent implements OnInit {
             items: [
               {
                 name: 'Smart Shot',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Power Shooter',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Easy Photo Maker',
-                link: '#'
+                link: '#',
               },
               {
                 name: 'Super Pixel',
-                link: '#'
-              }
-            ]
-          }
-        ]
+                link: '#',
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'Magazines',
@@ -118,29 +118,29 @@ export class AppComponent implements OnInit {
         items: [
           {
             name: 'National Geographics',
-            link: '#'
+            link: '#',
           },
           {
             name: 'Scientific American',
-            link: '#'
+            link: '#',
           },
           {
             name: 'The Spectator',
-            link: '#'
+            link: '#',
           },
           {
             name: 'Rambler',
-            link: '#'
+            link: '#',
           },
           {
             name: 'Physics World',
-            link: '#'
+            link: '#',
           },
           {
             name: 'The New Scientist',
-            link: '#'
-          }
-        ]
+            link: '#',
+          },
+        ],
       },
       {
         name: 'Store',
@@ -159,25 +159,25 @@ export class AppComponent implements OnInit {
                 items: [
                   {
                     name: 'Tops',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Dresses',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Trousers',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Shoes',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Sale',
-                    link: '#'
-                  }
-                ]
+                    link: '#',
+                  },
+                ],
               },
               {
                 name: "Men's Clothing",
@@ -186,46 +186,46 @@ export class AppComponent implements OnInit {
                 items: [
                   {
                     name: 'Shirts',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Trousers',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Shoes',
-                    link: '#'
+                    link: '#',
                   },
                   {
                     name: 'Sale',
-                    link: '#'
-                  }
-                ]
-              }
-            ]
+                    link: '#',
+                  },
+                ],
+              },
+            ],
           },
           {
             name: 'Jewelry',
-            link: '#'
+            link: '#',
           },
           {
             name: 'Music',
-            link: '#'
+            link: '#',
           },
           {
             name: 'Grocery',
-            link: '#'
-          }
-        ]
+            link: '#',
+          },
+        ],
       },
       {
         name: 'Collections',
-        link: 'collections'
+        link: 'collections',
       },
       {
         name: 'Credits',
-        link: 'credits'
-      }
+        link: 'credits',
+      },
     ];
   }
 

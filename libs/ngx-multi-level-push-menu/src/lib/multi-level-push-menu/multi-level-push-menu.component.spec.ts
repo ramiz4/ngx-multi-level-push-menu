@@ -10,16 +10,17 @@ describe('MultiLevelPushMenuComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
+    imports: [
         RouterTestingModule.withRoutes([]),
-      ],
-      declarations: [ 
-        MultiLevelPushMenuComponent 
-      ],
-      providers: [           
+    ],
+    declarations: [
+        MultiLevelPushMenuComponent
+    ],
+    providers: [
         MultiLevelPushMenuService,
-      ]
-    })
+    ],
+    teardown: { destroyAfterEach: false }
+})
     .compileComponents();
   }));
 

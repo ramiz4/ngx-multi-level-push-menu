@@ -16,20 +16,20 @@
             "main": "apps/multi-level-push-menu-example/src/main.ts",
             "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
             "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
-            "aot": false,
             "assets": [
-              "apps/multi-level-push-menu-example/src/favicon.ico",
-              "apps/multi-level-push-menu-example/src/assets"
+              "apps/multi-level-push-menu-example/src/favicon.ico"
             ],
             "styles": [
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "libs/ngx-multi-level-push-menu/src/assets/css/jquery.multilevelpushmenu.css",
               "apps/multi-level-push-menu-example/src/styles.css"
             ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "libs/ngx-multi-level-push-menu/src/assets/js/jquery.multilevelpushmenu.js"
-            ]
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -42,9 +42,7 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -61,7 +59,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -81,15 +80,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "apps/multi-level-push-menu-example/tsconfig.app.json",
-              "apps/multi-level-push-menu-example/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/multi-level-push-menu-example/**"
+            "lintFilePatterns": [
+              "apps/multi-level-push-menu-example/**/*.ts",
+              "apps/multi-level-push-menu-example/**/*.html"
             ]
           }
         },
@@ -122,14 +117,10 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "apps/multi-level-push-menu-example-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/multi-level-push-menu-example-e2e/**"
+            "lintFilePatterns": [
+              "apps/multi-level-push-menu-example-e2e/**/*.ts"
             ]
           }
         }
@@ -144,20 +135,21 @@
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-              "project": "libs/ngx-multi-level-push-menu/ng-package.json",
-              "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
+            "project": "libs/ngx-multi-level-push-menu/ng-package.json",
+            "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
           }
-        },
+        ,          "configurations": {
+            "production": {
+              "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.prod.json"
+            }
+          }
+},
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "libs/ngx-multi-level-push-menu/tsconfig.lib.json",
-              "libs/ngx-multi-level-push-menu/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/ngx-multi-level-push-menu/**"
+            "lintFilePatterns": [
+              "libs/ngx-multi-level-push-menu/**/*.ts",
+              "libs/ngx-multi-level-push-menu/**/*.html"
             ]
           }
         },

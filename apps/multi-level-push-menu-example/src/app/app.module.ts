@@ -1,8 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
+import {
+  NgxMultiLevelPushMenuModule,
+  MultiLevelPushMenuService
+} from '@ramiz4/ngx-multi-level-push-menu';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -18,7 +22,7 @@ const routes: Routes = [
   { path: 'collections', component: CollectionsComponent },
   { path: 'credits', component: CreditsComponent },
   { path: '**', component: PageNotFoundComponent }
-]
+];
 
 @NgModule({
   declarations: [
@@ -31,12 +35,11 @@ const routes: Routes = [
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot(routes, { initialNavigation: 'enabled' }),
     NgxMultiLevelPushMenuModule.forRoot()
   ],
-  providers: [
-    MultiLevelPushMenuService
-  ],
+  providers: [MultiLevelPushMenuService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

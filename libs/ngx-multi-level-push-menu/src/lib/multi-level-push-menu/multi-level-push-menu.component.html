@@ -1,12 +1,6 @@
-<!-- <p>multi-level-push-menu works!</p>
-
-<ul>
-  <li *ngFor="let item of items">{{ item }}</li>
-</ul> -->
-
-<div #menu id="menu">
-</div>
-
-<div #content id="content">
-  <ng-content></ng-content>
+<div class="multilevelpushmenu-wrapper">
+  <nav #menuContainer id="{{ options.menuID || 'multilevelpushmenu' }}"></nav>
+  <div #contentContainer id="content">
+    <ng-content></ng-content>
+  </div>
 </div>

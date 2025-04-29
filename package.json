@@ -1,6 +1,6 @@
 {
   "name": "ramiz4",
-  "version": "14.0.0",
+  "version": "14.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -30,7 +30,8 @@
     "update:check": "ng update",
     "workspace-schematic": "nx workspace-schematic",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "publish:ci": "npm publish dist/libs/ngx-multi-level-push-menu/ --access=public --ignore-scripts --no-git-checks"
   },
   "private": false,
   "dependencies": {

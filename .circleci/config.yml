@@ -56,17 +56,12 @@ jobs:
             fi
 
       - run:
-          name: Set scope
-          command: echo "scope=ramiz4" >> ~/.npmrc
-
-      - run:
-          name: Set registry URL
-          command: echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
-
-      - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          name: Configure npm for CI publishing
+          command: |
+            echo "registry=https://registry.npmjs.org/" > ~/.npmrc
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            npm config set access public
 
       - run:
           name: Publish package
-          command: npm publish dist/libs/ngx-multi-level-push-menu/ --access=public
+          command: npm run publish:ci

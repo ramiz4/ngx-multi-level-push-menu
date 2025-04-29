@@ -7,12 +7,13 @@ import { NgxMultiLevelPushMenuModule } from "@ramiz4/ngx-multi-level-push-menu";
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
+    imports: [
         RouterTestingModule,
         NgxMultiLevelPushMenuModule.forRoot()
-      ],
-      declarations: [AppComponent]
-    }).compileComponents();
+    ],
+    declarations: [AppComponent],
+    teardown: { destroyAfterEach: false }
+}).compileComponents();
   }));
 
   it('should create the app', () => {

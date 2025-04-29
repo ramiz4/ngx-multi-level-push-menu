@@ -4,8 +4,9 @@ import { NgxMultiLevelPushMenuModule } from './ngx-multi-level-push-menu.module'
 describe('NgMultiLevelPushMenuModule', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [NgxMultiLevelPushMenuModule]
-    }).compileComponents();
+    imports: [NgxMultiLevelPushMenuModule],
+    teardown: { destroyAfterEach: false }
+}).compileComponents();
   }));
 
   it('should create', () => {

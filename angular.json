@@ -77,15 +77,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "apps/multi-level-push-menu-example/tsconfig.app.json",
-              "apps/multi-level-push-menu-example/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/multi-level-push-menu-example/**"
+            "lintFilePatterns": [
+              "apps/multi-level-push-menu-example/**/*.ts",
+              "apps/multi-level-push-menu-example/**/*.html"
             ]
           }
         },
@@ -118,14 +114,10 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "apps/multi-level-push-menu-example-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/multi-level-push-menu-example-e2e/**"
+            "lintFilePatterns": [
+              "apps/multi-level-push-menu-example-e2e/**/*.ts"
             ]
           }
         }
@@ -145,15 +137,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "libs/ngx-multi-level-push-menu/tsconfig.lib.json",
-              "libs/ngx-multi-level-push-menu/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/ngx-multi-level-push-menu/**"
+            "lintFilePatterns": [
+              "libs/ngx-multi-level-push-menu/**/*.ts",
+              "libs/ngx-multi-level-push-menu/**/*.html"
             ]
           }
         },

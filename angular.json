@@ -23,13 +23,9 @@
             ],
             "styles": [
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "libs/ngx-multi-level-push-menu/src/assets/css/jquery.multilevelpushmenu.css",
               "apps/multi-level-push-menu-example/src/styles.css"
             ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "libs/ngx-multi-level-push-menu/src/assets/js/jquery.multilevelpushmenu.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {

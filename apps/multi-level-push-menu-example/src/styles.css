@@ -2,4 +2,13 @@
 html,
 body {
   margin: 0;
+  height: 100%;
+  overflow: hidden;
 }
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* For FontAwesome icons - if you're using them */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');

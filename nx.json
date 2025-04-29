@@ -7,15 +7,20 @@
     "tslint.json": "*",
     "nx.json": "*"
   },
-  "projects": {
-    "multi-level-push-menu-example-e2e": {
-      "tags": []
-    },
-    "multi-level-push-menu-example": {
-      "tags": []
-    },
-    "ngx-multi-level-push-menu": {
-      "tags": []
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
+      }
     }
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"]
+    }
+  },
+  "affected": {
+    "defaultBase": "main"
   }
 }

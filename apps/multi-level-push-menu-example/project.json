@@ -1,0 +1,83 @@
+{
+  "projectType": "application",
+  "root": "apps/multi-level-push-menu-example",
+  "sourceRoot": "apps/multi-level-push-menu-example/src",
+  "prefix": "app",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/multi-level-push-menu-example",
+        "index": "apps/multi-level-push-menu-example/src/index.html",
+        "main": "apps/multi-level-push-menu-example/src/main.ts",
+        "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
+        "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
+        "assets": [
+          "apps/multi-level-push-menu-example/src/favicon.ico",
+          "apps/multi-level-push-menu-example/src/assets"
+        ],
+        "styles": ["apps/multi-level-push-menu-example/src/styles.css"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/multi-level-push-menu-example/src/environments/environment.ts",
+              "with": "apps/multi-level-push-menu-example/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false,
+          "buildOptimizer": true,
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "10kb"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "browserTarget": "multi-level-push-menu-example:build"
+      },
+      "configurations": {
+        "production": {
+          "browserTarget": "multi-level-push-menu-example:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/multi-level-push-menu-example/src/**/*.ts",
+          "apps/multi-level-push-menu-example/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/multi-level-push-menu-example"],
+      "options": {
+        "jestConfig": "apps/multi-level-push-menu-example/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

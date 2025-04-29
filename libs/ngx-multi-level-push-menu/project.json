@@ -1,0 +1,42 @@
+{
+  "projectType": "library",
+  "root": "libs/ngx-multi-level-push-menu",
+  "sourceRoot": "libs/ngx-multi-level-push-menu/src",
+  "prefix": "lib",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:package",
+      "outputs": ["dist/libs/ngx-multi-level-push-menu"],
+      "options": {
+        "project": "libs/ngx-multi-level-push-menu/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ngx-multi-level-push-menu"],
+      "options": {
+        "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/ngx-multi-level-push-menu/src/**/*.ts",
+          "libs/ngx-multi-level-push-menu/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

@@ -12,6 +12,9 @@
     "url": "https://github.com/ramiz4/ngx-multi-level-push-menu/issues"
   },
   "license": "MIT",
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
   "peerDependencies": {
     "@angular/common": "^8.2.11",
     "@angular/core": "^8.2.11",

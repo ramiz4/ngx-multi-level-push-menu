@@ -36,7 +36,7 @@ const routes: Routes = [
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    RouterModule.forRoot(routes, { initialNavigation: 'enabled' }),
+    RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' }),
     NgxMultiLevelPushMenuModule.forRoot(),
   ],
   providers: [MultiLevelPushMenuService],

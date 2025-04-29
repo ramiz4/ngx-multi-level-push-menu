@@ -4,7 +4,7 @@ import { Observable, Subject } from 'rxjs';
 @Injectable()
 export class MultiLevelPushMenuService {
   private collapseSubject = new Subject<number>();
-  private expandSubject = new Subject();
+  private expandSubject = new Subject<void>();
 
   collapse(level?: number) {
     this.collapseSubject.next(level);

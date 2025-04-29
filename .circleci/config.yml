@@ -59,4 +59,4 @@ jobs:
 
       - run:
           name: Publish package
-          command: npm publish dist/libs/ngx-multi-level-push-menu/
+          command: npm publish dist/libs/ngx-multi-level-push-menu/ --access=public

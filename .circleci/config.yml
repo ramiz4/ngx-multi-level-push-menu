@@ -32,29 +32,31 @@ jobs:
           paths:
             - node_modules
 
-      # Run unit tests!
-      # - run: npm test
+      - run:
+          name: Run unit tests
+          command: npm test
 
-      # Build ngx-multi-level-push-menu library
-      - run: npm run build ngx-multi-level-push-menu
+      - run: 
+          name: Build ngx-multi-level-push-menu
+          command: npm run build ngx-multi-level-push-menu
 
-      # Copy asssets to dist of ngx-multi-level-push-menu library
-      - run: npm run copy:lib:assets
-
-      # Store build artefacts on circle
       - store_artifacts:
+          name: Store build artefacts on circle
           path: ~/repo/dist
           destination: dist
 
       - run:
           name: Set scope
           command: echo "scope=ramiz4" >> ~/.npmrc
+      
       - run:
           name: Set registry URL
           command: echo "@ramiz4:registry=https://registry.npmjs.org/" >> ~/.npmrc
+      
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      
       - run:
           name: Publish package
           command: npm publish dist/libs/ngx-multi-level-push-menu/

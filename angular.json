@@ -17,8 +17,7 @@
             "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
             "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
             "assets": [
-              "apps/multi-level-push-menu-example/src/favicon.ico",
-              "apps/multi-level-push-menu-example/src/assets"
+              "apps/multi-level-push-menu-example/src/favicon.ico"
             ],
             "styles": [
               "node_modules/font-awesome/css/font-awesome.min.css",

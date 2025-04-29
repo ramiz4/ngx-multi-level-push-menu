@@ -61,8 +61,8 @@ import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 })
 export class MultiLevelPushMenuComponent
   implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('menuContainer', { static: false }) menuContainer: ElementRef;
-  @ViewChild('contentContainer', { static: false })
+  @ViewChild('menuContainer') menuContainer: ElementRef;
+  @ViewChild('contentContainer')
   contentContainer: ElementRef;
 
   private _options = new MultiLevelPushMenuOptions();

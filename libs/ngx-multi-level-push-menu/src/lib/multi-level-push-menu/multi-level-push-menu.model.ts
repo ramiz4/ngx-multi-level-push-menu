@@ -1,27 +1,63 @@
 export class MultiLevelPushMenuOptions {
-  constructor(
-    public menu?: MultiLevelPushMenu, // JS array of menu items (if markup not provided).
-    public mode?: string, // Menu sliding mode?: overlap/cover.
-    public collapsed?: boolean, // Initialize menu in collapsed/expanded mode
-    public menuID?: string, // ID of <nav> element.
-    public wrapperClass?: string, // Wrapper CSS class.
-    public menuInactiveClass?: string, // CSS class for inactive wrappers.
-    public menuWidth?: string, // Wrapper width (integer, '%', 'px', 'em').
-    public menuHeight?: string, // Menu height (integer, '%', 'px', 'em').
-    public backText?: string, // Text for 'Back' menu item.
-    public backItemClass?: string, // CSS class for back menu item.
-    public backItemIcon?: string, // FontAvesome icon used for back menu item.
-    public groupIcon?: string, // FontAvesome icon used for menu items contaning sub-items.
-    public overlapWidth?: string, // Width in px of menu wrappers overlap
-    public preventItemClick?: boolean, // set to false if you do not need event callback functionality per item click
-    public preventGroupItemClick?: boolean, // set to false if you do not need event callback functionality per group item click
-    public direction?: string, // set to 'rtl' for reverse sliding direction
-    public fullCollapse?: boolean, // set to true to fully hide base level holder when collapsed
-    public swipe?: string // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
-  ) {
-    this.menu =
-      menu || new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-bars');
-    this.mode = mode || 'cover';
+  /** JS array of menu items (if markup not provided) */
+  public menu = new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-bars');
+  
+  /** Menu sliding mode: overlap/cover */
+  public mode = 'cover';
+  
+  /** Initialize menu in collapsed/expanded mode */
+  public collapsed = false;
+  
+  /** ID of <nav> element */
+  public menuID?: string;
+  
+  /** Wrapper CSS class */
+  public wrapperClass?: string;
+  
+  /** CSS class for inactive wrappers */
+  public menuInactiveClass?: string;
+  
+  /** Wrapper width (integer, '%', 'px', 'em') */
+  public menuWidth = '300px';
+  
+  /** Menu height (integer, '%', 'px', 'em') */
+  public menuHeight?: string;
+  
+  /** Text for 'Back' menu item */
+  public backText = 'Back';
+  
+  /** CSS class for back menu item */
+  public backItemClass = 'back-item';
+  
+  /** FontAwesome icon used for back menu item */
+  public backItemIcon = 'fa fa-angle-right';
+  
+  /** FontAwesome icon used for menu items containing sub-items */
+  public groupIcon = 'fa fa-angle-left';
+  
+  /** Width in px of menu wrappers overlap */
+  public overlapWidth = '55';
+  
+  /** Set to false if you do not need event callback functionality per item click */
+  public preventItemClick = true;
+  
+  /** Set to false if you do not need event callback functionality per group item click */
+  public preventGroupItemClick = true;
+  
+  /** Set to 'rtl' for reverse sliding direction */
+  public direction = 'ltr';
+  
+  /** Set to true to fully hide base level holder when collapsed */
+  public fullCollapse = false;
+  
+  /** 'touchscreen', 'desktop', or 'none'. Everything else is considered as 'none' */
+  public swipe = 'both';
+
+  constructor(options?: Partial<MultiLevelPushMenuOptions>) {
+    if (options) {
+      // Apply provided options over defaults
+      Object.assign(this, options);
+    }
   }
 }
 
@@ -43,4 +79,16 @@ export class MultiLevelPushMenuItem {
     public link?: string,
     public items?: Array<MultiLevelPushMenuItem>
   ) {}
+}
+
+/**
+ * Represents the data structure for a menu level in the multi-level push menu
+ */
+export interface MenuLevelData {
+  /** The DOM element representing this menu level */
+  element: HTMLElement;
+  /** The menu item data for this level */
+  data: MultiLevelPushMenuItem;
+  /** Optional parent element for nested levels */
+  parent?: HTMLElement;
 }

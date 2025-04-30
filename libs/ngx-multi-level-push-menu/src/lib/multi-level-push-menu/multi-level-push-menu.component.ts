@@ -21,12 +21,15 @@ import {
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
+  MenuLevelData,
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
 } from './multi-level-push-menu.model';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 
-const DEFAULT_OVERLAP_WIDTH = '55';
+// Constants
+const ANIMATION_DURATION = 400;
+const CONTENT_PADDING = 20;
 
 @Component({
   selector: 'ramiz4-multi-level-push-menu',
@@ -36,60 +39,41 @@ const DEFAULT_OVERLAP_WIDTH = '55';
   encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('slideInOut', [
-      state(
-        'in',
-        style({
-          transform: 'translateX(0)',
-        })
-      ),
-      state(
-        'out',
-        style({
-          transform: 'translateX(-100%)',
-        })
-      ),
-      state(
-        'outRtl',
-        style({
-          transform: 'translateX(100%)',
-        })
-      ),
-      transition('in => out', [animate('400ms ease-in-out')]),
-      transition('out => in', [animate('400ms ease-in-out')]),
-      transition('in => outRtl', [animate('400ms ease-in-out')]),
-      transition('outRtl => in', [animate('400ms ease-in-out')]),
+      state('in', style({ transform: 'translateX(0)' })),
+      state('out', style({ transform: 'translateX(-100%)' })),
+      state('outRtl', style({ transform: 'translateX(100%)' })),
+      transition('in => out', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
+      transition('out => in', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
+      transition('in => outRtl', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
+      transition('outRtl => in', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
     ]),
   ],
 })
 export class MultiLevelPushMenuComponent
   implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('menuContainer') menuContainer!: ElementRef;
-  @ViewChild('contentContainer')
-  contentContainer!: ElementRef;
+  @ViewChild('contentContainer') contentContainer!: ElementRef;
 
   private _options = new MultiLevelPushMenuOptions();
   private activeLevelHolders: HTMLElement[] = [];
-  private menuLevels: Map<
-    string,
-    { element: HTMLElement; data: MultiLevelPushMenuItem; parent?: HTMLElement }
-  > = new Map();
+  private menuLevels = new Map<string, MenuLevelData>();
   private isMobile = false;
   private startX = 0;
   private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
-  private lastReflowValue = 0; // Property to store reflow values
+  private lastReflowValue = 0;
 
-  collapseSubscription: Subscription;
-  expandSubscription: Subscription;
+  // Subscriptions with initializers
+  private collapseSubscription: Subscription = new Subscription();
+  private expandSubscription: Subscription = new Subscription();
 
   @Input()
   set options(options: MultiLevelPushMenuOptions) {
-    this._options = {
-      ...this._options,
-      ...options,
-      mode: options.mode || this._options.mode,
-      menu: options.menu || this._options.menu,
-    };
+    // Simply use Object.assign to apply any custom options
+    // This works because our new class already has all default values
+    if (options) {
+      Object.assign(this._options, options);
+    }
 
     if (this.menuContainer) {
       this.initMenu();
@@ -106,8 +90,24 @@ export class MultiLevelPushMenuComponent
     private multiLevelPushMenuService: MultiLevelPushMenuService,
     private cdr: ChangeDetectorRef
   ) {
-    this.isMobile = this.mobileCheck();
+  }
 
+  ngOnInit(): void {
+    this.isMobile = this.mobileCheck();
+    this.setupSubscriptions();
+  }
+
+  ngAfterViewInit(): void {
+    this.initMenu();
+    this.cdr.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe();
+  }
+
+  // Setup service subscriptions
+  private setupSubscriptions(): void {
     this.collapseSubscription = this.multiLevelPushMenuService
       .collapsed()
       .subscribe((level) => {
@@ -121,35 +121,20 @@ export class MultiLevelPushMenuComponent
       });
   }
 
-  ngOnInit() {
-    if (!this._options.menuWidth) {
-      this._options.menuWidth = '300px';
+  private unsubscribe(): void {
+    if (this.collapseSubscription) {
+      this.collapseSubscription.unsubscribe();
+    }
+    if (this.expandSubscription) {
+      this.expandSubscription.unsubscribe();
     }
   }
 
-  ngAfterViewInit() {
-    this.initMenu();
-    this.cdr.detectChanges();
-  }
-
-  initMenu() {
+  // Menu initialization
+  initMenu(): void {
     if (!this.menuContainer || !this.contentContainer) return;
 
-    const menuWidth = this._options.menuWidth;
-
-    // Set content position and width
-    this.renderer.setStyle(
-      this.contentContainer.nativeElement,
-      'left',
-      `calc(${menuWidth} + 20px)`
-    );
-    this.renderer.setStyle(
-      this.contentContainer.nativeElement,
-      'width',
-      `calc(100% - (${menuWidth} + 20px))`
-    );
-
-    // Create menu structure
+    this.setContentPositionAndWidth(this._options.menuWidth);
     this.createMenuStructure();
 
     // Initialize in expanded state by default, unless explicitly set to collapsed
@@ -158,13 +143,24 @@ export class MultiLevelPushMenuComponent
     }
   }
 
-  createMenuStructure() {
+  private setContentPositionAndWidth(menuWidth: string): void {
+    this.renderer.setStyle(
+      this.contentContainer.nativeElement,
+      'left',
+      `calc(${menuWidth} + ${CONTENT_PADDING}px)`
+    );
+    this.renderer.setStyle(
+      this.contentContainer.nativeElement,
+      'width',
+      `calc(100% - (${menuWidth} + ${CONTENT_PADDING}px))`
+    );
+  }
+
+  // Menu structure creation
+  createMenuStructure(): void {
     if (!this._options.menu) return;
 
-    // Clear existing menu if any
     this.clearMenu();
-
-    // Create the base level holder
     const baseLevel = this.createLevelHolder(this._options.menu, 0);
     this.renderer.appendChild(this.menuContainer.nativeElement, baseLevel);
 
@@ -182,16 +178,13 @@ export class MultiLevelPushMenuComponent
     this.renderer.addClass(levelHolder, 'level-holder');
     this.renderer.setAttribute(levelHolder, 'data-level', level.toString());
 
-    // Don't apply animation trigger attribute directly with @ symbol
-    // Instead, track animation state in a property
     const initialState =
       level === 0 ? 'in' : this._options.direction === 'rtl' ? 'outRtl' : 'out';
     this.renderer.setProperty(levelHolder, '_slideState', initialState);
-
     this.renderer.setStyle(
       levelHolder,
       'width',
-      this._options.menuWidth || '300px'
+      this._options.menuWidth
     );
 
     // Add to menu levels map
@@ -200,13 +193,24 @@ export class MultiLevelPushMenuComponent
       data: menuData,
     });
 
-    if (this._options.direction === 'rtl') {
-      this.renderer.addClass(levelHolder, 'rtl');
-    } else {
-      this.renderer.addClass(levelHolder, 'ltr');
+    // Add directional class
+    this.renderer.addClass(levelHolder, this._options.direction === 'rtl' ? 'rtl' : 'ltr');
+
+    // Create and append title
+    this.appendLevelTitle(levelHolder, menuData);
+
+    // Add back button for levels > 0
+    if (level > 0) {
+      this.createBackItem(levelHolder);
     }
 
-    // Create title
+    // Create menu items
+    this.createMenuItemGroup(levelHolder, menuData, level);
+
+    return levelHolder;
+  }
+
+  private appendLevelTitle(levelHolder: HTMLElement, menuData: MultiLevelPushMenuItem): void {
     const title = this.renderer.createElement('h2');
     this.renderer.addClass(title, 'title');
     this.renderer.appendChild(
@@ -216,39 +220,45 @@ export class MultiLevelPushMenuComponent
 
     // Add title icon if exists
     if (menuData.icon) {
-      const titleIcon = this.renderer.createElement('i');
-      // Split class names and add them individually
-      menuData.icon.split(' ').forEach((className) => {
-        if (className) this.renderer.addClass(titleIcon, className);
-      });
-      this.renderer.addClass(
-        titleIcon,
-        this._options.direction === 'rtl' ? 'floatLeft' : 'floatRight'
-      );
-      this.renderer.addClass(titleIcon, 'cursorPointer');
-
-      // Apply direct styles
-      if (this._options.direction === 'rtl') {
-        this.renderer.setStyle(titleIcon, 'float', 'left');
-      } else {
-        this.renderer.setStyle(titleIcon, 'float', 'right');
-      }
-      this.renderer.setStyle(titleIcon, 'cursor', 'pointer');
-
-      this.renderer.listen(titleIcon, 'click', (event) =>
-        this.titleIconClick(event)
-      );
-      this.renderer.appendChild(title, titleIcon);
+      this.appendTitleIcon(title, menuData.icon);
     }
 
     this.renderer.appendChild(levelHolder, title);
+  }
 
-    // Add back button for levels > 0
-    if (level > 0) {
-      this.createBackItem(levelHolder);
-    }
+  private appendTitleIcon(titleElement: HTMLElement, iconClasses: string): void {
+    const titleIcon = this.renderer.createElement('i');
 
-    // Create menu items
+    // Add icon classes
+    iconClasses.split(' ').forEach((className) => {
+      if (className) this.renderer.addClass(titleIcon, className);
+    });
+
+    // Add positioning classes
+    this.renderer.addClass(
+      titleIcon,
+      this._options.direction === 'rtl' ? 'floatLeft' : 'floatRight'
+    );
+    this.renderer.addClass(titleIcon, 'cursorPointer');
+
+    // Apply styles
+    const floatDirection = this._options.direction === 'rtl' ? 'left' : 'right';
+    this.renderer.setStyle(titleIcon, 'float', floatDirection);
+    this.renderer.setStyle(titleIcon, 'cursor', 'pointer');
+
+    // Add click listener
+    this.renderer.listen(titleIcon, 'click', (event) =>
+      this.titleIconClick(event)
+    );
+
+    this.renderer.appendChild(titleElement, titleIcon);
+  }
+
+  private createMenuItemGroup(
+    levelHolder: HTMLElement,
+    menuData: MultiLevelPushMenuItem,
+    level: number
+  ): void {
     const itemGroup = this.renderer.createElement('ul');
     this.renderer.appendChild(levelHolder, itemGroup);
 
@@ -257,8 +267,6 @@ export class MultiLevelPushMenuComponent
         this.createMenuItem(item, itemGroup, levelHolder, level);
       });
     }
-
-    return levelHolder;
   }
 
   createMenuItem(
@@ -266,189 +274,216 @@ export class MultiLevelPushMenuComponent
     itemGroup: HTMLElement,
     levelHolder: HTMLElement,
     parentLevel: number
-  ) {
+  ): void {
     const listItem = this.renderer.createElement('li');
     this.renderer.setStyle(
       listItem,
       'text-align',
       this._options.direction === 'rtl' ? 'right' : 'left'
     );
-
     this.renderer.addClass(listItem, 'list-item');
 
-    const anchor = this.renderer.createElement('a');
-
-    // Check if Router is configured by seeing if it has routes
-    if (this.router && this.router.config && this.router.config.length > 0) {
-      // Angular Router is configured, use routerLink
-      this.renderer.setAttribute(anchor, 'routerLink', item.link || '#');
-    } else {
-      // Angular Router is not configured or empty, use href instead
-      this.renderer.setAttribute(anchor, 'href', item.link || '#');
-    }
-    this.renderer.addClass(anchor, 'anchor');
-
-    this.renderer.appendChild(
-      anchor,
-      this.renderer.createText(item.name || '')
-    );
+    const anchor = this.createMenuItemAnchor(item);
 
     // Add item icon if exists
     if (item.icon) {
-      const itemIcon = this.renderer.createElement('i');
-      // Split class names and add them individually
-      item.icon.split(' ').forEach((className) => {
-        if (className) this.renderer.addClass(itemIcon, className);
-      });
-
-      this.renderer.addClass(itemIcon, 'anchor-icon');
-
-      if (this._options.direction === 'rtl') {
-        this.renderer.setStyle(itemIcon, 'float', 'left');
-      } else {
-        this.renderer.setStyle(itemIcon, 'float', 'right');
-      }
-
-      this.renderer.appendChild(anchor, itemIcon);
+      this.appendItemIcon(anchor, item.icon);
     }
 
-    // If item has sub-items, create submenu
+    // Handle submenu items
     if (item.items && item.items.length > 0) {
-      // Create group icon
-      const groupIcon = this.renderer.createElement('i');
-      // Split class names and add them individually
-      const groupIconClasses = this._options.groupIcon || 'fa fa-angle-left';
-      groupIconClasses.split(' ').forEach((className) => {
-        if (className) this.renderer.addClass(groupIcon, className);
-      });
-
-      this.renderer.addClass(groupIcon, 'group-icon');
-
-      // Add positioning styles directly
-      if (this._options.direction === 'rtl') {
-        this.renderer.setStyle(groupIcon, 'float', 'right');
-        this.renderer.setStyle(groupIcon, 'padding', '0 0 0 .6em');
-      } else {
-        this.renderer.setStyle(groupIcon, 'float', 'left');
-        this.renderer.setStyle(groupIcon, 'padding', '0 .6em 0 0');
-      }
-
-      this.renderer.appendChild(anchor, groupIcon);
-
-      // Handle click on item with sub-items
-      this.renderer.listen(anchor, 'click', (event) => {
-        event.preventDefault();
-        if (this._options.preventGroupItemClick) {
-          event.stopPropagation();
-        }
-
-        // Create sublevel if it doesn't exist
-        const nextLevel = parentLevel + 1;
-        const sublevelKey = `${item.id || item.name}-${nextLevel}`;
-
-        if (!this.menuLevels.has(sublevelKey)) {
-          const subLevelData = {
-            title: item.name,
-            id: item.id || item.name,
-            icon: item.icon,
-            items: item.items,
-          };
-
-          const subLevelHolder = this.createLevelHolder(
-            subLevelData,
-            nextLevel
-          );
-
-          // Force immediate visibility and proper initial positioning
-          // This ensures the element is in the DOM and ready to be animated
-          this.renderer.setStyle(subLevelHolder, 'visibility', 'visible');
-
-          // Position it properly first - off screen initially
-          if (this._options.direction === 'rtl') {
-            this.renderer.setStyle(
-              subLevelHolder,
-              'transform',
-              'translateX(100%)'
-            );
-          } else {
-            this.renderer.setStyle(
-              subLevelHolder,
-              'transform',
-              'translateX(-100%)'
-            );
-          }
-
-          this.renderer.appendChild(
-            this.menuContainer.nativeElement,
-            subLevelHolder
-          );
-
-          this.menuLevels.set(sublevelKey, {
-            element: subLevelHolder,
-            data: subLevelData,
-            parent: levelHolder,
-          });
-
-          // Force a reflow to ensure styles are applied before animation
-          this.forceReflow(subLevelHolder);
-        }
-
-        // Add a small delay before showing the sublevel to ensure browser has time to process
-        setTimeout(() => {
-          // Show the sublevel
-          this.expandSubMenu(sublevelKey, nextLevel);
-        }, 10);
-      });
+      this.setupSubmenuItem(anchor, item, levelHolder, parentLevel);
     } else {
-      // Normal item click
-      this.renderer.listen(anchor, 'click', (event) => {
-        if (this._options.preventItemClick) {
-          event.preventDefault();
-        }
-
-        if (item.link && item.link !== '#') {
-          this.router.navigateByUrl(item.link);
-        }
-      });
+      this.setupNormalMenuItem(anchor, item);
     }
 
     this.renderer.appendChild(listItem, anchor);
     this.renderer.appendChild(itemGroup, listItem);
   }
 
-  createBackItem(levelHolder: HTMLElement) {
+  private createMenuItemAnchor(item: MultiLevelPushMenuItem): HTMLElement {
+    const anchor = this.renderer.createElement('a');
+
+    // Set link property based on router availability
+    const hasRouter = this.router && this.router.config && this.router.config.length > 0;
+    const linkAttr = hasRouter ? 'routerLink' : 'href';
+    this.renderer.setAttribute(anchor, linkAttr, item.link || '#');
+
+    this.renderer.addClass(anchor, 'anchor');
+    this.renderer.appendChild(
+      anchor,
+      this.renderer.createText(item.name || '')
+    );
+
+    return anchor;
+  }
+
+  private appendItemIcon(anchor: HTMLElement, iconClasses: string): void {
+    const itemIcon = this.renderer.createElement('i');
+
+    // Add icon classes
+    iconClasses.split(' ').forEach((className) => {
+      if (className) this.renderer.addClass(itemIcon, className);
+    });
+
+    this.renderer.addClass(itemIcon, 'anchor-icon');
+
+    // Set float direction based on RTL setting
+    const floatDirection = this._options.direction === 'rtl' ? 'left' : 'right';
+    this.renderer.setStyle(itemIcon, 'float', floatDirection);
+
+    this.renderer.appendChild(anchor, itemIcon);
+  }
+
+  private setupSubmenuItem(
+    anchor: HTMLElement,
+    item: MultiLevelPushMenuItem,
+    levelHolder: HTMLElement,
+    parentLevel: number
+  ): void {
+    // Create group icon
+    const groupIcon = this.createGroupIcon();
+    this.renderer.appendChild(anchor, groupIcon);
+
+    // Handle click on item with sub-items
+    this.renderer.listen(anchor, 'click', (event) => {
+      event.preventDefault();
+      if (this._options.preventGroupItemClick) {
+        event.stopPropagation();
+      }
+
+      const nextLevel = parentLevel + 1;
+      const sublevelKey = `${item.id || item.name}-${nextLevel}`;
+
+      this.handleSubmenuClick(sublevelKey, nextLevel, item, levelHolder);
+    });
+  }
+
+  private createGroupIcon(): HTMLElement {
+    const groupIcon = this.renderer.createElement('i');
+
+    // Add icon classes
+    const groupIconClasses = this._options.groupIcon;
+    groupIconClasses.split(' ').forEach((className) => {
+      if (className) this.renderer.addClass(groupIcon, className);
+    });
+
+    // Add positioning styles
+    const isRtl = this._options.direction === 'rtl';
+    this.renderer.setStyle(groupIcon, 'float', isRtl ? 'right' : 'left');
+    this.renderer.setStyle(groupIcon, 'padding', isRtl ? '0 0 0 .6em' : '0 .6em 0 0');
+
+    return groupIcon;
+  }
+
+  private handleSubmenuClick(
+    sublevelKey: string,
+    nextLevel: number,
+    item: MultiLevelPushMenuItem,
+    parentLevelHolder: HTMLElement
+  ): void {
+    if (!this.menuLevels.has(sublevelKey)) {
+      this.createSubmenu(sublevelKey, nextLevel, item, parentLevelHolder);
+    }
+
+    // Add a small delay before showing the sublevel
+    setTimeout(() => {
+      this.expandSubMenu(sublevelKey, nextLevel);
+    }, 10);
+  }
+
+  private createSubmenu(
+    sublevelKey: string,
+    nextLevel: number,
+    item: MultiLevelPushMenuItem,
+    parentLevelHolder: HTMLElement
+  ): void {
+    const subLevelData = {
+      title: item.name,
+      id: item.id || item.name,
+      icon: item.icon,
+      items: item.items,
+    };
+
+    const subLevelHolder = this.createLevelHolder(subLevelData, nextLevel);
+
+    // Position properly for animation
+    this.renderer.setStyle(subLevelHolder, 'visibility', 'visible');
+
+    // Set initial position off-screen
+    const initialTransform = this._options.direction === 'rtl' ?
+      'translateX(100%)' : 'translateX(-100%)';
+    this.renderer.setStyle(subLevelHolder, 'transform', initialTransform);
+
+    this.renderer.appendChild(this.menuContainer.nativeElement, subLevelHolder);
+
+    this.menuLevels.set(sublevelKey, {
+      element: subLevelHolder,
+      data: subLevelData,
+      parent: parentLevelHolder,
+    });
+
+    // Force a reflow to ensure styles are applied before animation
+    this.forceReflow(subLevelHolder);
+  }
+
+  private setupNormalMenuItem(anchor: HTMLElement, item: MultiLevelPushMenuItem): void {
+    this.renderer.listen(anchor, 'click', (event) => {
+      if (this._options.preventItemClick) {
+        event.preventDefault();
+      }
+
+      if (item.link && item.link !== '#') {
+        this.router.navigateByUrl(item.link);
+      }
+    });
+  }
+
+  createBackItem(levelHolder: HTMLElement): void {
     const backItem = this.renderer.createElement('div');
     this.renderer.addClass(
       backItem,
-      this._options.backItemClass || 'back-item'
+      this._options.backItemClass
     );
 
     const backAnchor = this.renderer.createElement('a');
-
     this.renderer.setAttribute(backAnchor, 'href', '#');
     this.renderer.addClass(backAnchor, 'back-anchor');
-
     this.renderer.appendChild(
       backAnchor,
-      this.renderer.createText(this._options.backText || 'Back')
+      this.renderer.createText(this._options.backText)
     );
 
+    // Create back icon
+    this.appendBackIcon(backAnchor);
+
+    // Add click listener
+    this.setupBackItemClickHandler(backAnchor, levelHolder);
+
+    this.renderer.appendChild(backItem, backAnchor);
+    this.renderer.appendChild(levelHolder, backItem);
+  }
+
+  private appendBackIcon(backAnchor: HTMLElement): void {
     const backIcon = this.renderer.createElement('i');
-    // Split class names and add them individually
-    const backIconClasses = this._options.backItemIcon || 'fa fa-angle-right';
+
+    // Add icon classes
+    const backIconClasses = this._options.backItemIcon;
     backIconClasses.split(' ').forEach((className) => {
       if (className) this.renderer.addClass(backIcon, className);
     });
 
-    // Apply direct styles for icon positioning
-    if (this._options.direction === 'rtl') {
-      this.renderer.setStyle(backIcon, 'float', 'left');
-    } else {
-      this.renderer.setStyle(backIcon, 'float', 'right');
-    }
+    // Set float based on direction
+    const floatDirection = this._options.direction === 'rtl' ? 'left' : 'right';
+    this.renderer.setStyle(backIcon, 'float', floatDirection);
 
     this.renderer.appendChild(backAnchor, backIcon);
+  }
 
+  private setupBackItemClickHandler(
+    backAnchor: HTMLElement,
+    levelHolder: HTMLElement
+  ): void {
     this.renderer.listen(backAnchor, 'click', (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -463,64 +498,55 @@ export class MultiLevelPushMenuComponent
 
       if (!targetLevelData) return;
 
-      // Make sure the target level is visible
-      this.renderer.setStyle(targetLevelData.element, 'visibility', 'visible');
-
-      // Start the animation directly on the current level holder
-      if (this._options.direction === 'rtl') {
-        // Set up the initial state to ensure animation will trigger
-        this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
-        // Force a reflow
-        this.forceReflow(levelHolder);
-        // Apply the animation direction
-        this.renderer.setStyle(levelHolder, 'transform', 'translateX(100%)');
-      } else {
-        // Set up the initial state to ensure animation will trigger
-        this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
-        // Force a reflow
-        this.forceReflow(levelHolder);
-        // Apply the animation direction
-        this.renderer.setStyle(levelHolder, 'transform', 'translateX(-100%)');
-      }
-
-      // Update navigation state after animation completes
-      setTimeout(() => {
-        // Update the holder visibility
-        this.renderer.setStyle(levelHolder, 'visibility', 'hidden');
-
-        // Update the current level
-        this.currentLevel = targetLevel;
-
-        // Update active level holders
-        this.activeLevelHolders = this.activeLevelHolders.filter(
-          (holder) =>
-            parseInt(holder.getAttribute('data-level') ?? '0', 10) <=
-            targetLevel
-        );
-
-        // Update visible holders
-        this.visibleLevelHolders = this.visibleLevelHolders.filter(
-          (holder) =>
-            parseInt(holder.getAttribute('data-level') ?? '0', 10) <=
-            targetLevel
-        );
-
-        // Adjust content position if in overlap mode
-        if (this._options.mode === 'overlap') {
-          const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
-          this.pushContent(overlapWidth * targetLevel);
-        }
-
-        // Update change detection
-        this.cdr.detectChanges();
-      }, 400);
+      this.handleBackNavigation(levelHolder, targetLevelData.element, targetLevel);
     });
-
-    this.renderer.appendChild(backItem, backAnchor);
-    this.renderer.appendChild(levelHolder, backItem);
   }
 
-  titleIconClick(event: MouseEvent) {
+  private handleBackNavigation(
+    currentLevelHolder: HTMLElement,
+    targetLevelHolder: HTMLElement,
+    targetLevel: number
+  ): void {
+    // Make sure the target level is visible
+    this.renderer.setStyle(targetLevelHolder, 'visibility', 'visible');
+
+    // Setup animation for current level
+    this.renderer.setStyle(currentLevelHolder, 'transform', 'translateX(0)');
+    this.forceReflow(currentLevelHolder);
+
+    // Apply the animation direction
+    const transform = this._options.direction === 'rtl' ?
+      'translateX(100%)' : 'translateX(-100%)';
+    this.renderer.setStyle(currentLevelHolder, 'transform', transform);
+
+    // Update navigation state after animation completes
+    setTimeout(() => {
+      this.renderer.setStyle(currentLevelHolder, 'visibility', 'hidden');
+      this.updateNavigationState(targetLevel);
+    }, ANIMATION_DURATION);
+  }
+
+  private updateNavigationState(targetLevel: number): void {
+    this.currentLevel = targetLevel;
+
+    // Update active and visible level holders
+    const filterByLevel = (holder: HTMLElement) =>
+      parseInt(holder.getAttribute('data-level') ?? '0', 10) <= targetLevel;
+
+    this.activeLevelHolders = this.activeLevelHolders.filter(filterByLevel);
+    this.visibleLevelHolders = this.visibleLevelHolders.filter(filterByLevel);
+
+    // Adjust content position if in overlap mode
+    if (this._options.mode === 'overlap') {
+      const overlapWidth = parseInt(this._options.overlapWidth, 10);
+      this.pushContent(overlapWidth * targetLevel);
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  // Event handlers
+  titleIconClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -531,178 +557,167 @@ export class MultiLevelPushMenuComponent
     }
   }
 
-  collapseMenu(level?: number) {
+  // Menu collapse/expand methods
+  collapseMenu(level?: number): void {
     if (level === undefined) {
-      // Full collapse
-      const baseLevel = this.menuLevels.get('level-0');
-      if (baseLevel) {
-        const element = baseLevel.element;
-
-        // Calculate the position
-        const width = this.getElementWidth(element);
-        const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
-        const marginLeft = this._options.fullCollapse
-          ? -width
-          : -width + overlapWidth;
-
-        // Force a reflow first to ensure animation will trigger
-        this.forceReflow(element);
-
-        // Apply the animation using calculated px values instead of percentages
-        if (this._options.direction === 'rtl') {
-          this.renderer.setStyle(element, 'transform', `translateX(${-marginLeft}px)`);
-        } else {
-          this.renderer.setStyle(element, 'transform', `translateX(${marginLeft}px)`);
-        }
-
-        // Set margins after transform is applied (after animation completes)
-        setTimeout(() => {
-          this.pushContent(marginLeft);
-        }, 400);
-
-        // Hide submenu items
-        const menuUl = element.querySelector('ul');
-        if (menuUl) {
-          this.renderer.setStyle(menuUl, 'display', 'none');
-        }
-
-        this.currentLevel = 0;
-        this._options.collapsed = true;
-      }
+      this.performFullCollapse();
     } else {
-      // Collapse to specific level
       this.collapseToLevel(level);
     }
   }
 
-  expandMenu() {
+  private performFullCollapse(): void {
     const baseLevel = this.menuLevels.get('level-0');
-    if (baseLevel) {
-      const element = baseLevel.element;
+    if (!baseLevel) return;
 
-      if (this._options.direction === 'rtl') {
-        this.renderer.setStyle(element, 'transform', `translateX(0)`);
-      } else {
-        this.renderer.setStyle(element, 'transform', `translateX(0)`);
-      }
+    const element = baseLevel.element;
 
-      // Show menu items
+    // Calculate the position
+    const width = this.getElementWidth(element);
+    const overlapWidth = parseInt(this._options.overlapWidth, 10);
+    const marginLeft = this._options.fullCollapse ? -width : -width + overlapWidth;
+
+    this.forceReflow(element);
+
+    // Apply transform based on direction
+    const transform = this._options.direction === 'rtl' ?
+      `translateX(${-marginLeft}px)` : `translateX(${marginLeft}px)`;
+    this.renderer.setStyle(element, 'transform', transform);
+
+    // Adjust content position after animation completes
+    setTimeout(() => {
+      this.pushContent(marginLeft);
+
+      // Hide submenu items
       const menuUl = element.querySelector('ul');
       if (menuUl) {
-        this.renderer.setStyle(menuUl, 'display', 'block');
+        this.renderer.setStyle(menuUl, 'display', 'none');
       }
 
-      // Push content
-      this.pushContent(0);
-
-      this._options.collapsed = false;
-    }
+      this.currentLevel = 0;
+      this._options.collapsed = true;
+    }, ANIMATION_DURATION);
   }
 
-  // Helper method to force a reflow without triggering linter warnings
+  expandMenu(): void {
+    const baseLevel = this.menuLevels.get('level-0');
+    if (!baseLevel) return;
+
+    const element = baseLevel.element;
+
+    // Reset transform
+    this.renderer.setStyle(element, 'transform', 'translateX(0)');
+
+    // Show menu items
+    const menuUl = element.querySelector('ul');
+    if (menuUl) {
+      this.renderer.setStyle(menuUl, 'display', 'block');
+    }
+
+    // Reset content position
+    this.pushContent(0);
+    this._options.collapsed = false;
+  }
+
+  // Helper method to force a reflow
   private forceReflow(element: HTMLElement): number {
-    // Reading a property like offsetWidth forces a reflow
-    // Storing and using the result prevents linter warnings
     this.lastReflowValue = element.offsetWidth;
     return this.lastReflowValue;
   }
 
-  expandSubMenu(sublevelKey: string, level: number) {
+  expandSubMenu(sublevelKey: string, level: number): void {
     const sublevel = this.menuLevels.get(sublevelKey);
     if (!sublevel) return;
 
     const element = sublevel.element;
-
-    // Ensure element is in the DOM and visible first
     this.renderer.setStyle(element, 'visibility', 'visible');
-
-    // Force a reflow before changing transform to ensure animation works
     this.forceReflow(element);
 
-    // Now apply the animation by changing transform
+    // Apply animation
     this.renderer.setProperty(element, '_slideState', 'in');
     this.renderer.setStyle(element, 'transform', 'translateX(0)');
 
-    // Adjust width if in overlap mode
-    if (this._options.mode === 'overlap') {
-      const element = this.menuLevels.get('level-0')?.element;
-      if (!element) {
-        throw new Error('Base level not found');
-      }
-      const baseWidth = this.getElementWidth(element);
-      const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
-      const levelWidth = baseWidth + level * overlapWidth;
+    // Adjust menu width in overlap mode
+    this.adjustMenuWidthInOverlapMode(level);
 
-      this.renderer.setStyle(element, 'width', `${levelWidth}px`);
-    }
-
+    // Update navigation state
     this.currentLevel = level;
     this.activeLevelHolders = [...this.activeLevelHolders, element];
     this.visibleLevelHolders = [...this.visibleLevelHolders, element];
 
-    // Push content further if in overlap mode
+    // Push content in overlap mode
     if (this._options.mode === 'overlap') {
-      const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
+      const overlapWidth = parseInt(this._options.overlapWidth, 10);
       this.pushContent(overlapWidth * level);
     }
 
-    // Trigger change detection to apply animations
     this.cdr.detectChanges();
   }
 
-  collapseToLevel(level: number) {
-    // Find all levels higher than the target level
-    Array.from(this.menuLevels.entries())
-      .filter(
-        ([, value]) =>
-          parseInt(value.element.getAttribute('data-level') ?? '0', 10) > level
-      )
-      .forEach(([, value]) => {
-        // Hide these levels
-        const element = value.element;
+  private adjustMenuWidthInOverlapMode(level: number): void {
+    if (this._options.mode !== 'overlap') return;
 
-        // Force a reflow before changing transform to ensure animation works
+    const baseElement = this.menuLevels.get('level-0')?.element;
+    if (!baseElement) return;
+
+    const baseWidth = this.getElementWidth(baseElement);
+    const overlapWidth = parseInt(this._options.overlapWidth, 10);
+    const levelWidth = baseWidth + level * overlapWidth;
+
+    this.renderer.setStyle(baseElement, 'width', `${levelWidth}px`);
+  }
+
+  collapseToLevel(level: number): void {
+    // Find and animate all levels higher than the target level
+    this.animateHigherLevelsOut(level);
+
+    // Update active level and related state
+    this.currentLevel = level;
+    this.activeLevelHolders = this.activeLevelHolders.filter(
+      holder => parseInt(holder.getAttribute('data-level') ?? '0', 10) <= level
+    );
+
+    // Adjust content position in overlap mode
+    if (this._options.mode === 'overlap') {
+      const overlapWidth = parseInt(this._options.overlapWidth, 10);
+      this.pushContent(overlapWidth * level);
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  private animateHigherLevelsOut(targetLevel: number): void {
+    Array.from(this.menuLevels.entries())
+      .filter(([, value]) => {
+        const levelAttr = value.element.getAttribute('data-level');
+        return parseInt(levelAttr ?? '0', 10) > targetLevel;
+      })
+      .forEach(([, value]) => {
+        const element = value.element;
         this.forceReflow(element);
 
-        // Apply animation by directly modifying transform style with proper timing
+        // Apply animation state
         const animState = this._options.direction === 'rtl' ? 'outRtl' : 'out';
         this.renderer.setProperty(element, '_slideState', animState);
 
-        // Set transform immediately to trigger animation
-        if (this._options.direction === 'rtl') {
-          this.renderer.setStyle(element, 'transform', 'translateX(100%)');
-        } else {
-          this.renderer.setStyle(element, 'transform', 'translateX(-100%)');
-        }
+        // Set transform for animation
+        const transform = this._options.direction === 'rtl' ?
+          'translateX(100%)' : 'translateX(-100%)';
+        this.renderer.setStyle(element, 'transform', transform);
 
-        // We need to set visibility to hidden after animation completes
+        // Hide after animation completes
         setTimeout(() => {
           this.renderer.setStyle(element, 'visibility', 'hidden');
-        }, 400); // Match animation duration
+        }, ANIMATION_DURATION);
       });
-
-    // Update active level
-    this.currentLevel = level;
-    this.activeLevelHolders = this.activeLevelHolders.filter(
-      (holder) =>
-        parseInt(holder.getAttribute('data-level') ?? '0', 10) <= level
-    );
-
-    // Adjust the push content based on the active level
-    if (this._options.mode === 'overlap') {
-      const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
-      this.pushContent(overlapWidth * level);
-    }
-
-    // Trigger change detection to apply animations
-    this.cdr.detectChanges();
   }
 
-  pushContent(amount: number) {
+  // Content positioning
+  pushContent(amount: number): void {
     if (!this.contentContainer) return;
 
-    const menuWidth = this.parseSize(this._options.menuWidth || '300px');
-    const totalPush = menuWidth + amount + 20; // 20px is additional padding
+    const menuWidth = this.parseSize(this._options.menuWidth);
+    const totalPush = menuWidth + amount + CONTENT_PADDING;
 
     this.renderer.setStyle(
       this.contentContainer.nativeElement,
@@ -716,6 +731,7 @@ export class MultiLevelPushMenuComponent
     );
   }
 
+  // Utility methods
   getElementWidth(element: HTMLElement): number {
     return element ? element.offsetWidth : 0;
   }
@@ -739,72 +755,7 @@ export class MultiLevelPushMenuComponent
     }
   }
 
-  // Touch/swipe support
-  @HostListener('touchstart', ['$event'])
-  onTouchStart(event: TouchEvent) {
-    if (!this._options.swipe || this._options.swipe === 'none') return;
-    if (this._options.swipe === 'desktop') return;
-
-    this.startX = event.touches[0].clientX;
-  }
-
-  @HostListener('touchmove', ['$event'])
-  onTouchMove(event: TouchEvent) {
-    if (!this._options.swipe || this._options.swipe === 'none') return;
-    if (this._options.swipe === 'desktop') return;
-
-    const currentX = event.touches[0].clientX;
-    const diff = currentX - this.startX;
-    const threshold = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10) * 0.3;
-
-    if (Math.abs(diff) > threshold) {
-      if (this._options.direction === 'rtl') {
-        diff < 0 ? this.expandMenu() : this.collapseMenu(this.currentLevel - 1);
-      } else {
-        diff > 0 ? this.expandMenu() : this.collapseMenu(this.currentLevel - 1);
-      }
-
-      this.startX = 0;
-    }
-  }
-
-  @HostListener('mousedown', ['$event'])
-  onMouseDown(event: MouseEvent) {
-    if (!this._options.swipe || this._options.swipe === 'none') return;
-    if (this._options.swipe === 'touchscreen') return;
-
-    this.startX = event.clientX;
-
-    const mouseMoveHandler = (e: MouseEvent) => {
-      const diff = e.clientX - this.startX;
-      const threshold = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10) * 0.3;
-
-      if (Math.abs(diff) > threshold) {
-        if (this._options.direction === 'rtl') {
-          diff < 0
-            ? this.expandMenu()
-            : this.collapseMenu(this.currentLevel - 1);
-        } else {
-          diff > 0
-            ? this.expandMenu()
-            : this.collapseMenu(this.currentLevel - 1);
-        }
-
-        this.startX = 0;
-        document.removeEventListener('mousemove', mouseMoveHandler);
-      }
-    };
-
-    const mouseUpHandler = () => {
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-    };
-
-    document.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
-  }
-
-  clearMenu() {
+  clearMenu(): void {
     if (!this.menuContainer) return;
 
     while (this.menuContainer.nativeElement.firstChild) {
@@ -821,25 +772,83 @@ export class MultiLevelPushMenuComponent
 
   // Mobile detection
   mobileCheck(): boolean {
-    // First check for touch capability (most reliable modern approach)
+    // Check for touch capability
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-      // Additional check for mobile user agent to avoid detecting tablets as mobile
       const userAgent = navigator.userAgent.toLowerCase();
-      return /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i.test(
-        userAgent
-      );
+      return /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
     }
 
-    // Fall back to checking media query for small screens as another signal
+    // Fallback to screen size check
     return window.matchMedia('(max-width: 767px)').matches;
   }
 
-  ngOnDestroy() {
-    if (this.collapseSubscription) {
-      this.collapseSubscription.unsubscribe();
+  // Touch/swipe support
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent): void {
+    if (!this.isSwipeEnabled('touchscreen')) return;
+    this.startX = event.touches[0].clientX;
+  }
+
+  @HostListener('touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isSwipeEnabled('touchscreen')) return;
+
+    const currentX = event.touches[0].clientX;
+    const diff = currentX - this.startX;
+    const threshold = this.getSwipeThreshold();
+
+    if (Math.abs(diff) > threshold) {
+      this.handleSwipe(diff);
+      this.startX = 0;
     }
-    if (this.expandSubscription) {
-      this.expandSubscription.unsubscribe();
+  }
+
+  @HostListener('mousedown', ['$event'])
+  onMouseDown(event: MouseEvent): void {
+    if (!this.isSwipeEnabled('desktop')) return;
+
+    this.startX = event.clientX;
+    this.setupMouseSwipeHandlers();
+  }
+
+  private isSwipeEnabled(deviceType: 'desktop' | 'touchscreen'): boolean {
+    if (this._options.swipe === 'none') return false;
+    return deviceType === 'desktop' ?
+      this._options.swipe !== 'touchscreen' :
+      this._options.swipe !== 'desktop';
+  }
+
+  private getSwipeThreshold(): number {
+    const overlapWidth = parseInt(this._options.overlapWidth, 10);
+    return overlapWidth * 0.3;
+  }
+
+  private handleSwipe(diff: number): void {
+    if (this._options.direction === 'rtl') {
+      diff < 0 ? this.expandMenu() : this.collapseMenu(this.currentLevel - 1);
+    } else {
+      diff > 0 ? this.expandMenu() : this.collapseMenu(this.currentLevel - 1);
     }
+  }
+
+  private setupMouseSwipeHandlers(): void {
+    const mouseMoveHandler = (e: MouseEvent) => {
+      const diff = e.clientX - this.startX;
+      const threshold = this.getSwipeThreshold();
+
+      if (Math.abs(diff) > threshold) {
+        this.handleSwipe(diff);
+        this.startX = 0;
+        document.removeEventListener('mousemove', mouseMoveHandler);
+      }
+    };
+
+    const mouseUpHandler = () => {
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
   }
 }

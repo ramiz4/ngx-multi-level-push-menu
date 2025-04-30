@@ -20,12 +20,13 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-
 import {
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
 } from './multi-level-push-menu.model';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
+
+const DEFAULT_OVERLAP_WIDTH = '55';
 
 @Component({
   selector: 'ramiz4-multi-level-push-menu',
@@ -61,8 +62,7 @@ import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
   ],
 })
 export class MultiLevelPushMenuComponent
-  implements OnInit, OnDestroy, AfterViewInit
-{
+  implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('menuContainer') menuContainer!: ElementRef;
   @ViewChild('contentContainer')
   contentContainer!: ElementRef;
@@ -188,21 +188,6 @@ export class MultiLevelPushMenuComponent
       level === 0 ? 'in' : this._options.direction === 'rtl' ? 'outRtl' : 'out';
     this.renderer.setProperty(levelHolder, '_slideState', initialState);
 
-    // Apply proper animation styles directly
-    // if (initialState === 'in') {
-    //   this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
-    // } else if (initialState === 'out') {
-    //   this.renderer.setStyle(levelHolder, 'transform', 'translateX(-90%)');
-    // } else if (initialState === 'outRtl') {
-    //   this.renderer.setStyle(levelHolder, 'transform', 'translateX(90%)');
-    // }
-
-    // this.renderer.setStyle(
-    //   levelHolder,
-    //   'transition',
-    //   'transform 400ms ease-in-out'
-    // );
-
     this.renderer.setStyle(
       levelHolder,
       'width',
@@ -251,7 +236,7 @@ export class MultiLevelPushMenuComponent
       this.renderer.setStyle(titleIcon, 'cursor', 'pointer');
 
       this.renderer.listen(titleIcon, 'click', (event) =>
-        this.titleIconClick(event, levelHolder)
+        this.titleIconClick(event)
       );
       this.renderer.appendChild(title, titleIcon);
     }
@@ -288,11 +273,11 @@ export class MultiLevelPushMenuComponent
       'text-align',
       this._options.direction === 'rtl' ? 'right' : 'left'
     );
-    
+
     this.renderer.addClass(listItem, 'list-item');
 
     const anchor = this.renderer.createElement('a');
-    
+
     // Check if Router is configured by seeing if it has routes
     if (this.router && this.router.config && this.router.config.length > 0) {
       // Angular Router is configured, use routerLink
@@ -439,7 +424,7 @@ export class MultiLevelPushMenuComponent
     );
 
     const backAnchor = this.renderer.createElement('a');
-    
+
     this.renderer.setAttribute(backAnchor, 'href', '#');
     this.renderer.addClass(backAnchor, 'back-anchor');
 
@@ -522,7 +507,7 @@ export class MultiLevelPushMenuComponent
 
         // Adjust content position if in overlap mode
         if (this._options.mode === 'overlap') {
-          const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
+          const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
           this.pushContent(overlapWidth * targetLevel);
         }
 
@@ -535,17 +520,14 @@ export class MultiLevelPushMenuComponent
     this.renderer.appendChild(levelHolder, backItem);
   }
 
-  titleIconClick(event: MouseEvent, levelHolder: HTMLElement) {
+  titleIconClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
 
-    // Use element.getAttribute directly instead of renderer.getAttribute
-    const level = parseInt(levelHolder.getAttribute('data-level') ?? '0', 10);
-
-    if (level === 0 && this._options.collapsed) {
+    if (this._options.collapsed) {
       this.expandMenu();
     } else {
-      this.collapseMenu(level);
+      this.collapseMenu(undefined);
     }
   }
 
@@ -558,14 +540,14 @@ export class MultiLevelPushMenuComponent
 
         // Calculate the position
         const width = this.getElementWidth(element);
-        const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
+        const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
         const marginLeft = this._options.fullCollapse
           ? -width
           : -width + overlapWidth;
 
         // Force a reflow first to ensure animation will trigger
         this.forceReflow(element);
-        
+
         // Apply the animation using calculated px values instead of percentages
         if (this._options.direction === 'rtl') {
           this.renderer.setStyle(element, 'transform', `translateX(${-marginLeft}px)`);
@@ -648,7 +630,7 @@ export class MultiLevelPushMenuComponent
         throw new Error('Base level not found');
       }
       const baseWidth = this.getElementWidth(element);
-      const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
+      const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
       const levelWidth = baseWidth + level * overlapWidth;
 
       this.renderer.setStyle(element, 'width', `${levelWidth}px`);
@@ -660,7 +642,7 @@ export class MultiLevelPushMenuComponent
 
     // Push content further if in overlap mode
     if (this._options.mode === 'overlap') {
-      const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
+      const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
       this.pushContent(overlapWidth * level);
     }
 
@@ -708,7 +690,7 @@ export class MultiLevelPushMenuComponent
 
     // Adjust the push content based on the active level
     if (this._options.mode === 'overlap') {
-      const overlapWidth = parseInt(this._options.overlapWidth || '40', 10);
+      const overlapWidth = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10);
       this.pushContent(overlapWidth * level);
     }
 
@@ -773,7 +755,7 @@ export class MultiLevelPushMenuComponent
 
     const currentX = event.touches[0].clientX;
     const diff = currentX - this.startX;
-    const threshold = parseInt(this._options.overlapWidth || '40', 10) * 0.3;
+    const threshold = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10) * 0.3;
 
     if (Math.abs(diff) > threshold) {
       if (this._options.direction === 'rtl') {
@@ -795,7 +777,7 @@ export class MultiLevelPushMenuComponent
 
     const mouseMoveHandler = (e: MouseEvent) => {
       const diff = e.clientX - this.startX;
-      const threshold = parseInt(this._options.overlapWidth || '40', 10) * 0.3;
+      const threshold = parseInt(this._options.overlapWidth || DEFAULT_OVERLAP_WIDTH, 10) * 0.3;
 
       if (Math.abs(diff) > threshold) {
         if (this._options.direction === 'rtl') {

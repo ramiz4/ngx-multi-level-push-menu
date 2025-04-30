@@ -154,9 +154,7 @@ export class MultiLevelPushMenuComponent
 
     // Initialize in expanded state by default, unless explicitly set to collapsed
     if (!this._options.collapsed) {
-      setTimeout(() => {
-        this.expandMenu();
-      }, 0);
+      this.expandMenu();
     }
   }
 
@@ -181,7 +179,7 @@ export class MultiLevelPushMenuComponent
     level: number
   ): HTMLElement {
     const levelHolder = this.renderer.createElement('div');
-    this.renderer.addClass(levelHolder, 'levelHolderClass');
+    this.renderer.addClass(levelHolder, 'level-holder');
     this.renderer.setAttribute(levelHolder, 'data-level', level.toString());
 
     // Don't apply animation trigger attribute directly with @ symbol
@@ -190,34 +188,20 @@ export class MultiLevelPushMenuComponent
       level === 0 ? 'in' : this._options.direction === 'rtl' ? 'outRtl' : 'out';
     this.renderer.setProperty(levelHolder, '_slideState', initialState);
 
-    // Add direct styles to ensure they're applied
-    this.renderer.setStyle(levelHolder, 'position', 'absolute');
-    this.renderer.setStyle(levelHolder, 'overflow', 'hidden');
-    this.renderer.setStyle(levelHolder, 'top', '0');
-    this.renderer.setStyle(levelHolder, 'background', '#336ca6');
-    this.renderer.setStyle(levelHolder, 'min-height', '100%');
-    this.renderer.setStyle(
-      levelHolder,
-      'font-family',
-      "'Open Sans Condensed', sans-serif"
-    );
-    this.renderer.setStyle(levelHolder, 'font-size', '1em');
-    this.renderer.setStyle(levelHolder, 'zoom', '1');
-
     // Apply proper animation styles directly
-    if (initialState === 'in') {
-      this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
-    } else if (initialState === 'out') {
-      this.renderer.setStyle(levelHolder, 'transform', 'translateX(-100%)');
-    } else if (initialState === 'outRtl') {
-      this.renderer.setStyle(levelHolder, 'transform', 'translateX(100%)');
-    }
+    // if (initialState === 'in') {
+    //   this.renderer.setStyle(levelHolder, 'transform', 'translateX(0)');
+    // } else if (initialState === 'out') {
+    //   this.renderer.setStyle(levelHolder, 'transform', 'translateX(-90%)');
+    // } else if (initialState === 'outRtl') {
+    //   this.renderer.setStyle(levelHolder, 'transform', 'translateX(90%)');
+    // }
 
-    this.renderer.setStyle(
-      levelHolder,
-      'transition',
-      'transform 400ms ease-in-out'
-    );
+    // this.renderer.setStyle(
+    //   levelHolder,
+    //   'transition',
+    //   'transform 400ms ease-in-out'
+    // );
 
     this.renderer.setStyle(
       levelHolder,
@@ -233,35 +217,13 @@ export class MultiLevelPushMenuComponent
 
     if (this._options.direction === 'rtl') {
       this.renderer.addClass(levelHolder, 'rtl');
-      this.renderer.setStyle(levelHolder, 'right', '0');
-      this.renderer.setStyle(
-        levelHolder,
-        'box-shadow',
-        '-5px 0 5px -5px #1f4164'
-      );
     } else {
       this.renderer.addClass(levelHolder, 'ltr');
-      this.renderer.setStyle(levelHolder, 'left', '0');
-      this.renderer.setStyle(
-        levelHolder,
-        'box-shadow',
-        '5px 0 5px -5px #1f4164'
-      );
     }
 
     // Create title
     const title = this.renderer.createElement('h2');
-    this.renderer.setStyle(
-      title,
-      'text-align',
-      this._options.direction === 'rtl' ? 'right' : 'left'
-    );
-    this.renderer.setStyle(title, 'font-size', '1.5em');
-    this.renderer.setStyle(title, 'line-height', '1em');
-    this.renderer.setStyle(title, 'font-weight', 'bold');
-    this.renderer.setStyle(title, 'color', '#1f4164');
-    this.renderer.setStyle(title, 'padding', '0 0.4em');
-    this.renderer.setStyle(title, 'margin', '0');
+    this.renderer.addClass(title, 'title');
     this.renderer.appendChild(
       title,
       this.renderer.createText(menuData.title || '')
@@ -303,11 +265,6 @@ export class MultiLevelPushMenuComponent
 
     // Create menu items
     const itemGroup = this.renderer.createElement('ul');
-    // Apply direct styles to ul
-    this.renderer.setStyle(itemGroup, 'list-style', 'none');
-    this.renderer.setStyle(itemGroup, 'padding', '0');
-    this.renderer.setStyle(itemGroup, 'margin', '0');
-
     this.renderer.appendChild(levelHolder, itemGroup);
 
     if (menuData.items && menuData.items.length) {
@@ -331,24 +288,20 @@ export class MultiLevelPushMenuComponent
       'text-align',
       this._options.direction === 'rtl' ? 'right' : 'left'
     );
-    this.renderer.setStyle(listItem, 'cursor', 'pointer');
-    this.renderer.setStyle(listItem, 'border-top', '1px solid #295685');
-    this.renderer.setStyle(listItem, 'padding', '0.4em');
-
-    if (itemGroup.childNodes.length === 0) {
-      this.renderer.setStyle(listItem, 'border-bottom', '1px solid #295685');
-    }
+    
+    this.renderer.addClass(listItem, 'list-item');
 
     const anchor = this.renderer.createElement('a');
-    this.renderer.setAttribute(anchor, 'routerLink', item.link || '#');
-    this.renderer.setStyle(anchor, 'display', 'block');
-    this.renderer.setStyle(anchor, 'outline', 'none');
-    this.renderer.setStyle(anchor, 'overflow', 'hidden');
-    this.renderer.setStyle(anchor, 'font-size', '1.5em');
-    this.renderer.setStyle(anchor, 'line-height', '1em');
-    this.renderer.setStyle(anchor, 'padding', '0.2em');
-    this.renderer.setStyle(anchor, 'text-decoration', 'none');
-    this.renderer.setStyle(anchor, 'color', '#fff');
+    
+    // Check if Router is configured by seeing if it has routes
+    if (this.router && this.router.config && this.router.config.length > 0) {
+      // Angular Router is configured, use routerLink
+      this.renderer.setAttribute(anchor, 'routerLink', item.link || '#');
+    } else {
+      // Angular Router is not configured or empty, use href instead
+      this.renderer.setAttribute(anchor, 'href', item.link || '#');
+    }
+    this.renderer.addClass(anchor, 'anchor');
 
     this.renderer.appendChild(
       anchor,
@@ -362,6 +315,8 @@ export class MultiLevelPushMenuComponent
       item.icon.split(' ').forEach((className) => {
         if (className) this.renderer.addClass(itemIcon, className);
       });
+
+      this.renderer.addClass(itemIcon, 'anchor-icon');
 
       if (this._options.direction === 'rtl') {
         this.renderer.setStyle(itemIcon, 'float', 'left');
@@ -382,13 +337,15 @@ export class MultiLevelPushMenuComponent
         if (className) this.renderer.addClass(groupIcon, className);
       });
 
+      this.renderer.addClass(groupIcon, 'group-icon');
+
       // Add positioning styles directly
       if (this._options.direction === 'rtl') {
         this.renderer.setStyle(groupIcon, 'float', 'right');
-        this.renderer.setStyle(groupIcon, 'padding', '0 0 0 0.4em');
+        this.renderer.setStyle(groupIcon, 'padding', '0 0 0 .6em');
       } else {
         this.renderer.setStyle(groupIcon, 'float', 'left');
-        this.renderer.setStyle(groupIcon, 'padding', '0 0.4em 0 0');
+        this.renderer.setStyle(groupIcon, 'padding', '0 .6em 0 0');
       }
 
       this.renderer.appendChild(anchor, groupIcon);
@@ -478,25 +435,14 @@ export class MultiLevelPushMenuComponent
     const backItem = this.renderer.createElement('div');
     this.renderer.addClass(
       backItem,
-      this._options.backItemClass || 'backItemClass'
+      this._options.backItemClass || 'back-item'
     );
 
-    // Apply direct styles
-    this.renderer.setStyle(backItem, 'display', 'block');
-    this.renderer.setStyle(backItem, 'padding', '0.4em');
-    this.renderer.setStyle(backItem, 'background', '#2e6196');
-    this.renderer.setStyle(backItem, 'border-top', '1px solid #295685');
-
     const backAnchor = this.renderer.createElement('a');
-    this.renderer.setAttribute(backAnchor, 'routerLink', '#');
-    this.renderer.setStyle(backAnchor, 'display', 'block');
-    this.renderer.setStyle(backAnchor, 'outline', 'none');
-    this.renderer.setStyle(backAnchor, 'overflow', 'hidden');
-    this.renderer.setStyle(backAnchor, 'font-size', '1.5em');
-    this.renderer.setStyle(backAnchor, 'line-height', '1em');
-    this.renderer.setStyle(backAnchor, 'padding', '0.2em');
-    this.renderer.setStyle(backAnchor, 'text-decoration', 'none');
-    this.renderer.setStyle(backAnchor, 'color', '#fff');
+    
+    this.renderer.setAttribute(backAnchor, 'href', '#');
+    this.renderer.addClass(backAnchor, 'back-anchor');
+
     this.renderer.appendChild(
       backAnchor,
       this.renderer.createText(this._options.backText || 'Back')

@@ -20,7 +20,7 @@ export class MultiLevelPushMenuOptions {
     public swipe?: string // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
   ) {
     this.menu =
-      menu || new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-reorder');
+      menu || new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-bars');
     this.mode = mode || 'cover';
   }
 }

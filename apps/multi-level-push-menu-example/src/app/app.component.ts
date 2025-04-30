@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
     this.options.menu = {
       title: 'Company Name',
       id: 'menuID',
-      icon: 'fa fa-reorder',
+      icon: 'fa fa-bars',
     };
     this.options.menu.items = [
       { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },

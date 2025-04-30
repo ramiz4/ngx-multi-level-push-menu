@@ -5,139 +5,94 @@
   height: 100%;
 }
 
-// Main wrapper for the component
-.multilevelpushmenu-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  min-width: 100%;
-  display: block;
-}
-
-// Menu container - No longer need :host ::ng-deep since we're using ViewEncapsulation.None
-// Menu wrapper
-.multilevelpushmenu_wrapper {
+.level-holder {
   position: absolute;
   overflow: hidden;
-  min-width: 100%;
+  top: 0;
+  background: #336ca6;
   min-height: 100%;
-  margin: 0;
-  padding: 0;
+  color: #fff;
+  transition: transform 0.4s ease-in-out;
 
-  // Level holders
-  .levelHolderClass {
-    position: absolute;
-    overflow: hidden;
-    top: 0;
-    background: #336ca6;
-    width: auto;
-    min-height: 100%;
-    font-family: 'Open Sans Condensed', sans-serif;
-    font-size: 1em;
-    zoom: 1;
-    transition: margin 0.4s ease-in-out;
-
-    // LTR (left-to-right) styling
-    &.ltr {
-      margin-left: -100%;
-      left: 0;
-      box-shadow: 5px 0 5px -5px #1f4164;
+  &.rtl {
+    right: 0;
+    box-shadow: -5px 0 5px -5px #1f4164;
+    .title {
+      text-align: right;
     }
-
-    // RTL (right-to-left) styling
-    &.rtl {
-      margin-right: -100%;
-      right: 0;
-      box-shadow: -5px 0 5px -5px #1f4164;
+  }
+  
+  &.ltr {
+    left: 0;
+    box-shadow: 5px 0 5px -5px #1f4164;
+    .title {
+      text-align: left;
     }
+  }
 
-    // Inactive state
-    &.multilevelpushmenu_inactive {
-      background: #2e6196;
+  h2.title {
+    font-size: 1.5em;
+    // color: #fff;
+    margin: 0;
+    padding: .6em .8em;
+  }
+
+  .back-item {
+    display: block;
+    background: #2e6196;
+    border-top: 1px solid #295685;
+    
+    a.back-anchor {
+      display: block;
+      padding: 1em 1.2em;
+      text-decoration: none;
+      color: #fff;
+
+      &:hover {
+        background: #1f4164;
+      }
     }
+  }
 
-    // Headings
-    h2 {
-      font-size: 1.5em;
-      line-height: 1em;
-      font-weight: bold;
-      color: #1f4164;
-      padding: 0 0.4em;
-      margin: 0;
-    }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 
-    // Item lists
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
+    li.list-item {
+      display: block;
+      border-top: 1px solid #295685;
+      
+      &:first-child:last-child {
+        border-bottom: 1px solid #295685;
+      }
+      
+      a.anchor {
+        display: block;
+        padding: 1em 1.2em;
         cursor: pointer;
-        border-top: 1px solid #295685;
-        padding: 0.4em;
-
-        &:last-child {
-          border-bottom: 1px solid #295685;
-        }
 
         &:hover {
-          background-color: #295685;
+          background: #295685;
         }
 
-        // Links
-        a {
-          display: block;
-          outline: none;
-          overflow: hidden;
-          font-size: 1.5em;
-          line-height: 1em;
-          padding: 0.2em;
-          text-decoration: none;
-          color: #fff;
+        .group-icon {
+          display: flex;
+          justify-content: center;
+        }
 
-          &:hover {
-            color: #ffe;
-          }
+        .anchor-icon {
+          width: 1.5em;
+          display: flex;
+          justify-content: center;
         }
       }
     }
-
-    // Back button
-    .backItemClass {
-      display: block;
-      padding: 0.4em;
-      background: #2e6196;
-      border-top: 1px solid #295685;
+    
+    // When the group is empty (has no children)
+    &:empty + li.list-item {
+      border-bottom: 1px solid #295685;
     }
-  }
-
-  // Utility classes
-  .floatRight {
-    float: right;
-  }
-
-  .floatLeft {
-    float: left;
-  }
-
-  .cursorPointer {
-    cursor: pointer;
-  }
-
-  .iconSpacing_ltr {
-    padding: 0 0.4em 0 0;
-  }
-
-  .iconSpacing_rtl {
-    padding: 0 0 0 0.4em;
-  }
-
-  // Images in headings and links
-  h2 > img,
-  a > img {
-    max-height: 1em;
   }
 }
 
@@ -145,9 +100,8 @@
 #content {
   position: absolute;
   top: 0;
-  width: calc(
-    100% - 300px
-  ); /* Default - will be overridden by component logic */
+  width: calc(100% - 300px);
+  /* Default - will be overridden by component logic */
   height: 100%;
   transition: left 0.4s ease, width 0.4s ease;
   overflow: auto;

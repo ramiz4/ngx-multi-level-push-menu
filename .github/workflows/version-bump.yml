@@ -46,6 +46,12 @@ jobs:
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           
+          # Validate version format
+          if [[ ! "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Invalid version format in package.json. Expected semantic versioning (x.y.z), got '$CURRENT_VERSION'."
+            exit 1
+          fi
+          
           IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
           MAJOR=${VERSION_PARTS[0]}
           MINOR=${VERSION_PARTS[1]}

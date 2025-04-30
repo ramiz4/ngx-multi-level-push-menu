@@ -10,15 +10,16 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  HostListener,
   Input,
   OnDestroy,
   OnInit,
   Renderer2,
-  ViewChild
+  ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { SwipeDirection, SwipeEvent } from './directives/swipe.directive';
 import {
   MenuLevelData,
   MultiLevelPushMenuItem,
@@ -39,7 +40,7 @@ const ANIMATION_DURATION = 400;
   standalone: false,
   templateUrl: './multi-level-push-menu.component.html',
   styleUrls: ['./multi-level-push-menu.component.scss'],
-  // encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('slideInOut', [
       state('in', style({ transform: 'translateX(0)' })),
@@ -67,7 +68,6 @@ export class MultiLevelPushMenuComponent
   private activeLevelHolders: HTMLElement[] = [];
   private menuLevels = new Map<string, MenuLevelData>();
   private isMobile = false;
-  private startX = 0;
   private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
 
@@ -114,6 +114,13 @@ export class MultiLevelPushMenuComponent
 
   ngOnDestroy(): void {
     this.unsubscribe();
+  }
+
+  /**
+   * Helper method to convert string to number for template binding
+   */
+  toNumber(value: string): number {
+    return parseInt(value, 10);
   }
 
   // Setup service subscriptions
@@ -435,61 +442,24 @@ export class MultiLevelPushMenuComponent
     this.cdr.detectChanges();
   }
 
-  // Touch/swipe support
-  @HostListener('touchstart', ['$event'])
-  onTouchStart(event: TouchEvent): void {
-    if (!this.deviceDetectorService.isSwipeEnabled('touchscreen', this._options.swipe)) return;
-    this.startX = event.touches[0].clientX;
-  }
-
-  @HostListener('touchmove', ['$event'])
-  onTouchMove(event: TouchEvent): void {
-    if (!this.deviceDetectorService.isSwipeEnabled('touchscreen', this._options.swipe)) return;
-
-    const currentX = event.touches[0].clientX;
-    const diff = currentX - this.startX;
-    const threshold = this.deviceDetectorService.getSwipeThreshold(parseInt(this._options.overlapWidth, 10));
-
-    if (Math.abs(diff) > threshold) {
-      this.handleSwipe(diff);
-      this.startX = 0;
-    }
-  }
-
-  @HostListener('mousedown', ['$event'])
-  onMouseDown(event: MouseEvent): void {
-    if (!this.deviceDetectorService.isSwipeEnabled('desktop', this._options.swipe)) return;
-
-    this.startX = event.clientX;
-    this.setupMouseSwipeHandlers();
-  }
-
-  private handleSwipe(diff: number): void {
+  /**
+   * Handle swipe events from the SwipeDirective
+   */
+  onSwipeDetected(event: SwipeEvent): void {
     if (this._options.direction === 'rtl') {
-      diff < 0 ? this.expandMenu() : this.collapseMenu(this.currentLevel - 1);
-    } else {
-      diff > 0 ? this.expandMenu() : this.collapseMenu(this.currentLevel - 1);
-    }
-  }
-
-  private setupMouseSwipeHandlers(): void {
-    const mouseMoveHandler = (e: MouseEvent) => {
-      const diff = e.clientX - this.startX;
-      const threshold = this.deviceDetectorService.getSwipeThreshold(parseInt(this._options.overlapWidth, 10));
-
-      if (Math.abs(diff) > threshold) {
-        this.handleSwipe(diff);
-        this.startX = 0;
-        document.removeEventListener('mousemove', mouseMoveHandler);
+      // Handle RTL mode
+      if (event.direction === SwipeDirection.Left) {
+        this.expandMenu();
+      } else {
+        this.collapseMenu(this.currentLevel - 1);
       }
-    };
-
-    const mouseUpHandler = () => {
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-    };
-
-    document.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
+    } else {
+      // Handle LTR mode
+      if (event.direction === SwipeDirection.Right) {
+        this.expandMenu();
+      } else {
+        this.collapseMenu(this.currentLevel - 1);
+      }
+    }
   }
 }

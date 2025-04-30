@@ -1,5 +1,6 @@
 <div class="multilevelpushmenu-wrapper">
-  <nav #menuContainer id="{{ options.menuID || 'multilevelpushmenu' }}"></nav>
+  <nav #menuContainer id="{{ options.menuID || 'multilevelpushmenu' }}" ramiz4Swipe [swipeEnabled]="options.swipe"
+    [overlapWidth]="toNumber(options.overlapWidth)" (swipe)="onSwipeDetected($event)"></nav>
   <div #contentContainer id="content">
     <ng-content></ng-content>
   </div>

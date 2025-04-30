@@ -28,30 +28,35 @@ jobs:
           CURRENT_TIME=$(date +%s)
           TIME_DIFF=$((CURRENT_TIME - LAST_BUMP_TIME))
           
-          # If a version bump happened in the last 5 minutes (300 seconds), skip this run
+          # If a version bump happened in the last 5 minutes (300 seconds), set skip flag
           if [[ $TIME_DIFF -lt 300 ]]; then
-            echo "Too soon after last version bump, skipping"
-            exit 1
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+            echo "Too soon after last version bump, skipping remaining steps"
+          else
+            echo "should_skip=false" >> $GITHUB_OUTPUT
+            echo "No recent version bumps found, proceeding"
           fi
-          
-          echo "No recent version bumps found, proceeding"
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       
       - name: Install dependencies
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: npm ci
       
       - name: Configure Git
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions@github.com'
       
       - name: Determine version bump type
         id: bump-type
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           if [[ "$COMMIT_MSG" == *"BREAKING CHANGE"* ]] || [[ "$COMMIT_MSG" == *"major"* ]]; then
@@ -64,6 +69,7 @@ jobs:
       
       - name: Bump version
         id: version-bump
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           
@@ -96,12 +102,14 @@ jobs:
           npm version $NEW_VERSION --no-git-tag-version
       
       - name: Commit version bump
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           git add package.json libs/ngx-multi-level-push-menu/package.json
           git commit -m "chore: bump version to ${{ steps.version-bump.outputs.new_version }}"
           git tag v${{ steps.version-bump.outputs.new_version }}
       
       - name: Push changes
+        if: steps.recent-bumps.outputs.should_skip != 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GH_PAT }}

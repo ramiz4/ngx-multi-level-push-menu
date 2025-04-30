@@ -1,6 +1,6 @@
 {
   "name": "ngx-multi-level-push-menu",
-  "version": "14.0.9",
+  "version": "15.0.0",
   "license": "MIT",
   "scripts": {
     "start": "nx serve",

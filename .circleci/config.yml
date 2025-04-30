@@ -32,9 +32,9 @@ jobs:
           paths:
             - node_modules
 
-      # - run:
-      #     name: Run unit tests
-      #     command: npm test
+      - run:
+          name: Run unit tests
+          command: npm run test:ci
 
       - run:
           name: Build ngx-multi-level-push-menu

@@ -1,98 +1,148 @@
-# NgxMultiLevelPushMenu
+# ngx-multi-level-push-menu
+
+Angular component for a responsive multi-level push menu.
+
+[![npm version](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Features
+
+- Responsive multi-level push menu for Angular applications
+- Customizable styling and animations
+- Support for nested menu items
+- Router integration
+- Font Awesome icons support
+
+## Installation
+
+Install the package via npm:
+
+```bash
+npm install @ramiz4/ngx-multi-level-push-menu --save
+```
+
+Make sure you have the peer dependencies installed:
+
+```bash
+npm install font-awesome@4.7.0 --save
+```
+
+## Usage
+
+1. Import the module in your app.module.ts:
+
+```typescript
+import { NgxMultiLevelPushMenuModule } from '@ramiz4/ngx-multi-level-push-menu';
+
+@NgModule({
+  imports: [
+    // ...other imports
+    NgxMultiLevelPushMenuModule
+  ],
+  // ...
+})
+export class AppModule { }
+```
+
+2. Add the component to your template:
+
+```html
+<ngx-multi-level-push-menu [menu]="menuItems" [options]="menuOptions"></ngx-multi-level-push-menu>
+```
+
+3. Define your menu structure in your component:
+
+```typescript
+export class AppComponent {
+  menuItems = [
+    {
+      name: 'Home',
+      link: '/home',
+      icon: 'fa fa-home'
+    },
+    {
+      name: 'Collections',
+      icon: 'fa fa-collection',
+      items: [
+        {
+          name: 'Collection 1',
+          link: '/collections/1'
+        },
+        {
+          name: 'Collection 2',
+          link: '/collections/2'
+        }
+      ]
+    }
+    // Add more menu items as needed
+  ];
+
+  menuOptions = {
+    // Optional configuration options
+    // Example:
+    // collapsed: false,
+    // width: 300,
+    // showBackLink: true
+  };
+}
+```
+
+## API Documentation
+
+### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| menu | Array | [] | Array of menu items |
+| options | Object | {} | Configuration options |
+
+### Menu Item Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| name | string | Display name of the menu item |
+| link | string | Optional router link |
+| icon | string | Optional icon class (Font Awesome) |
+| items | Array | Optional array of child menu items |
+
+### Options
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| collapsed | boolean | false | Initial menu state |
+| width | number | 300 | Width of the menu in pixels |
+| showBackLink | boolean | true | Show back link for submenu navigation |
+
+## Example Application
+
+See the example application in the `apps/multi-level-push-menu-example` folder for a complete usage example.
+
+To run the example:
+
+```bash
+ng serve multi-level-push-menu-example
+```
+
+## Development
 
 This project was generated using [Nx](https://nx.dev).
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+### Development server
 
-🔎 **Smart, Fast and Extensible Build System**
+Run `ng serve multi-level-push-menu-example` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
 
-## Quick Start & Documentation
+### Build the library
 
-[Nx Documentation](https://nx.dev/getting-started/intro)
+Run `ng build ngx-multi-level-push-menu` to build the library. The build artifacts will be stored in the `dist/libs/ngx-multi-level-push-menu` directory.
 
-[Mental model is a good starting point for those who like to understand things theoretically first.](https://nx.dev/concepts/mental-model)
+### Running unit tests
 
-[Interactive Tutorial](https://nx.dev/getting-started/angular-tutorial)
+Run `ng test ngx-multi-level-push-menu` to execute the unit tests via [Jest](https://jestjs.io).
 
-## Adding capabilities to your workspace
+## Contributing
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+## License
 
-Below are our core plugins:
-
-- [Angular](https://angular.io)
-  - `ng add @nrwl/angular`
-- [React](https://reactjs.org)
-  - `ng add @nrwl/react`
-- Web (no framework frontends)
-  - `ng add @nrwl/web`
-- [Nest](https://nestjs.com)
-  - `ng add @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `ng add @nrwl/express`
-- [Node](https://nodejs.org)
-  - `ng add @nrwl/node`
-
-There are also many [community plugins](https://nx.dev/community) you could add.
-
-## Generate an application
-
-Run `ng g @nrwl/angular:app my-app` to generate an application.
-
-> You can use any of the plugins above to generate applications as well.
-
-When using Nx, you can create multiple applications and libraries in the same workspace.
-
-## Generate a library
-
-Run `ng g @nrwl/angular:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported from `@ngx-multi-level-push-menu/mylib`.
-
-## Development server
-
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng g component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+MIT © [Ramiz Loki](https://ramizloki.com)

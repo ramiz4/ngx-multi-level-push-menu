@@ -1,20 +1,24 @@
 # NgxMultiLevelPushMenu
 
-Multi-level push menu is cross-browser compatible angular 6+ component allowing endless nesting of navigation elements.
+[![npm version](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Multi-level push menu is a cross-browser compatible Angular component allowing endless nesting of navigation elements.
+
+`@ramiz4/ngx-multi-level-push-menu` is built for modern browsers using _TypeScript, CSS3 and HTML5_ and is compatible with **Angular 6+** up through **Angular 16+**.
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Options](#options)
 - [Features](#features)
 - [Common Issues & Solutions](#common-issues--solutions)
-
-`@ramiz4/ngx-multi-level-push-menu` is an Angular component for generating a fancy push menu. It was built for modern browsers using _TypeScript, CSS3 and HTML5_ and Angular `>=6.0.0`.
+- [Demo](#demo)
 
 See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases) for recent changes.
 
 ## Installation
 
-To use @ramiz4/ngx-multi-level-push-menu in your project install it via [npm](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu):
+To use @ramiz4/ngx-multi-level-push-menu in your project, install it via [npm](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu):
 
 ```bash
 npm i @ramiz4/ngx-multi-level-push-menu --save
@@ -22,14 +26,23 @@ npm i @ramiz4/ngx-multi-level-push-menu --save
 
 ## Install dependencies
 
+The component requires Font Awesome for icons. You can use either Font Awesome 4.x, 5.x, or 6.x:
+
+### Font Awesome 4.x (Classic):
 ```bash
 npm i font-awesome --save
+```
+
+### Font Awesome 5.x or 6.x (Recommended for newer projects):
+```bash
+npm i @fortawesome/fontawesome-free --save
 ```
 
 ## Usage
 
 ### 1. Update your `angular.json`
 
+For Font Awesome 4.x:
 ```json
 "styles": [
   "node_modules/font-awesome/css/font-awesome.min.css",
@@ -38,9 +51,18 @@ npm i font-awesome --save
 "scripts": [],
 ```
 
+For Font Awesome 5.x or 6.x:
+```json
+"styles": [
+  "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+  "styles.css"
+],
+"scripts": [],
+```
+
 ### 2. Import the `NgxMultiLevelPushMenuModule` to `app.module.ts`
 
-Finally, you can use @ramiz4/ngx-multi-level-push-menu in your Angular project. You have to import `NgxMultiLevelPushMenuModule.forRoot()` in the root NgModule `app.module.ts` of your application.
+Import `NgxMultiLevelPushMenuModule.forRoot()` in the root NgModule `app.module.ts` of your application.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
@@ -59,14 +81,14 @@ import { AppComponent } from './app.component';
 export class AppModule {}
 ```
 
-You need to add the RouterModule and define some routes. In this example there are defined 4 routes and therefor you need to create 4 components:
+You need to add the RouterModule and define some routes. In this example there are defined 4 routes and therefore you need to create 4 components:
 
 ```bash
 ng g component home && ng g component about-us && ng g component collections && ng g component credits && ng g component page-not-found
 ```
 
 **NOTE**
-Angular automatically adds the declarations to the AppModule when generating the components. You have to remove them from AppModule, if you add them to the following app-routing.module.ts!
+Angular automatically adds the declarations to the AppModule when generating the components. If you organize your routing as shown below, you should remove those declarations from AppModule.
 
 Edit the generated app-routing.module.ts to this:
 
@@ -117,25 +139,25 @@ export class AppComponent implements OnInit {
     this.options.menu = {
       title: 'Company Name',
       id: 'menuID',
-      icon: 'fa fa-reorder',
+      icon: 'fa fa-reorder', // Use 'fas fa-bars' for Font Awesome 5+
     };
     this.options.menu.items = [
-      { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },
+      { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' }, // Use 'fas fa-home' for Font Awesome 5+
       {
         name: 'About Us',
         id: 'about-us',
-        icon: 'fa fa-user',
+        icon: 'fa fa-user', // Use 'fas fa-user' for Font Awesome 5+
         link: 'about-us',
       },
       {
         name: 'Devices',
         id: 'devices',
-        icon: 'fa fa-laptop',
+        icon: 'fa fa-laptop', // Use 'fas fa-laptop' for Font Awesome 5+
         link: '#',
         items: [
           {
             name: 'Mobile Phones',
-            icon: 'fa fa-phone',
+            icon: 'fa fa-phone', // Use 'fas fa-phone' for Font Awesome 5+
             link: '#',
             items: [
               {
@@ -150,7 +172,7 @@ export class AppComponent implements OnInit {
           },
           {
             name: 'Televisions',
-            icon: 'fa fa-desktop',
+            icon: 'fa fa-desktop', // Use 'fas fa-desktop' for Font Awesome 5+
             link: '#',
             items: [
               {
@@ -188,6 +210,8 @@ export class AppComponent implements OnInit {
 
 **Important**: Note the menu structure. Each submenu should be defined directly with an `items` array containing its child items. Don't add extra wrapper objects around menu items.
 
+> **Font Awesome 5+ Note**: If using Font Awesome 5+, use class naming pattern `fas fa-icon-name` instead of `fa fa-icon-name`. Update the icon classes in your menu configuration and the options accordingly.
+
 ### 4. Replace content in `app.component.html`
 
 ```html
@@ -215,7 +239,7 @@ body {
 npm start
 ```
 
-### Options
+## Options
 
 ```typescript
 collapsed: false,                                          // Initialize menu in collapsed/expanded mode
@@ -252,11 +276,12 @@ swipe: 'both'                                              // or 'touchscreen', 
   - Chrome
   - Firefox
   - Safari
-  - IE11+
   - Edge
   - Android Browser
   - iOS Safari
+- Angular Versions Support (6+)
 - AoT Compilation Support
+- Font Awesome 4.x, 5.x and 6.x support
 
 ## Common Issues & Solutions
 
@@ -305,3 +330,22 @@ The menu supports both touch and mouse interactions. You can customize this with
 ### Custom Styling
 
 You can customize the appearance of the menu by overriding the CSS classes in your global styles.
+
+### Font Awesome Version Compatibility
+
+If you're using Font Awesome 5+ and icons aren't showing, make sure to:
+1. Update your icon class prefixes from `fa fa-` to `fas fa-`
+2. Adjust the menu configuration, including `backItemIcon` and `groupIcon` options
+
+## Demo
+
+Check out the example project in the repository to see a live implementation:
+
+```bash
+git clone https://github.com/ramiz4/ngx-multi-level-push-menu.git
+cd ngx-multi-level-push-menu
+npm install
+npm start
+```
+
+Then navigate to `http://localhost:4200` to view the demo.

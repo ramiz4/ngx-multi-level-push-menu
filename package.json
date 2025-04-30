@@ -1,13 +1,13 @@
 {
   "name": "ngx-multi-level-push-menu",
-  "version": "14.0.4",
+  "version": "14.0.5",
   "license": "MIT",
   "scripts": {
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2020 browser module main",
     "start": "nx serve",
     "build": "nx build",
-    "build:lib": "ng build ngx-multi-level-push-menu",
+    "build:lib": "nx build ngx-multi-level-push-menu",
     "test": "nx test",
     "test:lib": "ng test ngx-multi-level-push-menu",
     "test:ci": "ng test ngx-multi-level-push-menu --watch=false --bail --no-progress --progress=false",

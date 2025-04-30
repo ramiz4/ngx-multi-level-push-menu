@@ -39,24 +39,20 @@ jobs:
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        if: steps.recent-bumps.outputs.should_skip != 'true'
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       
       - name: Install dependencies
-        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: npm ci
       
       - name: Configure Git
-        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions@github.com'
       
       - name: Determine version bump type
         id: bump-type
-        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           if [[ "$COMMIT_MSG" == *"BREAKING CHANGE"* ]] || [[ "$COMMIT_MSG" == *"major"* ]]; then

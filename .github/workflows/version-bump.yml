@@ -65,7 +65,6 @@ jobs:
       
       - name: Bump version
         id: version-bump
-        if: steps.recent-bumps.outputs.should_skip != 'true'
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           

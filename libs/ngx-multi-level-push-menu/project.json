@@ -6,7 +6,7 @@
   "prefix": "ngx-multi-level-push-menu",
   "targets": {
     "build": {
-      "executor": "@nrwl/angular:ng-packagr-lite",
+      "executor": "@nx/angular:package",
       "outputs": ["{options.outputPath}"],
       "options": {
         "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json",
@@ -14,7 +14,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["coverage/libs/ngx-multi-level-push-menu"],
       "options": {
         "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.ts",
@@ -22,7 +22,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "libs/ngx-multi-level-push-menu/**/*.ts",

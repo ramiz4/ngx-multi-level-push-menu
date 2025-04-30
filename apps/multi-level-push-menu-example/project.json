@@ -12,7 +12,7 @@
         "outputPath": "dist/apps/multi-level-push-menu-example",
         "index": "apps/multi-level-push-menu-example/src/index.html",
         "main": "apps/multi-level-push-menu-example/src/main.ts",
-        "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -74,7 +74,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "apps/multi-level-push-menu-example/**/*.ts",
@@ -83,7 +83,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["coverage/apps/multi-level-push-menu-example"],
       "options": {
         "jestConfig": "apps/multi-level-push-menu-example/jest.config.ts",

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { CreditsComponent } from './credits.component';
 
 describe('CreditsComponent', () => {

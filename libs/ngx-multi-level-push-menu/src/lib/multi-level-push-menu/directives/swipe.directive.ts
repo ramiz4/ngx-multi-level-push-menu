@@ -28,7 +28,7 @@ export interface SwipeEvent {
  * Directive to handle swipe gestures on both mobile and desktop devices
  */
 @Directive({
-  selector: '[ramiz4Swipe]',
+  selector: '[ramiz4Swipe], [swipeEnabled], [overlapWidth]',
 })
 export class SwipeDirective {
   // Inputs

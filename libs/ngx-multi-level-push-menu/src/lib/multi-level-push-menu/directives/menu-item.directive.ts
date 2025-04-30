@@ -30,7 +30,7 @@ export interface MenuItemClickEvent {
  * - Accessibility attributes
  */
 @Directive({
-  selector: '[ramiz4MenuItem]',
+  selector: '[ramiz4MenuItem], [menuItem], [isSubmenu], [isBackItem]',
 })
 export class MenuItemDirective implements OnInit, OnChanges {
   // Inputs

@@ -5,7 +5,7 @@ import { DeviceDetectorService } from '../services/device-detector.service';
 import { SwipeDirection, SwipeDirective, SwipeEvent } from './swipe.directive';
 
 @Component({
-    template: `
+  template: `
     <div
       ramiz4Swipe
       [swipeEnabled]="swipeEnabled"
@@ -15,222 +15,222 @@ import { SwipeDirection, SwipeDirective, SwipeEvent } from './swipe.directive';
   `,
 })
 class TestComponent {
-    swipeEnabled = 'both';
-    overlapWidth = 60;
-    lastSwipeEvent: SwipeEvent | undefined;
+  swipeEnabled = 'both';
+  overlapWidth = 60;
+  lastSwipeEvent: SwipeEvent | undefined;
 
-    onSwipe(event: SwipeEvent): void {
-        this.lastSwipeEvent = event;
-    }
+  onSwipe(event: SwipeEvent): void {
+    this.lastSwipeEvent = event;
+  }
 }
 
 describe('SwipeDirective', () => {
-    let component: TestComponent;
-    let fixture: ComponentFixture<TestComponent>;
-    let directiveElement: DebugElement;
-    let directiveInstance: SwipeDirective;
-    let deviceDetectorServiceMock: DeviceDetectorService;
+  let component: TestComponent;
+  let fixture: ComponentFixture<TestComponent>;
+  let directiveElement: DebugElement;
+  let directiveInstance: SwipeDirective;
+  let deviceDetectorServiceMock: DeviceDetectorService;
 
-    beforeEach(async () => {
-        // Create a mock for DeviceDetectorService using Jest
-        deviceDetectorServiceMock = {
-            isSwipeEnabled: jest.fn().mockReturnValue(true),
-            getSwipeThreshold: jest
-                .fn()
-                .mockImplementation((overlapWidth: number) => overlapWidth * 0.3),
-            isMobile: jest.fn().mockReturnValue(false),
-        } as unknown as DeviceDetectorService;
+  beforeEach(async () => {
+    // Create a mock for DeviceDetectorService using Jest
+    deviceDetectorServiceMock = {
+      isSwipeEnabled: jest.fn().mockReturnValue(true),
+      getSwipeThreshold: jest
+        .fn()
+        .mockImplementation((overlapWidth: number) => overlapWidth * 0.3),
+      isMobile: jest.fn().mockReturnValue(false),
+    } as unknown as DeviceDetectorService;
 
-        await TestBed.configureTestingModule({
-            declarations: [TestComponent, SwipeDirective],
-            providers: [
-                { provide: DeviceDetectorService, useValue: deviceDetectorServiceMock },
-            ],
-        }).compileComponents();
+    await TestBed.configureTestingModule({
+      declarations: [TestComponent, SwipeDirective],
+      providers: [
+        { provide: DeviceDetectorService, useValue: deviceDetectorServiceMock },
+      ],
+    }).compileComponents();
 
-        fixture = TestBed.createComponent(TestComponent);
-        component = fixture.componentInstance;
-        directiveElement = fixture.debugElement.query(By.directive(SwipeDirective));
-        directiveInstance = directiveElement.injector.get(SwipeDirective);
-        fixture.detectChanges();
+    fixture = TestBed.createComponent(TestComponent);
+    component = fixture.componentInstance;
+    directiveElement = fixture.debugElement.query(By.directive(SwipeDirective));
+    directiveInstance = directiveElement.injector.get(SwipeDirective);
+    fixture.detectChanges();
+  });
+
+  it('should create the directive', () => {
+    expect(directiveInstance).toBeTruthy();
+  });
+
+  it('should call isSwipeEnabled with correct parameters on touchstart', () => {
+    const touchEvent = new TouchEvent('touchstart', {
+      touches: [{ clientX: 100 } as Touch],
     });
 
-    it('should create the directive', () => {
-        expect(directiveInstance).toBeTruthy();
+    directiveElement.nativeElement.dispatchEvent(touchEvent);
+
+    expect(deviceDetectorServiceMock.isSwipeEnabled).toHaveBeenCalledWith(
+      'touchscreen',
+      'both'
+    );
+  });
+
+  it('should call isSwipeEnabled with correct parameters on mousedown', () => {
+    const mouseEvent = new MouseEvent('mousedown', { clientX: 100 });
+
+    directiveElement.nativeElement.dispatchEvent(mouseEvent);
+
+    expect(deviceDetectorServiceMock.isSwipeEnabled).toHaveBeenCalledWith(
+      'desktop',
+      'both'
+    );
+  });
+
+  it('should not process touch events when touchscreen swipe is disabled', () => {
+    (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
+      false
+    );
+
+    const touchstartEvent = new TouchEvent('touchstart', {
+      touches: [{ clientX: 100 } as Touch],
+    });
+    directiveElement.nativeElement.dispatchEvent(touchstartEvent);
+
+    const touchmoveEvent = new TouchEvent('touchmove', {
+      touches: [{ clientX: 200 } as Touch],
+    });
+    directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
+
+    expect(component.lastSwipeEvent).toBeUndefined();
+  });
+
+  describe('Touch Events', () => {
+    it('should emit swipe event on right swipe (touchmove)', () => {
+      // Simulate threshold
+      (
+        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
+      ).mockReturnValue(10);
+
+      // Touchstart
+      const touchstartEvent = new TouchEvent('touchstart', {
+        touches: [{ clientX: 100 } as Touch],
+      });
+      directiveElement.nativeElement.dispatchEvent(touchstartEvent);
+
+      // Touchmove (right swipe)
+      const touchmoveEvent = new TouchEvent('touchmove', {
+        touches: [{ clientX: 130 } as Touch], // Move 30px right
+      });
+      directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
+
+      expect(component.lastSwipeEvent).toBeDefined();
+      expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Right);
+      expect(component.lastSwipeEvent?.distance).toBe(30);
     });
 
-    it('should call isSwipeEnabled with correct parameters on touchstart', () => {
-        const touchEvent = new TouchEvent('touchstart', {
-            touches: [{ clientX: 100 } as Touch],
-        });
+    it('should emit swipe event on left swipe (touchmove)', () => {
+      // Simulate threshold
+      (
+        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
+      ).mockReturnValue(10);
 
-        directiveElement.nativeElement.dispatchEvent(touchEvent);
+      // Touchstart
+      const touchstartEvent = new TouchEvent('touchstart', {
+        touches: [{ clientX: 100 } as Touch],
+      });
+      directiveElement.nativeElement.dispatchEvent(touchstartEvent);
 
-        expect(deviceDetectorServiceMock.isSwipeEnabled).toHaveBeenCalledWith(
-            'touchscreen',
-            'both'
-        );
+      // Touchmove (left swipe)
+      const touchmoveEvent = new TouchEvent('touchmove', {
+        touches: [{ clientX: 70 } as Touch], // Move 30px left
+      });
+      directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
+
+      expect(component.lastSwipeEvent).toBeDefined();
+      expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Left);
+      expect(component.lastSwipeEvent?.distance).toBe(30);
     });
 
-    it('should call isSwipeEnabled with correct parameters on mousedown', () => {
-        const mouseEvent = new MouseEvent('mousedown', { clientX: 100 });
+    it('should not emit swipe event when movement is below threshold', () => {
+      // Set threshold to 20
+      (
+        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
+      ).mockReturnValue(20);
 
-        directiveElement.nativeElement.dispatchEvent(mouseEvent);
+      // Touchstart
+      const touchstartEvent = new TouchEvent('touchstart', {
+        touches: [{ clientX: 100 } as Touch],
+      });
+      directiveElement.nativeElement.dispatchEvent(touchstartEvent);
 
-        expect(deviceDetectorServiceMock.isSwipeEnabled).toHaveBeenCalledWith(
-            'desktop',
-            'both'
-        );
+      // Touchmove with small movement
+      const touchmoveEvent = new TouchEvent('touchmove', {
+        touches: [{ clientX: 110 } as Touch], // Move only 10px right
+      });
+      directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
+
+      expect(component.lastSwipeEvent).toBeUndefined();
+    });
+  });
+
+  describe('Mouse Events', () => {
+    it('should setup mouse event handlers on mousedown', () => {
+      jest.spyOn(document, 'addEventListener');
+
+      const mousedownEvent = new MouseEvent('mousedown', { clientX: 100 });
+      directiveElement.nativeElement.dispatchEvent(mousedownEvent);
+
+      expect(document.addEventListener).toHaveBeenCalledTimes(2);
+      expect(document.addEventListener).toHaveBeenCalledWith(
+        'mousemove',
+        expect.any(Function)
+      );
+      expect(document.addEventListener).toHaveBeenCalledWith(
+        'mouseup',
+        expect.any(Function)
+      );
     });
 
-    it('should not process touch events when touchscreen swipe is disabled', () => {
-        (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
-            false
-        );
+    it('should not setup mouse event handlers when desktop swipe is disabled', () => {
+      // Override the default mock to return false for desktop swipes
+      (
+        deviceDetectorServiceMock.isSwipeEnabled as jest.Mock
+      ).mockImplementation((deviceType: string) => {
+        if (deviceType === 'desktop') return false;
+        return true;
+      });
 
-        const touchstartEvent = new TouchEvent('touchstart', {
-            touches: [{ clientX: 100 } as Touch],
-        });
-        directiveElement.nativeElement.dispatchEvent(touchstartEvent);
+      // Spy on document.addEventListener
+      const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
 
-        const touchmoveEvent = new TouchEvent('touchmove', {
-            touches: [{ clientX: 200 } as Touch],
-        });
-        directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
+      // Clear any previous calls
+      addEventListenerSpy.mockClear();
 
-        expect(component.lastSwipeEvent).toBeUndefined();
+      const mousedownEvent = new MouseEvent('mousedown', { clientX: 100 });
+      directiveElement.nativeElement.dispatchEvent(mousedownEvent);
+
+      expect(addEventListenerSpy).not.toHaveBeenCalled();
     });
+  });
 
-    describe('Touch Events', () => {
-        it('should emit swipe event on right swipe (touchmove)', () => {
-            // Simulate threshold
-            (
-                deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
-            ).mockReturnValue(10);
+  it('should use the correct overlapWidth to calculate threshold', () => {
+    // Reset mock call history
+    (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockClear();
 
-            // Touchstart
-            const touchstartEvent = new TouchEvent('touchstart', {
-                touches: [{ clientX: 100 } as Touch],
-            });
-            directiveElement.nativeElement.dispatchEvent(touchstartEvent);
+    // First call the touchstart handler to initialize
+    component.overlapWidth = 80;
+    fixture.detectChanges();
 
-            // Touchmove (right swipe)
-            const touchmoveEvent = new TouchEvent('touchmove', {
-                touches: [{ clientX: 130 } as Touch], // Move 30px right
-            });
-            directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-            expect(component.lastSwipeEvent).toBeDefined();
-            expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Right);
-            expect(component.lastSwipeEvent?.distance).toBe(30);
-        });
-
-        it('should emit swipe event on left swipe (touchmove)', () => {
-            // Simulate threshold
-            (
-                deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
-            ).mockReturnValue(10);
-
-            // Touchstart
-            const touchstartEvent = new TouchEvent('touchstart', {
-                touches: [{ clientX: 100 } as Touch],
-            });
-            directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-            // Touchmove (left swipe)
-            const touchmoveEvent = new TouchEvent('touchmove', {
-                touches: [{ clientX: 70 } as Touch], // Move 30px left
-            });
-            directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-            expect(component.lastSwipeEvent).toBeDefined();
-            expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Left);
-            expect(component.lastSwipeEvent?.distance).toBe(30);
-        });
-
-        it('should not emit swipe event when movement is below threshold', () => {
-            // Set threshold to 20
-            (
-                deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
-            ).mockReturnValue(20);
-
-            // Touchstart
-            const touchstartEvent = new TouchEvent('touchstart', {
-                touches: [{ clientX: 100 } as Touch],
-            });
-            directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-            // Touchmove with small movement
-            const touchmoveEvent = new TouchEvent('touchmove', {
-                touches: [{ clientX: 110 } as Touch], // Move only 10px right
-            });
-            directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-            expect(component.lastSwipeEvent).toBeUndefined();
-        });
+    // Then trigger a touchmove to ensure getSwipeThreshold is called
+    const touchstartEvent = new TouchEvent('touchstart', {
+      touches: [{ clientX: 100 } as Touch],
     });
+    directiveElement.nativeElement.dispatchEvent(touchstartEvent);
 
-    describe('Mouse Events', () => {
-        it('should setup mouse event handlers on mousedown', () => {
-            jest.spyOn(document, 'addEventListener');
-
-            const mousedownEvent = new MouseEvent('mousedown', { clientX: 100 });
-            directiveElement.nativeElement.dispatchEvent(mousedownEvent);
-
-            expect(document.addEventListener).toHaveBeenCalledTimes(2);
-            expect(document.addEventListener).toHaveBeenCalledWith(
-                'mousemove',
-                expect.any(Function)
-            );
-            expect(document.addEventListener).toHaveBeenCalledWith(
-                'mouseup',
-                expect.any(Function)
-            );
-        });
-
-        it('should not setup mouse event handlers when desktop swipe is disabled', () => {
-            // Override the default mock to return false for desktop swipes
-            (
-                deviceDetectorServiceMock.isSwipeEnabled as jest.Mock
-            ).mockImplementation((deviceType: string) => {
-                if (deviceType === 'desktop') return false;
-                return true;
-            });
-
-            // Spy on document.addEventListener
-            const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
-
-            // Clear any previous calls
-            addEventListenerSpy.mockClear();
-
-            const mousedownEvent = new MouseEvent('mousedown', { clientX: 100 });
-            directiveElement.nativeElement.dispatchEvent(mousedownEvent);
-
-            expect(addEventListenerSpy).not.toHaveBeenCalled();
-        });
+    const touchmoveEvent = new TouchEvent('touchmove', {
+      touches: [{ clientX: 150 } as Touch],
     });
+    directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
 
-    it('should use the correct overlapWidth to calculate threshold', () => {
-        // Reset mock call history
-        (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockClear();
-
-        // First call the touchstart handler to initialize
-        component.overlapWidth = 80;
-        fixture.detectChanges();
-
-        // Then trigger a touchmove to ensure getSwipeThreshold is called
-        const touchstartEvent = new TouchEvent('touchstart', {
-            touches: [{ clientX: 100 } as Touch],
-        });
-        directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-        const touchmoveEvent = new TouchEvent('touchmove', {
-            touches: [{ clientX: 150 } as Touch],
-        });
-        directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-        expect(deviceDetectorServiceMock.getSwipeThreshold).toHaveBeenCalledWith(
-            80
-        );
-    });
+    expect(deviceDetectorServiceMock.getSwipeThreshold).toHaveBeenCalledWith(
+      80
+    );
+  });
 });

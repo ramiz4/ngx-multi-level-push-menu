@@ -233,7 +233,6 @@ export class MultiLevelPushMenuComponent
 
     if (this._options.direction === 'rtl') {
       this.renderer.addClass(levelHolder, 'rtl');
-      this.renderer.setStyle(levelHolder, 'margin-right', '-100%');
       this.renderer.setStyle(levelHolder, 'right', '0');
       this.renderer.setStyle(
         levelHolder,
@@ -242,7 +241,6 @@ export class MultiLevelPushMenuComponent
       );
     } else {
       this.renderer.addClass(levelHolder, 'ltr');
-      this.renderer.setStyle(levelHolder, 'margin-left', '-100%'); // Initially hidden
       this.renderer.setStyle(levelHolder, 'left', '0');
       this.renderer.setStyle(
         levelHolder,
@@ -584,7 +582,7 @@ export class MultiLevelPushMenuComponent
 
         // Update change detection
         this.cdr.detectChanges();
-      }, 400); // Match the animation duration
+      }, 400);
     });
 
     this.renderer.appendChild(backItem, backAnchor);
@@ -619,14 +617,20 @@ export class MultiLevelPushMenuComponent
           ? -width
           : -width + overlapWidth;
 
+        // Force a reflow first to ensure animation will trigger
+        this.forceReflow(element);
+        
+        // Apply the animation using calculated px values instead of percentages
         if (this._options.direction === 'rtl') {
-          this.renderer.setStyle(element, 'margin-right', `${marginLeft}px`);
+          this.renderer.setStyle(element, 'transform', `translateX(${-marginLeft}px)`);
         } else {
-          this.renderer.setStyle(element, 'margin-left', `${marginLeft}px`);
+          this.renderer.setStyle(element, 'transform', `translateX(${marginLeft}px)`);
         }
 
-        // Adjust content
-        this.pushContent(marginLeft);
+        // Set margins after transform is applied (after animation completes)
+        setTimeout(() => {
+          this.pushContent(marginLeft);
+        }, 400);
 
         // Hide submenu items
         const menuUl = element.querySelector('ul');
@@ -649,9 +653,9 @@ export class MultiLevelPushMenuComponent
       const element = baseLevel.element;
 
       if (this._options.direction === 'rtl') {
-        this.renderer.setStyle(element, 'margin-right', '0');
+        this.renderer.setStyle(element, 'transform', `translateX(0)`);
       } else {
-        this.renderer.setStyle(element, 'margin-left', '0');
+        this.renderer.setStyle(element, 'transform', `translateX(0)`);
       }
 
       // Show menu items
@@ -690,13 +694,6 @@ export class MultiLevelPushMenuComponent
     // Now apply the animation by changing transform
     this.renderer.setProperty(element, '_slideState', 'in');
     this.renderer.setStyle(element, 'transform', 'translateX(0)');
-
-    // Show this level - set margins after transform to avoid conflicts
-    if (this._options.direction === 'rtl') {
-      this.renderer.setStyle(element, 'margin-right', '0');
-    } else {
-      this.renderer.setStyle(element, 'margin-left', '0');
-    }
 
     // Adjust width if in overlap mode
     if (this._options.mode === 'overlap') {
@@ -748,14 +745,6 @@ export class MultiLevelPushMenuComponent
           this.renderer.setStyle(element, 'transform', 'translateX(100%)');
         } else {
           this.renderer.setStyle(element, 'transform', 'translateX(-100%)');
-        }
-
-        // Set margins after transform is applied
-        const width = this.getElementWidth(element);
-        if (this._options.direction === 'rtl') {
-          this.renderer.setStyle(element, 'margin-right', `-${width}px`);
-        } else {
-          this.renderer.setStyle(element, 'margin-left', `-${width}px`);
         }
 
         // We need to set visibility to hidden after animation completes

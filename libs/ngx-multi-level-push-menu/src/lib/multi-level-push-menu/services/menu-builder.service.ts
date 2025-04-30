@@ -1,4 +1,5 @@
 import { Injectable, Renderer2 } from '@angular/core';
+import { MenuItemClickEvent } from '../directives/menu-item.directive';
 import { MenuLevelData, MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from '../multi-level-push-menu.model';
 import { MenuUtils } from '../utilities/menu-utils';
 import { MenuDomService } from './menu-dom.service';
@@ -102,6 +103,88 @@ export class MenuBuilderService {
     }
 
     /**
+     * Creates a menu item
+     */
+    public createMenuItem(
+        renderer: Renderer2,
+        item: MultiLevelPushMenuItem,
+        itemGroup: HTMLElement,
+        levelHolder: HTMLElement,
+        parentLevel: number,
+        options: MultiLevelPushMenuOptions,
+        submenuClickHandler: (sublevelKey: string, nextLevel: number, item: MultiLevelPushMenuItem, parentLevelHolder: HTMLElement) => void,
+        menuItemClickHandler: (anchor: HTMLElement, item: MultiLevelPushMenuItem) => void
+    ): void {
+        const listItem = renderer.createElement('li');
+        renderer.setStyle(
+            listItem,
+            'text-align',
+            options.direction === 'rtl' ? 'right' : 'left'
+        );
+        renderer.addClass(listItem, 'list-item');
+
+        const anchor = this.createMenuItemAnchor(renderer, item);
+
+        // Add ramiz4MenuItem directive attribute
+        renderer.setAttribute(anchor, 'ramiz4MenuItem', '');
+
+        // Add data attributes for the directive to use
+        renderer.setAttribute(anchor, 'data-item-id', item.id || '');
+        renderer.setAttribute(anchor, 'data-item-name', item.name || '');
+
+        // Add item icon if exists
+        if (item.icon) {
+            this.menuDomService.appendItemIcon(
+                renderer,
+                anchor,
+                item.icon,
+                options.direction === 'rtl'
+            );
+        }
+
+        // Handle submenu items
+        const hasSubmenu = item.items && item.items.length > 0;
+        if (hasSubmenu) {
+            // Mark as submenu item for the directive
+            renderer.setAttribute(anchor, 'data-is-submenu', 'true');
+
+            this.setupSubmenuItem(
+                renderer,
+                anchor,
+                item,
+                levelHolder,
+                parentLevel,
+                options,
+                submenuClickHandler
+            );
+        } else {
+            renderer.setAttribute(anchor, 'data-is-submenu', 'false');
+            this.setupNormalMenuItem(renderer, anchor, item, options, menuItemClickHandler);
+        }
+
+        // Add click listener that handles both normal and submenu items via the directive's output
+        renderer.listen(anchor, 'itemClick', (event: MenuItemClickEvent) => {
+            if (event.isSubmenu) {
+                if (options.preventGroupItemClick) {
+                    event.event.stopPropagation();
+                }
+
+                const nextLevel = parentLevel + 1;
+                const sublevelKey = `${item.id || item.name}-${nextLevel}`;
+                submenuClickHandler(sublevelKey, nextLevel, item, levelHolder);
+            } else {
+                if (options.preventItemClick) {
+                    event.event.preventDefault();
+                }
+                menuItemClickHandler(anchor, item);
+            }
+        });
+
+        renderer.appendChild(listItem, anchor);
+        renderer.appendChild(itemGroup, listItem);
+    }
+
+    /**
      * Creates a back item for navigating up a level
      */
     public createBackItem(
@@ -115,6 +198,8 @@ export class MenuBuilderService {
 
         const backAnchor = renderer.createElement('a');
         renderer.setAttribute(backAnchor, 'href', '#');
+        renderer.setAttribute(backAnchor, 'ramiz4MenuItem', '');
+        renderer.setAttribute(backAnchor, 'data-is-back-item', 'true');
         renderer.addClass(backAnchor, 'back-anchor');
         renderer.appendChild(
             backAnchor,
@@ -169,58 +254,6 @@ export class MenuBuilderService {
                 );
             });
         }
-    }
-
-    /**
-     * Creates a menu item
-     */
-    public createMenuItem(
-        renderer: Renderer2,
-        item: MultiLevelPushMenuItem,
-        itemGroup: HTMLElement,
-        levelHolder: HTMLElement,
-        parentLevel: number,
-        options: MultiLevelPushMenuOptions,
-        submenuClickHandler: (sublevelKey: string, nextLevel: number, item: MultiLevelPushMenuItem, parentLevelHolder: HTMLElement) => void,
-        menuItemClickHandler: (anchor: HTMLElement, item: MultiLevelPushMenuItem) => void
-    ): void {
-        const listItem = renderer.createElement('li');
-        renderer.setStyle(
-            listItem,
-            'text-align',
-            options.direction === 'rtl' ? 'right' : 'left'
-        );
-        renderer.addClass(listItem, 'list-item');
-
-        const anchor = this.createMenuItemAnchor(renderer, item);
-
-        // Add item icon if exists
-        if (item.icon) {
-            this.menuDomService.appendItemIcon(
-                renderer,
-                anchor,
-                item.icon,
-                options.direction === 'rtl'
-            );
-        }
-
-        // Handle submenu items
-        if (item.items && item.items.length > 0) {
-            this.setupSubmenuItem(
-                renderer,
-                anchor,
-                item,
-                levelHolder,
-                parentLevel,
-                options,
-                submenuClickHandler
-            );
-        } else {
-            this.setupNormalMenuItem(renderer, anchor, item, options, menuItemClickHandler);
-        }
-
-        renderer.appendChild(listItem, anchor);
-        renderer.appendChild(itemGroup, listItem);
     }
 
     /**

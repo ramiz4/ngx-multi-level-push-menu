@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { MenuItemDirective } from './multi-level-push-menu/directives/menu-item.directive';
 import { SwipeDirective } from './multi-level-push-menu/directives/swipe.directive';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu/multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-push-menu.service';
@@ -8,11 +9,13 @@ import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-p
   imports: [CommonModule],
   declarations: [
     MultiLevelPushMenuComponent,
-    SwipeDirective
+    SwipeDirective,
+    MenuItemDirective
   ],
   exports: [
     MultiLevelPushMenuComponent,
-    SwipeDirective
+    SwipeDirective,
+    MenuItemDirective
   ],
 })
 export class NgxMultiLevelPushMenuModule {

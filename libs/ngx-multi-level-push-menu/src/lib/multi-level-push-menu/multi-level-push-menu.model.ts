@@ -1,55 +1,55 @@
 export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
   public menu = new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-bars');
-  
+
   /** Menu sliding mode: overlap/cover */
   public mode = 'cover';
-  
+
   /** Initialize menu in collapsed/expanded mode */
   public collapsed = false;
-  
+
   /** ID of <nav> element */
   public menuID?: string;
-  
+
   /** Wrapper CSS class */
   public wrapperClass?: string;
-  
+
   /** CSS class for inactive wrappers */
   public menuInactiveClass?: string;
-  
+
   /** Wrapper width (integer, '%', 'px', 'em') */
   public menuWidth = '300px';
-  
+
   /** Menu height (integer, '%', 'px', 'em') */
   public menuHeight?: string;
-  
+
   /** Text for 'Back' menu item */
   public backText = 'Back';
-  
+
   /** CSS class for back menu item */
   public backItemClass = 'back-item';
-  
+
   /** FontAwesome icon used for back menu item */
   public backItemIcon = 'fa fa-angle-right';
-  
+
   /** FontAwesome icon used for menu items containing sub-items */
   public groupIcon = 'fa fa-angle-left';
-  
+
   /** Width in px of menu wrappers overlap */
   public overlapWidth = '55';
-  
+
   /** Set to false if you do not need event callback functionality per item click */
   public preventItemClick = true;
-  
+
   /** Set to false if you do not need event callback functionality per group item click */
   public preventGroupItemClick = true;
-  
+
   /** Set to 'rtl' for reverse sliding direction */
   public direction = 'ltr';
-  
+
   /** Set to true to fully hide base level holder when collapsed */
   public fullCollapse = false;
-  
+
   /** 'touchscreen', 'desktop', or 'none'. Everything else is considered as 'none' */
   public swipe = 'both';
 

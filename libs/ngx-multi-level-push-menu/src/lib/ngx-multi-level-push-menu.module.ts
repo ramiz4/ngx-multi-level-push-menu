@@ -10,13 +10,9 @@ import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-p
   declarations: [
     MultiLevelPushMenuComponent,
     SwipeDirective,
-    MenuItemDirective
+    MenuItemDirective,
   ],
-  exports: [
-    MultiLevelPushMenuComponent,
-    SwipeDirective,
-    MenuItemDirective
-  ],
+  exports: [MultiLevelPushMenuComponent, SwipeDirective, MenuItemDirective],
 })
 export class NgxMultiLevelPushMenuModule {
   public static forRoot(): ModuleWithProviders<NgxMultiLevelPushMenuModule> {

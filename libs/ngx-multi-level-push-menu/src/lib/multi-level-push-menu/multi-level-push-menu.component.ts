@@ -48,19 +48,24 @@ const ANIMATION_DURATION = 400;
       state('outRtl', style({ transform: 'translateX(100%)' })),
       transition('in => out', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
       transition('out => in', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
-      transition('in => outRtl', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
-      transition('outRtl => in', [animate(`${ANIMATION_DURATION}ms ease-in-out`)]),
+      transition('in => outRtl', [
+        animate(`${ANIMATION_DURATION}ms ease-in-out`),
+      ]),
+      transition('outRtl => in', [
+        animate(`${ANIMATION_DURATION}ms ease-in-out`),
+      ]),
     ]),
   ],
   providers: [
     DeviceDetectorService,
     MenuAnimationService,
     MenuBuilderService,
-    MenuDomService
-  ]
+    MenuDomService,
+  ],
 })
 export class MultiLevelPushMenuComponent
-  implements OnInit, OnDestroy, AfterViewInit {
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @ViewChild('menuContainer') menuContainer!: ElementRef;
   @ViewChild('contentContainer') contentContainer!: ElementRef;
 
@@ -100,7 +105,7 @@ export class MultiLevelPushMenuComponent
     private menuAnimationService: MenuAnimationService,
     private menuBuilderService: MenuBuilderService,
     private menuDomService: MenuDomService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.isMobile = this.deviceDetectorService.isMobile();
@@ -176,8 +181,18 @@ export class MultiLevelPushMenuComponent
       this._options,
       this.menuLevels,
       (event: MouseEvent) => this.titleIconClick(event),
-      (sublevelKey: string, nextLevel: number, item: MultiLevelPushMenuItem, parentLevelHolder: HTMLElement) =>
-        this.handleSubmenuClick(sublevelKey, nextLevel, item, parentLevelHolder),
+      (
+        sublevelKey: string,
+        nextLevel: number,
+        item: MultiLevelPushMenuItem,
+        parentLevelHolder: HTMLElement
+      ) =>
+        this.handleSubmenuClick(
+          sublevelKey,
+          nextLevel,
+          item,
+          parentLevelHolder
+        ),
       (backAnchor: HTMLElement, levelHolder: HTMLElement) =>
         this.handleBackItemClick(levelHolder),
       (anchor: HTMLElement, item: MultiLevelPushMenuItem) =>
@@ -245,7 +260,11 @@ export class MultiLevelPushMenuComponent
 
     if (!targetLevelData) return;
 
-    this.handleBackNavigation(levelHolder, targetLevelData.element, targetLevel);
+    this.handleBackNavigation(
+      levelHolder,
+      targetLevelData.element,
+      targetLevel
+    );
   }
 
   private handleBackNavigation(
@@ -331,7 +350,9 @@ export class MultiLevelPushMenuComponent
       overlapWidth,
       () => {
         // Push content
-        const marginLeft = this._options.fullCollapse ? -width : -width + overlapWidth;
+        const marginLeft = this._options.fullCollapse
+          ? -width
+          : -width + overlapWidth;
         this.menuDomService.pushContent(
           this.renderer,
           this.contentContainer.nativeElement,
@@ -425,7 +446,8 @@ export class MultiLevelPushMenuComponent
     // Update active level and related state
     this.currentLevel = level;
     this.activeLevelHolders = this.activeLevelHolders.filter(
-      holder => parseInt(holder.getAttribute('data-level') ?? '0', 10) <= level
+      (holder) =>
+        parseInt(holder.getAttribute('data-level') ?? '0', 10) <= level
     );
 
     // Adjust content position in overlap mode

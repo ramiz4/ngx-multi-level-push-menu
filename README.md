@@ -37,11 +37,11 @@ import { NgxMultiLevelPushMenuModule } from '@ramiz4/ngx-multi-level-push-menu';
 @NgModule({
   imports: [
     // ...other imports
-    NgxMultiLevelPushMenuModule
+    NgxMultiLevelPushMenuModule,
   ],
   // ...
 })
-export class AppModule { }
+export class AppModule {}
 ```
 
 2. Add the component to your template:
@@ -58,7 +58,7 @@ export class AppComponent {
     {
       name: 'Home',
       link: '/home',
-      icon: 'fa fa-home'
+      icon: 'fa fa-home',
     },
     {
       name: 'Collections',
@@ -66,14 +66,14 @@ export class AppComponent {
       items: [
         {
           name: 'Collection 1',
-          link: '/collections/1'
+          link: '/collections/1',
         },
         {
           name: 'Collection 2',
-          link: '/collections/2'
-        }
-      ]
-    }
+          link: '/collections/2',
+        },
+      ],
+    },
     // Add more menu items as needed
   ];
 
@@ -91,27 +91,27 @@ export class AppComponent {
 
 ### Inputs
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| menu | Array | [] | Array of menu items |
-| options | Object | {} | Configuration options |
+| Name    | Type   | Default | Description           |
+| ------- | ------ | ------- | --------------------- |
+| menu    | Array  | []      | Array of menu items   |
+| options | Object | {}      | Configuration options |
 
 ### Menu Item Properties
 
-| Name | Type | Description |
-|------|------|-------------|
-| name | string | Display name of the menu item |
-| link | string | Optional router link |
-| icon | string | Optional icon class (Font Awesome) |
-| items | Array | Optional array of child menu items |
+| Name  | Type   | Description                        |
+| ----- | ------ | ---------------------------------- |
+| name  | string | Display name of the menu item      |
+| link  | string | Optional router link               |
+| icon  | string | Optional icon class (Font Awesome) |
+| items | Array  | Optional array of child menu items |
 
 ### Options
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| collapsed | boolean | false | Initial menu state |
-| width | number | 300 | Width of the menu in pixels |
-| showBackLink | boolean | true | Show back link for submenu navigation |
+| Name         | Type    | Default | Description                           |
+| ------------ | ------- | ------- | ------------------------------------- |
+| collapsed    | boolean | false   | Initial menu state                    |
+| width        | number  | 300     | Width of the menu in pixels           |
+| showBackLink | boolean | true    | Show back link for submenu navigation |
 
 ## Example Application
 

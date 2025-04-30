@@ -21,7 +21,7 @@
       text-align: right;
     }
   }
-  
+
   &.ltr {
     left: 0;
     box-shadow: 5px 0 5px -5px #1f4164;
@@ -34,14 +34,14 @@
     font-size: 1.5em;
     // color: #fff;
     margin: 0;
-    padding: .6em .8em;
+    padding: 0.6em 0.8em;
   }
 
   .back-item {
     display: block;
     background: #2e6196;
     border-top: 1px solid #295685;
-    
+
     a.back-anchor {
       display: block;
       padding: 1em 1.2em;
@@ -62,11 +62,11 @@
     li.list-item {
       display: block;
       border-top: 1px solid #295685;
-      
+
       &:first-child:last-child {
         border-bottom: 1px solid #295685;
       }
-      
+
       a.anchor {
         display: block;
         padding: 1em 1.2em;
@@ -90,7 +90,7 @@
         }
       }
     }
-    
+
     // When the group is empty (has no children)
     &:empty + li.list-item {
       border-bottom: 1px solid #295685;

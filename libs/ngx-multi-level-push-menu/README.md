@@ -29,11 +29,13 @@ npm i @ramiz4/ngx-multi-level-push-menu --save
 The component requires Font Awesome for icons. You can use either Font Awesome 4.x, 5.x, or 6.x:
 
 ### Font Awesome 4.x (Classic):
+
 ```bash
 npm i font-awesome --save
 ```
 
 ### Font Awesome 5.x or 6.x (Recommended for newer projects):
+
 ```bash
 npm i @fortawesome/fontawesome-free --save
 ```
@@ -43,6 +45,7 @@ npm i @fortawesome/fontawesome-free --save
 ### 1. Update your `angular.json`
 
 For Font Awesome 4.x:
+
 ```json
 "styles": [
   "node_modules/font-awesome/css/font-awesome.min.css",
@@ -52,6 +55,7 @@ For Font Awesome 4.x:
 ```
 
 For Font Awesome 5.x or 6.x:
+
 ```json
 "styles": [
   "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
@@ -334,6 +338,7 @@ You can customize the appearance of the menu by overriding the CSS classes in yo
 ### Font Awesome Version Compatibility
 
 If you're using Font Awesome 5+ and icons aren't showing, make sure to:
+
 1. Update your icon class prefixes from `fa fa-` to `fas fa-`
 2. Adjust the menu configuration, including `backItemIcon` and `groupIcon` options
 

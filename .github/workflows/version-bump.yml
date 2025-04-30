@@ -29,6 +29,8 @@ jobs:
           TIME_DIFF=$((CURRENT_TIME - LAST_BUMP_TIME))
           
           # If a version bump happened in the last 5 minutes (300 seconds), set skip flag
+          # The 5-minute threshold is used to prevent multiple version bumps in quick succession,
+          # which could be unnecessary and disruptive to the workflow.
           if [[ $TIME_DIFF -lt 300 ]]; then
             echo "should_skip=true" >> $GITHUB_OUTPUT
             echo "Too soon after last version bump, skipping remaining steps"

@@ -4,16 +4,37 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '**.md'
 
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    # Skip if commit is from dependabot, GitHub Actions, or is already a version bump
+    if: "!contains(github.event.head_commit.author.name, 'dependabot') && !contains(github.event.head_commit.message, 'chore: bump version') && !contains(github.event.head_commit.author.name, 'GitHub Actions')"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
+      
+      # Add a check for recent version bumps to prevent multiple bumps in quick succession
+      - name: Check for recent version bumps
+        id: recent-bumps
+        run: |
+          # Get timestamp of the last version bump commit (in seconds since epoch)
+          LAST_BUMP_TIME=$(git log -1 --format=%ct --grep="chore: bump version" || echo 0)
+          CURRENT_TIME=$(date +%s)
+          TIME_DIFF=$((CURRENT_TIME - LAST_BUMP_TIME))
+          
+          # If a version bump happened in the last 5 minutes (300 seconds), skip this run
+          if [[ $TIME_DIFF -lt 300 ]]; then
+            echo "Too soon after last version bump, skipping"
+            exit 1
+          fi
+          
+          echo "No recent version bumps found, proceeding"
       
       - name: Setup Node.js
         uses: actions/setup-node@v3

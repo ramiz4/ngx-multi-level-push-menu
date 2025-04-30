@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule, Routes } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppComponent } from './app.component';
+import { RouterModule, Routes } from '@angular/router';
 import {
   MultiLevelPushMenuService,
   NgxMultiLevelPushMenuModule,
 } from '@ramiz4/ngx-multi-level-push-menu';
+import { AppComponent } from './app.component';
 
 const routes: Routes = [];
 

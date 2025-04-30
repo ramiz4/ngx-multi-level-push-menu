@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SwipeDirective } from './directives/swipe.directive';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
-import { SwipeDirective } from './directives/swipe.directive';
 import { DeviceDetectorService } from './services/device-detector.service';
 
 // Mock window.matchMedia
@@ -24,7 +24,7 @@ describe('MultiLevelPushMenuComponent', () => {
   let component: MultiLevelPushMenuComponent;
   let fixture: ComponentFixture<MultiLevelPushMenuComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes([])],
       declarations: [

@@ -1,8 +1,8 @@
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { NgxMultiLevelPushMenuModule } from './ngx-multi-level-push-menu.module';
 
 describe('NgMultiLevelPushMenuModule', () => {
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxMultiLevelPushMenuModule],
       teardown: { destroyAfterEach: false },

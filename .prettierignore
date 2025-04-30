@@ -5,3 +5,5 @@
 /.angular
 /node_modules
 /tmp
+
+/.nx/cache

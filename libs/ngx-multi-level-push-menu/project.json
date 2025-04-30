@@ -15,20 +15,13 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["coverage/libs/ngx-multi-level-push-menu"],
+      "outputs": ["{workspaceRoot}/coverage/libs/ngx-multi-level-push-menu"],
       "options": {
-        "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.ts"
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/ngx-multi-level-push-menu/**/*.ts",
-          "libs/ngx-multi-level-push-menu/**/*.html"
-        ]
-      }
+      "executor": "@nx/eslint:lint"
     }
   },
   "tags": []

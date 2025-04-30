@@ -1,6 +1,5 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "npmScope": "ngx-multi-level-push-menu",
   "affected": {
     "defaultBase": "master"
   },

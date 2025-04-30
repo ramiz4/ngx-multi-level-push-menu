@@ -1,8 +1,9 @@
 {
+  "name": "multi-level-push-menu-example",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "root": "apps/multi-level-push-menu-example",
   "sourceRoot": "apps/multi-level-push-menu-example/src",
-  "prefix": "app",
+  "prefix": "ngx-multi-level-push-menu",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
@@ -13,60 +14,71 @@
         "main": "apps/multi-level-push-menu-example/src/main.ts",
         "polyfills": "apps/multi-level-push-menu-example/src/polyfills.ts",
         "tsConfig": "apps/multi-level-push-menu-example/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
         "assets": [
           "apps/multi-level-push-menu-example/src/favicon.ico",
           "apps/multi-level-push-menu-example/src/assets"
         ],
-        "styles": ["apps/multi-level-push-menu-example/src/styles.css"],
+        "styles": ["apps/multi-level-push-menu-example/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
         "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
           "fileReplacements": [
             {
               "replace": "apps/multi-level-push-menu-example/src/environments/environment.ts",
               "with": "apps/multi-level-push-menu-example/src/environments/environment.prod.ts"
             }
           ],
-          "optimization": true,
-          "outputHashing": "all",
-          "sourceMap": false,
-          "namedChunks": false,
-          "extractLicenses": true,
-          "vendorChunk": false,
-          "buildOptimizer": true,
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "2mb",
-              "maximumError": "5mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "6kb",
-              "maximumError": "10kb"
-            }
-          ]
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
         }
-      }
+      },
+      "defaultConfiguration": "production"
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
-      "options": {
-        "browserTarget": "multi-level-push-menu-example:build"
-      },
       "configurations": {
         "production": {
           "browserTarget": "multi-level-push-menu-example:build:production"
+        },
+        "development": {
+          "browserTarget": "multi-level-push-menu-example:build:development"
         }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "multi-level-push-menu-example:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "apps/multi-level-push-menu-example/src/**/*.ts",
-          "apps/multi-level-push-menu-example/src/**/*.html"
+          "apps/multi-level-push-menu-example/**/*.ts",
+          "apps/multi-level-push-menu-example/**/*.html"
         ]
       }
     },
@@ -74,7 +86,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/multi-level-push-menu-example"],
       "options": {
-        "jestConfig": "apps/multi-level-push-menu-example/jest.config.js",
+        "jestConfig": "apps/multi-level-push-menu-example/jest.config.ts",
         "passWithNoTests": true
       }
     }

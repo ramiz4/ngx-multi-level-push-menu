@@ -1,30 +1,23 @@
 {
+  "name": "ngx-multi-level-push-menu",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "root": "libs/ngx-multi-level-push-menu",
   "sourceRoot": "libs/ngx-multi-level-push-menu/src",
-  "prefix": "lib",
+  "prefix": "ngx-multi-level-push-menu",
   "targets": {
     "build": {
-      "executor": "@nrwl/angular:package",
-      "outputs": ["dist/libs/ngx-multi-level-push-menu"],
+      "executor": "@nrwl/angular:ng-packagr-lite",
+      "outputs": ["{options.outputPath}"],
       "options": {
+        "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json",
         "project": "libs/ngx-multi-level-push-menu/ng-package.json"
-      },
-      "configurations": {
-        "production": {
-          "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.prod.json"
-        },
-        "development": {
-          "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
-        }
-      },
-      "defaultConfiguration": "production"
+      }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/ngx-multi-level-push-menu"],
       "options": {
-        "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.js",
+        "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -32,8 +25,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/ngx-multi-level-push-menu/src/**/*.ts",
-          "libs/ngx-multi-level-push-menu/src/**/*.html"
+          "libs/ngx-multi-level-push-menu/**/*.ts",
+          "libs/ngx-multi-level-push-menu/**/*.html"
         ]
       }
     }

@@ -6,8 +6,9 @@ import {
 
 @Component({
   selector: 'ramiz4-root',
+  standalone: false,
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   title = 'multi-level-push-menu-example';

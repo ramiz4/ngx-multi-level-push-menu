@@ -1,0 +1,88 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+      
+      - name: Determine version bump type
+        id: bump-type
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "$COMMIT_MSG" == *"BREAKING CHANGE"* ]] || [[ "$COMMIT_MSG" == *"major"* ]]; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif [[ "$COMMIT_MSG" == *"feat"* ]]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          else
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Bump version
+        id: version-bump
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          # Validate version format
+          if [[ ! "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Invalid version format in package.json. Expected semantic versioning (x.y.z), got '$CURRENT_VERSION'."
+            exit 1
+          fi
+          
+          IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          
+          if [[ "${{ steps.bump-type.outputs.bump }}" == "major" ]]; then
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+          elif [[ "${{ steps.bump-type.outputs.bump }}" == "minor" ]]; then
+            NEW_VERSION="${MAJOR}.$((MINOR + 1)).0"
+          else
+            NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          fi
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          # Update root package.json
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          # Update library package.json
+          cd libs/ngx-multi-level-push-menu
+          npm version $NEW_VERSION --no-git-tag-version
+      
+      - name: Commit version bump
+        run: |
+          git add package.json libs/ngx-multi-level-push-menu/package.json
+          git commit -m "chore: bump version to ${{ steps.version-bump.outputs.new_version }}"
+          git tag v${{ steps.version-bump.outputs.new_version }}
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          branch: master
+          tags: true

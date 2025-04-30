@@ -143,6 +143,45 @@ Run `ng test ngx-multi-level-push-menu` to execute the unit tests via [Jest](htt
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Development Workflow
+
+### Semantic Commit Messages
+
+This project uses semantic commit messages to automate version bumping. When you create a commit, use one of the following prefixes to indicate the type of change:
+
+| Commit Prefix | Description | Version Bump |
+|---------------|-------------|--------------|
+| `feat: `      | A new feature | Minor version bump |
+| `fix: `       | A bug fix | Patch version bump |
+| `docs: `      | Documentation only changes | Patch version bump |
+| `style: `     | Changes that do not affect the meaning of the code | Patch version bump |
+| `refactor: `  | Code changes that neither fix a bug nor add a feature | Patch version bump |
+| `perf: `      | Code changes that improve performance | Patch version bump |
+| `test: `      | Adding or correcting tests | Patch version bump |
+| `chore: `     | Changes to the build process or auxiliary tools | Patch version bump |
+
+To trigger a **major version** bump, include the phrase `BREAKING CHANGE` or `major` in your commit message.
+
+Examples:
+```
+feat: add new menu animation feature
+fix: resolve issue with menu not closing
+docs: update API documentation
+feat: add new API with BREAKING CHANGE
+```
+
+### Automated Version Bumping
+
+The project uses GitHub Actions to automate version bumping when changes are merged to the master branch. The workflow does the following:
+
+1. When code is merged to `master`, it automatically determines the type of version bump based on commit messages
+2. Updates all package.json files with the new version number
+3. Commits the version changes and creates a git tag
+4. Pushes the changes back to the repository
+5. Creates a new npm release when a tag is pushed
+
+This automation ensures that the version is always properly incremented according to semantic versioning principles, and that the npm package is kept up to date with the latest changes.
+
 ## License
 
 MIT © [Ramiz Loki](https://ramizloki.com)

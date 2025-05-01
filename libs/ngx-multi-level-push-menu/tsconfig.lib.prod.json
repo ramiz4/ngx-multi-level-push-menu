@@ -7,15 +7,21 @@
     "inlineSources": true,
     "types": [],
     "target": "ES2022",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "stripInternal": true,
+    "removeComments": true
   },
   "exclude": [
     "src/test-setup.ts",
     "**/*.spec.ts",
     "jest.config.ts",
-    "**/*.test.ts",
-    "**/*.stories.ts",
-    "**/*.stories.js"
+    "**/*.test.ts"
   ],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "angularCompilerOptions": {
+    "compilationMode": "partial",
+    "enableIvy": true,
+    "strictInjectionParameters": true,
+    "strictTemplates": true
+  }
 }

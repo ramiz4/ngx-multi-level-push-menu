@@ -5,6 +5,30 @@ import {
 } from '../multi-level-push-menu.model';
 import { MenuUtils } from '../utilities/menu-utils';
 
+/**
+ * Convert menuWidth to string to ensure consistent usage
+ */
+/**
+ * Checks if a string contains a valid CSS unit
+ */
+function hasValidCssUnit(value: string): boolean {
+  const cssUnits = ['px', 'em', 'rem', '%', 'vh', 'vw', 'vmin', 'vmax', 'cm', 'mm', 'in', 'pt', 'pc', 'ex', 'ch'];
+  return cssUnits.some(unit => value.endsWith(unit));
+}
+
+/**
+ * Convert menuWidth to string to ensure consistent usage
+ */
+function ensureMenuWidthString(value: string | number): string {
+  if (typeof value === 'number') {
+    return `${value}px`;
+  }
+  if (!hasValidCssUnit(value)) {
+    return `${value}px`;
+  }
+  return value;
+}
+
 // Content padding constant
 const CONTENT_PADDING = 20;
 
@@ -16,17 +40,18 @@ export class MenuDomService {
   public setContentPositionAndWidth(
     renderer: Renderer2,
     contentElement: HTMLElement,
-    menuWidth: string
+    menuWidth: string | number
   ): void {
+    const menuWidthStr = ensureMenuWidthString(menuWidth);
     renderer.setStyle(
       contentElement,
       'left',
-      `calc(${menuWidth} + ${CONTENT_PADDING}px)`
+      `calc(${menuWidthStr} + ${CONTENT_PADDING}px)`
     );
     renderer.setStyle(
       contentElement,
       'width',
-      `calc(100% - (${menuWidth} + ${CONTENT_PADDING}px))`
+      `calc(100% - (${menuWidthStr} + ${CONTENT_PADDING}px))`
     );
   }
 
@@ -37,11 +62,12 @@ export class MenuDomService {
     renderer: Renderer2,
     contentElement: HTMLElement,
     amount: number,
-    menuWidth: string
+    menuWidth: string | number
   ): void {
     if (!contentElement) return;
 
-    const menuWidthPx = MenuUtils.parseSize(menuWidth);
+    const menuWidthStr = ensureMenuWidthString(menuWidth);
+    const menuWidthPx = MenuUtils.parseSize(menuWidthStr);
     const totalPush = menuWidthPx + amount + CONTENT_PADDING;
 
     renderer.setStyle(contentElement, 'left', `${totalPush}px`);
@@ -71,6 +97,15 @@ export class MenuDomService {
         options,
         titleClickHandler
       );
+    } else {
+      // Add default icon if no icon is provided
+      this.appendTitleIcon(
+        renderer,
+        title,
+        options.titleIcon,
+        options,
+        titleClickHandler
+      );
     }
 
     renderer.appendChild(levelHolder, title);
@@ -88,27 +123,26 @@ export class MenuDomService {
   ): void {
     const titleIcon = renderer.createElement('i');
 
-    // Add icon classes
+    // Add icon classes to <i>
     iconClasses.split(' ').forEach((className) => {
       if (className) renderer.addClass(titleIcon, className);
     });
 
-    // Add positioning classes
-    renderer.addClass(
-      titleIcon,
-      options.direction === 'rtl' ? 'floatLeft' : 'floatRight'
-    );
-    renderer.addClass(titleIcon, 'cursorPointer');
+    // Create <button> wrapper
+    const buttonWrapper = renderer.createElement('button');
+    renderer.addClass(buttonWrapper, 'title-icon');
 
-    // Apply styles
-    const floatDirection = options.direction === 'rtl' ? 'left' : 'right';
-    renderer.setStyle(titleIcon, 'float', floatDirection);
-    renderer.setStyle(titleIcon, 'cursor', 'pointer');
+    // Optional accessibility
+    renderer.setAttribute(buttonWrapper, 'type', 'button');
+    renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
 
-    // Add click listener
-    renderer.listen(titleIcon, 'click', clickHandler);
+    // Append <i> to <button>
+    renderer.appendChild(buttonWrapper, titleIcon);
 
-    renderer.appendChild(titleElement, titleIcon);
+    // Add click listener to the button
+    renderer.listen(buttonWrapper, 'click', clickHandler);
+
+    renderer.appendChild(titleElement, buttonWrapper);
   }
 
   /**

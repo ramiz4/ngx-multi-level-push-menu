@@ -36,15 +36,21 @@ export class MenuBuilderService {
       item: MultiLevelPushMenuItem
     ) => void
   ): HTMLElement[] {
-    if (!options.menu) return [];
+    if (!options.menu || options.menu.length === 0) return [];
 
     // Clear the existing menu first
     this.menuDomService.clearMenu(renderer, menuContainer);
 
+    // Create a root level data object from the menu items array
+    const rootMenuData: MultiLevelPushMenuItem = {
+      name: 'Menu',
+      items: options.menu
+    };
+
     // Create base level
     const baseLevel = this.createLevelHolder(
       renderer,
-      options.menu,
+      rootMenuData,
       0,
       options,
       menuLevels,

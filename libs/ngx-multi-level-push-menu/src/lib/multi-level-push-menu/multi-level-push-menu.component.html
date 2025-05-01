@@ -13,10 +13,14 @@
     ramiz4Swipe
     [swipeEnabled]="options.swipe"
     [overlapWidth]="toNumber(options.overlapWidth)"
+    [preventBodyScroll]="true"
     (swipe)="onSwipeDetected($event)"
+    (swipeStart)="onSwipeStart()"
+    (swipeCancel)="onSwipeCancel()"
     role="menu"
     aria-label="Main navigation menu"
     [attr.aria-orientation]="'vertical'"
+    [class.is-swiping]="isSwiping"
   ></nav>
   <div #contentContainer id="content">
     <ng-content></ng-content>

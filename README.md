@@ -2,7 +2,7 @@
 
 Angular component for a responsive multi-level push menu.
 
-[![npm version](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu)
+[![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features

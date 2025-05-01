@@ -1,6 +1,6 @@
 # NgxMultiLevelPushMenu
 
-[![npm version](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/%40ramiz4%2Fngx-multi-level-push-menu)
+[![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Multi-level push menu is a cross-browser compatible Angular component allowing endless nesting of navigation elements.

@@ -5,9 +5,9 @@ import { provideMultiLevelPushMenu } from '@ramiz4/ngx-multi-level-push-menu';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
-    providers: [
-        provideRouter(routes, withComponentInputBinding()),
-        provideAnimations(),
-        provideMultiLevelPushMenu()
-    ]
+  providers: [
+    provideRouter(routes, withComponentInputBinding()),
+    provideAnimations(),
+    provideMultiLevelPushMenu(),
+  ],
 };

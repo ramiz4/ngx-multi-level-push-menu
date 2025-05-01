@@ -2,9 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
-import {
-  provideMultiLevelPushMenu
-} from '@ramiz4/ngx-multi-level-push-menu';
+import { provideMultiLevelPushMenu } from '@ramiz4/ngx-multi-level-push-menu';
 import { AppComponent } from './app.component';
 
 const routes: Routes = [];
@@ -30,9 +28,9 @@ describe('AppComponent', () => {
       imports: [
         BrowserModule,
         BrowserAnimationsModule,
-        RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' })
+        RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' }),
       ],
-      providers: [provideMultiLevelPushMenu()]
+      providers: [provideMultiLevelPushMenu()],
     }).compileComponents();
   });
 

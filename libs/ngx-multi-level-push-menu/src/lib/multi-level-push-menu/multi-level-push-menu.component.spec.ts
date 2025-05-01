@@ -1,7 +1,11 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter, Routes, withComponentInputBinding } from '@angular/router';
+import {
+  provideRouter,
+  Routes,
+  withComponentInputBinding,
+} from '@angular/router';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 
@@ -41,7 +45,7 @@ describe('MultiLevelPushMenuComponent', () => {
         { provide: 'WINDOW', useValue: window },
         provideRouter(routes, withComponentInputBinding()),
         provideAnimations(),
-        MultiLevelPushMenuService
+        MultiLevelPushMenuService,
       ],
     }).compileComponents();
   }));

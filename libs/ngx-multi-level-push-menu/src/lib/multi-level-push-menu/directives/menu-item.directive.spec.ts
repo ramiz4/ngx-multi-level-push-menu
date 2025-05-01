@@ -5,7 +5,6 @@ import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
 import { MenuItemClickEvent, MenuItemDirective } from './menu-item.directive';
 
 @Component({
-  standalone: true,
   imports: [MenuItemDirective],
   template: `
     <div

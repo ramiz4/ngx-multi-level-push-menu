@@ -5,7 +5,6 @@ import { DeviceDetectorService } from '../services/device-detector.service';
 import { SwipeDirection, SwipeDirective, SwipeEvent } from './swipe.directive';
 
 @Component({
-  standalone: true,
   imports: [SwipeDirective],
   template: `
     <div

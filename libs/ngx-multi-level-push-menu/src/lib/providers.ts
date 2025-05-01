@@ -5,12 +5,12 @@ import { DeviceDetectorService } from './multi-level-push-menu/services/device-d
 /**
  * Provides the necessary services for the Multi-Level Push Menu component
  * to work in a standalone application.
- * 
+ *
  * @returns The providers needed for the Multi-Level Push Menu
  */
 export function provideMultiLevelPushMenu(): EnvironmentProviders {
   return makeEnvironmentProviders([
     MultiLevelPushMenuService,
-    DeviceDetectorService
+    DeviceDetectorService,
   ]);
 }

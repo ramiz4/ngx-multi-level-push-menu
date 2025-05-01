@@ -8,7 +8,6 @@ import {
 
 @Component({
   selector: 'ramiz4-root',
-  standalone: true,
   imports: [RouterOutlet, MultiLevelPushMenuComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

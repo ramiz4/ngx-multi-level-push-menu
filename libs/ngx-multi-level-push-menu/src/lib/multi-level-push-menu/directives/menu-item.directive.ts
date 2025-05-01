@@ -30,8 +30,18 @@ export interface MenuItemClickEvent {
  * - Accessibility attributes
  */
 @Directive({
-  selector: '[ramiz4MenuItem], [menuItem], [isSubmenu], [isBackItem]',
-  standalone: true,
+  selector: '[ramiz4MenuItem]',
+  exportAs: 'menuItem',
+  host: {
+    '[attr.tabindex]': '0',
+    '[attr.role]': "'menuitem'",
+    '[attr.aria-label]': 'menuItem?.title',
+    '[attr.aria-haspopup]': 'isSubmenu ? "true" : null',
+    '[attr.aria-expanded]': 'isSubmenu ? "false" : null',
+    '(click)': 'onClick($event)',
+    '(keydown.enter)': 'onKeyDown($event)',
+    '(keydown.space)': 'onKeyDown($event)',
+  },
 })
 export class MenuItemDirective implements OnInit, OnChanges {
   // Inputs

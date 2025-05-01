@@ -6,7 +6,7 @@ describe('MultiLevelPushMenuComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MultiLevelPushMenuComponent],
-      providers: [MultiLevelPushMenuService]
+      providers: [MultiLevelPushMenuService],
     }).compileComponents();
   }));
 

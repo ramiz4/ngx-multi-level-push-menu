@@ -141,26 +141,58 @@ export class MenuDomService {
       if (className) renderer.addClass(titleIcon, className);
     });
 
-    // Create <button> wrapper
-    const buttonWrapper = renderer.createElement('button');
-    renderer.addClass(buttonWrapper, 'title-icon');
-    
-    // Add submenu-specific class if needed
     if (isSubmenu) {
-      renderer.addClass(buttonWrapper, 'submenu-icon');
+      // Create <div> wrapper for submenu title icon
+      const spanWrapper = renderer.createElement('div');
+      renderer.addClass(spanWrapper, 'title-icon');
+      renderer.addClass(spanWrapper, 'submenu-icon');
+
+      // Append <i> to <div>
+      renderer.appendChild(spanWrapper, titleIcon);
+
+      renderer.appendChild(titleElement, spanWrapper);
+
+
+      const titleIcon2 = renderer.createElement('i');
+      // Add icon classes to <i>
+      ['fa', 'fa-bars'].forEach((className) => {
+        if (className) renderer.addClass(titleIcon2, className);
+      });
+
+      // Create <button> wrapper for main title icon (still clickable)
+      const buttonWrapper = renderer.createElement('button');
+      renderer.addClass(buttonWrapper, 'title-icon');
+      renderer.addClass(buttonWrapper, 'mainmenu-icon');
+      
+      // Optional accessibility
+      renderer.setAttribute(buttonWrapper, 'type', 'button');
+      renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
+      
+      // Append <i> to <button>
+      renderer.appendChild(buttonWrapper, titleIcon2);
+      
+      // Add click listener only to main title icon
+      renderer.listen(buttonWrapper, 'click', clickHandler);
+      
+      renderer.appendChild(titleElement, buttonWrapper);
+    } else {
+      // Create <button> wrapper for main title icon (still clickable)
+      const buttonWrapper = renderer.createElement('button');
+      renderer.addClass(buttonWrapper, 'title-icon');
+      renderer.addClass(buttonWrapper, 'mainmenu-icon');
+      
+      // Optional accessibility
+      renderer.setAttribute(buttonWrapper, 'type', 'button');
+      renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
+      
+      // Append <i> to <button>
+      renderer.appendChild(buttonWrapper, titleIcon);
+      
+      // Add click listener only to main title icon
+      renderer.listen(buttonWrapper, 'click', clickHandler);
+      
+      renderer.appendChild(titleElement, buttonWrapper);
     }
-
-    // Optional accessibility
-    renderer.setAttribute(buttonWrapper, 'type', 'button');
-    renderer.setAttribute(buttonWrapper, 'aria-label', isSubmenu ? 'Return to previous menu' : 'Toggle menu');
-
-    // Append <i> to <button>
-    renderer.appendChild(buttonWrapper, titleIcon);
-
-    // Add click listener to the button
-    renderer.listen(buttonWrapper, 'click', clickHandler);
-
-    renderer.appendChild(titleElement, buttonWrapper);
   }
 
   /**

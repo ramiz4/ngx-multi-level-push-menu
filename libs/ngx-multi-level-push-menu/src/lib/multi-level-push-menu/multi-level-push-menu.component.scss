@@ -76,14 +76,13 @@
     justify-content: space-between;
     direction: inherit;
     margin: 0;
-    padding: 0.6em 0.8em;
+    padding: .4em;
     position: relative;
     
     // Submenu title styles with enhanced visual appearance
     &.submenu-title {
-      background-color: #295685;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: bold;
+      background-color: #2e6196;
+      border-bottom: 1px solid #1f4164;
       
       // Add extra shadow to prevent title overlay issues
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -98,19 +97,23 @@
     }
 
     .title-icon {
-      background: none;
       border: none;
-      padding: 0;
-      margin: 0;
-      cursor: pointer;
-      font-size: inherit;
       display: flex;
+      justify-content: center;
       align-items: center;
+      padding: 0.3em .4em;
+      margin: 0 0 0 0.5em;
+      font-size: inherit;
       color: inherit;
       outline: none;
       flex-shrink: 0;
       position: relative;
       z-index: 100;
+    }
+    
+    .mainmenu-icon {
+      background: #2e6196;
+      cursor: pointer;
     }
   }
   
@@ -235,7 +238,7 @@ nav.is-swiping {
     
     h2.title {
       font-size: 1.3em;
-      padding: 0.8em;
+      padding: 0.4em;
     }
   }
   

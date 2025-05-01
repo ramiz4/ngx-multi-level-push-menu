@@ -1,4 +1,4 @@
-import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
+import { MultiLevelPushMenuItem } from '../models';
 
 /**
  * Event emitted when a menu item is clicked

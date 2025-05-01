@@ -11,7 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { KeyNavigationEvent, MenuItemClickEvent } from '../interfaces';
-import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
+import { MultiLevelPushMenuItem } from '../models';
 
 /**
  * Directive to handle menu item interactions

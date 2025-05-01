@@ -1,8 +1,9 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
-import { MenuItemClickEvent, MenuItemDirective } from './menu-item.directive';
+import { MenuItemClickEvent } from '../interfaces';
+import { MultiLevelPushMenuItem } from '../models';
+import { MenuItemDirective } from './menu-item.directive';
 
 @Component({
   imports: [MenuItemDirective],

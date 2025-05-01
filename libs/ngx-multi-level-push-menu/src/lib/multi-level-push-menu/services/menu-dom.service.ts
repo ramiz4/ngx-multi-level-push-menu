@@ -2,7 +2,7 @@ import { Injectable, Renderer2 } from '@angular/core';
 import {
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
-} from '../multi-level-push-menu.model';
+} from '../models';
 import { MenuUtils } from '../utilities/menu-utils';
 
 /**
@@ -86,13 +86,13 @@ export class MenuDomService {
   ): void {
     const title = renderer.createElement('h2');
     renderer.addClass(title, 'title');
-    
+
     // Add level specific class to create visual hierarchy
     const level = levelHolder.getAttribute('data-level');
     if (level && parseInt(level, 10) > 0) {
       renderer.addClass(title, 'submenu-title');
     }
-    
+
     // Create a span element to contain title text for better overflow handling
     const titleTextSpan = renderer.createElement('span');
     renderer.appendChild(titleTextSpan, renderer.createText(menuData.title || ''));
@@ -163,34 +163,34 @@ export class MenuDomService {
       const buttonWrapper = renderer.createElement('button');
       renderer.addClass(buttonWrapper, 'title-icon');
       renderer.addClass(buttonWrapper, 'mainmenu-icon');
-      
+
       // Optional accessibility
       renderer.setAttribute(buttonWrapper, 'type', 'button');
       renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
-      
+
       // Append <i> to <button>
       renderer.appendChild(buttonWrapper, titleIcon2);
-      
+
       // Add click listener only to main title icon
       renderer.listen(buttonWrapper, 'click', clickHandler);
-      
+
       renderer.appendChild(titleElement, buttonWrapper);
     } else {
       // Create <button> wrapper for main title icon (still clickable)
       const buttonWrapper = renderer.createElement('button');
       renderer.addClass(buttonWrapper, 'title-icon');
       renderer.addClass(buttonWrapper, 'mainmenu-icon');
-      
+
       // Optional accessibility
       renderer.setAttribute(buttonWrapper, 'type', 'button');
       renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
-      
+
       // Append <i> to <button>
       renderer.appendChild(buttonWrapper, titleIcon);
-      
+
       // Add click listener only to main title icon
       renderer.listen(buttonWrapper, 'click', clickHandler);
-      
+
       renderer.appendChild(titleElement, buttonWrapper);
     }
   }

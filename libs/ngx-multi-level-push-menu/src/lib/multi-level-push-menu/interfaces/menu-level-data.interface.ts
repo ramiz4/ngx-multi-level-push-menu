@@ -1,4 +1,4 @@
-import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
+import { MultiLevelPushMenuItem } from '../models';
 
 /**
  * Represents the data structure for a menu level in the multi-level push menu

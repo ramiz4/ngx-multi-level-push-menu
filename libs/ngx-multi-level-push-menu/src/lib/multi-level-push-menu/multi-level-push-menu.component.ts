@@ -29,7 +29,7 @@ import { KeyNavigationEvent, MenuLevelData, SwipeEvent } from './interfaces';
 import {
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions
-} from './multi-level-push-menu.model';
+} from './models';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 import {
   AccessibilityService,

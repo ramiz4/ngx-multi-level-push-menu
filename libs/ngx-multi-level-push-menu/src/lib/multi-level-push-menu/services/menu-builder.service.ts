@@ -3,7 +3,7 @@ import { MenuItemClickEvent, MenuLevelData } from '../interfaces';
 import {
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
-} from '../multi-level-push-menu.model';
+} from '../models';
 import { MenuUtils } from '../utilities/menu-utils';
 import { MenuDomService } from './menu-dom.service';
 

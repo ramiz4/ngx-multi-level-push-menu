@@ -1,8 +1,9 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { SwipeEvent } from '../interfaces';
 import { DeviceDetectorService } from '../services';
-import { SwipeDirection, SwipeDirective, SwipeEvent } from './swipe.directive';
+import { SwipeDirection, SwipeDirective } from './swipe.directive';
 
 @Component({
   imports: [SwipeDirective],
@@ -105,8 +106,12 @@ describe('SwipeDirective', () => {
   describe('Touch Events', () => {
     it('should emit swipe event on right swipe (touchmove)', () => {
       // Mock the deviceDetectorService behavior for this test
-      (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(true);
-      (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockReturnValue(10);
+      (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
+        true
+      );
+      (
+        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
+      ).mockReturnValue(10);
 
       // Create a spy on the component's swipe event handler
       const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
@@ -130,7 +135,7 @@ describe('SwipeDirective', () => {
       // This simulates what would happen in a real component when the event is emitted
       component.lastSwipeEvent = {
         direction: SwipeDirection.Right,
-        distance: 30
+        distance: 30,
       };
 
       expect(component.lastSwipeEvent).toBeDefined();
@@ -140,8 +145,12 @@ describe('SwipeDirective', () => {
 
     it('should emit swipe event on left swipe (touchmove)', () => {
       // Mock the deviceDetectorService behavior for this test
-      (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(true);
-      (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockReturnValue(10);
+      (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
+        true
+      );
+      (
+        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
+      ).mockReturnValue(10);
 
       // Create a spy on the component's swipe event handler
       const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
@@ -165,7 +174,7 @@ describe('SwipeDirective', () => {
       // This simulates what would happen in a real component when the event is emitted
       component.lastSwipeEvent = {
         direction: SwipeDirection.Left,
-        distance: 30
+        distance: 30,
       };
 
       expect(component.lastSwipeEvent).toBeDefined();
@@ -175,7 +184,9 @@ describe('SwipeDirective', () => {
 
     it('should not emit swipe event when movement is below threshold', () => {
       // Set threshold to 20
-      (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockReturnValue(20);
+      (
+        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
+      ).mockReturnValue(20);
 
       // Create a spy on the component's swipe event handler
       const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');

@@ -93,7 +93,10 @@ export class MenuDomService {
       renderer.addClass(title, 'submenu-title');
     }
     
-    renderer.appendChild(title, renderer.createText(menuData.title || ''));
+    // Create a span element to contain title text for better overflow handling
+    const titleTextSpan = renderer.createElement('span');
+    renderer.appendChild(titleTextSpan, renderer.createText(menuData.title || ''));
+    renderer.appendChild(title, titleTextSpan);
 
     // Add title icon if exists
     if (menuData.icon) {

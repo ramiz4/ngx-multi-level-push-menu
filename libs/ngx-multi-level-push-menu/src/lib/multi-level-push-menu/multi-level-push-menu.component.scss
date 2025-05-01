@@ -73,6 +73,7 @@
   .title {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     direction: inherit;
     margin: 0;
     padding: 0.6em 0.8em;
@@ -88,6 +89,14 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
+    // Title text container to prevent overflow
+    span {
+      flex: 1;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
     .title-icon {
       background: none;
       border: none;
@@ -99,25 +108,9 @@
       align-items: center;
       color: inherit;
       outline: none;
-
-      // Push icon to the far end depending on direction
-      margin-left: auto;
-      
-      // Style for submenu icons
-      &.submenu-icon {
-        color: #fff;
-        opacity: 0.9;
-        
-        &:hover {
-          opacity: 1;
-        }
-      }
-  
-      // In RTL, push icon to far left
-      [dir="rtl"] & {
-        margin-left: 0;
-        margin-right: auto;
-      }
+      flex-shrink: 0;
+      position: relative;
+      z-index: 100;
     }
   }
   

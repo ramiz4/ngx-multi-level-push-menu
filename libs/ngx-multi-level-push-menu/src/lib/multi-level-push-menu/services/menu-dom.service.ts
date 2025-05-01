@@ -132,7 +132,7 @@ export class MenuDomService {
     iconClasses: string,
     options: MultiLevelPushMenuOptions,
     clickHandler: (event: MouseEvent) => void,
-    isSubmenu: boolean = false
+    isSubmenu = false
   ): void {
     const titleIcon = renderer.createElement('i');
 

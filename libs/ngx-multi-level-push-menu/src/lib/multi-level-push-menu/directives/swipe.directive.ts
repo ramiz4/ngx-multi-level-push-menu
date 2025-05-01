@@ -11,17 +11,12 @@ import {
   Renderer2,
   SimpleChanges,
 } from '@angular/core';
+import { SwipeEvent } from '../interfaces';
 import { DeviceDetectorService } from '../services';
 
 export enum SwipeDirection {
   Left = 'left',
   Right = 'right',
-}
-
-export interface SwipeEvent {
-  direction: SwipeDirection;
-  distance: number;
-  velocity?: number;
 }
 
 /**

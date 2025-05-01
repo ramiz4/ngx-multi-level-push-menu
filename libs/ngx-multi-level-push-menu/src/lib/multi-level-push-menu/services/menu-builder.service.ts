@@ -1,7 +1,6 @@
 import { Injectable, Renderer2 } from '@angular/core';
-import { MenuItemClickEvent } from '../directives/menu-item.directive';
+import { MenuItemClickEvent, MenuLevelData } from '../interfaces';
 import {
-  MenuLevelData,
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
 } from '../multi-level-push-menu.model';
@@ -10,7 +9,7 @@ import { MenuDomService } from './menu-dom.service';
 
 @Injectable()
 export class MenuBuilderService {
-  constructor(private menuDomService: MenuDomService) {}
+  constructor(private menuDomService: MenuDomService) { }
 
   /**
    * Creates the entire menu structure

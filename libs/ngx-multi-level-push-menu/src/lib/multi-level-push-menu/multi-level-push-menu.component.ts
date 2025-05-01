@@ -21,16 +21,14 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { KeyNavigationEvent } from './directives/menu-item.directive';
 import {
   SwipeDirection,
-  SwipeDirective,
-  SwipeEvent,
+  SwipeDirective
 } from './directives/swipe.directive';
+import { KeyNavigationEvent, MenuLevelData, SwipeEvent } from './interfaces';
 import {
-  MenuLevelData,
   MultiLevelPushMenuItem,
-  MultiLevelPushMenuOptions,
+  MultiLevelPushMenuOptions
 } from './multi-level-push-menu.model';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 import {

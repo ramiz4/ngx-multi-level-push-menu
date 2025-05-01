@@ -5,9 +5,14 @@
  * It first runs a migration check and then updates the dependencies.
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ANSI color codes for better terminal output
 const colors = {
@@ -20,7 +25,9 @@ const colors = {
 };
 
 function logHeader(message) {
-  console.log(`\n${colors.bright}${colors.blue}==== ${message} ====${colors.reset}\n`);
+  console.log(
+    `\n${colors.bright}${colors.blue}==== ${message} ====${colors.reset}\n`
+  );
 }
 
 function logSuccess(message) {
@@ -50,16 +57,16 @@ function runCommand(command, options = {}) {
 
 function updateNx() {
   logHeader('Checking for NX updates');
-  
+
   try {
     // Check for migrations first
     runCommand('npx nx migrate latest', { continueOnError: true });
-    
+
     // If migrations.json was created, run the migrations
     if (fs.existsSync(path.join(process.cwd(), 'migrations.json'))) {
       logHeader('Running migrations');
       runCommand('npx nx migrate --run-migrations');
-      
+
       // Clean up migrations file
       logHeader('Cleaning up migration files');
       if (fs.existsSync(path.join(process.cwd(), 'migrations.json'))) {
@@ -73,11 +80,11 @@ function updateNx() {
     // Install dependencies
     logHeader('Installing dependencies');
     runCommand('npm install');
-    
+
     // Run nx --version to verify the update
     logHeader('Current NX version');
     runCommand('npx nx --version');
-    
+
     logSuccess('NX update completed successfully');
   } catch (error) {
     logError(`Failed to update NX: ${error.message}`);

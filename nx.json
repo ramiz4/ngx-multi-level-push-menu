@@ -17,9 +17,6 @@
     },
     "@nx/angular:component": {
       "style": "scss"
-    },
-    "menu-item": {
-      "factory": "./tools/generators/menu-item"
     }
   },
   "namedInputs": {

@@ -31,6 +31,7 @@ export interface MenuItemClickEvent {
  */
 @Directive({
   selector: '[ramiz4MenuItem], [menuItem], [isSubmenu], [isBackItem]',
+  standalone: true,
 })
 export class MenuItemDirective implements OnInit, OnChanges {
   // Inputs

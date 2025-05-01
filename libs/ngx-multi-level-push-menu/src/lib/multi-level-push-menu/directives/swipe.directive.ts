@@ -29,6 +29,7 @@ export interface SwipeEvent {
  */
 @Directive({
   selector: '[ramiz4Swipe], [swipeEnabled], [overlapWidth]',
+  standalone: true,
 })
 export class SwipeDirective {
   // Inputs

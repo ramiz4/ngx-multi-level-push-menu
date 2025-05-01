@@ -26,15 +26,9 @@ describe('MultiLevelPushMenuComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([])],
-      declarations: [
-        MultiLevelPushMenuComponent,
-        SwipeDirective
-      ],
-      providers: [
-        MultiLevelPushMenuService,
-        DeviceDetectorService
-      ],
+      imports: [RouterTestingModule.withRoutes([]), SwipeDirective],
+      declarations: [MultiLevelPushMenuComponent],
+      providers: [MultiLevelPushMenuService, DeviceDetectorService],
       teardown: { destroyAfterEach: false },
     }).compileComponents();
   }));

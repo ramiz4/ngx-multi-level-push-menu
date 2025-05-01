@@ -393,6 +393,23 @@ export class MultiLevelPushMenuComponent
 
   // Menu collapse/expand methods
   collapseMenu(level?: number, animationSpeed: 'fast' | 'normal' = 'normal'): void {
+    // When collapsing from any level, we need to hide all currently visible submenus first
+    if (this.currentLevel > 0 && level === undefined) {
+      // Hide all submenus first
+      this.visibleLevelHolders.forEach(holder => {
+        const holderLevel = parseInt(holder.getAttribute('data-level') ?? '0', 10);
+        if (holderLevel > 0) {
+          this.renderer.setStyle(holder, 'visibility', 'hidden');
+        }
+      });
+      
+      // Reset the level tracking variables
+      this.currentLevel = 0;
+      this.visibleLevelHolders = this.visibleLevelHolders.filter(
+        holder => parseInt(holder.getAttribute('data-level') ?? '0', 10) === 0
+      );
+    }
+
     if (level === undefined) {
       this.performFullCollapse(animationSpeed);
     } else {

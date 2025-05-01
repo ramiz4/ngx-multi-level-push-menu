@@ -1,11 +1,24 @@
 # NgxMultiLevelPushMenu
 
-[![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu)
+<a href="https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu"><img src="https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg" alt="npm version" height="18"></a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Multi-level push menu is a cross-browser compatible Angular component allowing endless nesting of navigation elements.
+A comprehensive Angular component for creating accessible, responsive multi-level push menus with extensive customization options.
 
-`@ramiz4/ngx-multi-level-push-menu` is built for modern browsers using _TypeScript, CSS3 and HTML5_ and is compatible with **Angular 6+** up through **Angular 19+**.
+- [Angular Compatibility](#angular-compatibility)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Component API](#component-api)
+- [Service API](#service-api)
+- [Options](#options)
+- [Menu Structure](#menu-structure)
+- [Features](#features)
+- [Common Issues & Solutions](#common-issues--solutions)
+- [Accessibility](#accessibility)
+- [Performance Considerations](#performance-considerations)
+- [Demo](#demo)
+
+See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases) for recent changes.
 
 ## Angular Compatibility
 
@@ -18,54 +31,25 @@ Multi-level push menu is a cross-browser compatible Angular component allowing e
 | 16.x.x - 17.x.x | 15.x - 17.x     |
 | 18.x.x - 19.x.x | 18.x - 19.x     |
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Options](#options)
-- [Features](#features)
-- [Common Issues & Solutions](#common-issues--solutions)
-- [Demo](#demo)
-
-See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases) for recent changes.
-
 ## Installation
-
-To use @ramiz4/ngx-multi-level-push-menu in your project, install it via [npm](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu):
 
 ```bash
 npm i @ramiz4/ngx-multi-level-push-menu --save
 ```
 
-## Install dependencies
-
-The component requires Font Awesome for icons. You can use either Font Awesome 4.x, 5.x, or 6.x:
-
-### Font Awesome 4.x (Classic):
+### Install dependencies
 
 ```bash
+# For Font Awesome 4.x
 npm i font-awesome --save
-```
 
-### Font Awesome 5.x or 6.x (Recommended for newer projects):
-
-```bash
+# OR for Font Awesome 5+/6+ (recommended for newer projects)
 npm i @fortawesome/fontawesome-free --save
 ```
 
 ## Usage
 
 ### 1. Update your `angular.json`
-
-For Font Awesome 4.x:
-
-```json
-"styles": [
-  "node_modules/font-awesome/css/font-awesome.min.css",
-  "styles.css"
-],
-"scripts": [],
-```
-
-For Font Awesome 5.x or 6.x:
 
 ```json
 "styles": [
@@ -75,66 +59,53 @@ For Font Awesome 5.x or 6.x:
 "scripts": [],
 ```
 
-### 2. Import the `NgxMultiLevelPushMenuModule` to `app.module.ts`
+### 2. Import the module
 
-Import `NgxMultiLevelPushMenuModule.forRoot()` in the root NgModule `app.module.ts` of your application.
+#### For NgModule-based applications:
 
 ```ts
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
 import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-
 @NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, AppRoutingModule, NgxMultiLevelPushMenuModule.forRoot()],
-  providers: [MultiLevelPushMenuService],
-  bootstrap: [AppComponent],
+  imports: [
+    // ...
+    NgxMultiLevelPushMenuModule.forRoot()
+  ]
 })
 export class AppModule {}
 ```
 
-You need to add the RouterModule and define some routes. In this example there are defined 4 routes and therefore you need to create 4 components:
-
-```bash
-ng g component home && ng g component about-us && ng g component collections && ng g component credits && ng g component page-not-found
-```
-
-**NOTE**
-Angular automatically adds the declarations to the AppModule when generating the components. If you organize your routing as shown below, you should remove those declarations from AppModule.
-
-Edit the generated app-routing.module.ts to this:
+#### For standalone applications (Angular 14+):
 
 ```ts
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+// In app.config.ts
+import { ApplicationConfig } from '@angular/core';
+import { provideMultiLevelPushMenu } from '@ramiz4/ngx-multi-level-push-menu';
 
-import { HomeComponent } from './home/home.component';
-import { AboutUsComponent } from './about-us/about-us.component';
-import { CollectionsComponent } from './collections/collections.component';
-import { CreditsComponent } from './credits/credits.component';
-import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-
-const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'about-us', component: AboutUsComponent },
-  { path: 'collections', component: CollectionsComponent },
-  { path: 'credits', component: CreditsComponent },
-  { path: '**', component: PageNotFoundComponent },
-];
-
-@NgModule({
-  declarations: [HomeComponent, AboutUsComponent, CollectionsComponent, CreditsComponent, PageNotFoundComponent],
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...other providers
+    provideMultiLevelPushMenu(),
+  ]
+};
 ```
 
-### 3. Add menu options and items to `app.component.ts`
+```ts
+// In your component
+import { Component } from '@angular/core';
+import { MultiLevelPushMenuComponent } from '@ramiz4/ngx-multi-level-push-menu';
+
+@Component({
+  // ...
+  standalone: true,
+  imports: [MultiLevelPushMenuComponent],
+})
+export class AppComponent {
+  // ...
+}
+```
+
+### 3. Configure your component
 
 ```ts
 import { Component, OnInit } from '@angular/core';
@@ -142,220 +113,238 @@ import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ng
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
   options = new MultiLevelPushMenuOptions();
 
-  constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) {}
+  constructor(private menuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
+    // Menu configuration
     this.options.menu = {
-      title: 'Company Name',
-      id: 'menuID',
-      icon: 'fa fa-reorder', // Use 'fas fa-bars' for Font Awesome 5+
+      title: 'All Categories',
+      id: 'menu',
+      icon: 'fas fa-bars'
     };
+    
+    // Define menu items
     this.options.menu.items = [
-      { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' }, // Use 'fas fa-home' for Font Awesome 5+
       {
-        name: 'About Us',
-        id: 'about-us',
-        icon: 'fa fa-user', // Use 'fas fa-user' for Font Awesome 5+
-        link: 'about-us',
+        name: 'Home',
+        icon: 'fas fa-home',
+        link: 'home'
       },
       {
-        name: 'Devices',
-        id: 'devices',
-        icon: 'fa fa-laptop', // Use 'fas fa-laptop' for Font Awesome 5+
-        link: '#',
+        name: 'Products',
+        icon: 'fas fa-shopping-bag',
         items: [
           {
-            name: 'Mobile Phones',
-            icon: 'fa fa-phone', // Use 'fas fa-phone' for Font Awesome 5+
-            link: '#',
+            name: 'Electronics',
             items: [
-              {
-                name: 'Super Smart Phone',
-                link: 'xxx',
-              },
-              {
-                name: 'Thin Magic Mobile',
-                link: 'xxx',
-              },
-            ],
-          },
-          {
-            name: 'Televisions',
-            icon: 'fa fa-desktop', // Use 'fas fa-desktop' for Font Awesome 5+
-            link: '#',
-            items: [
-              {
-                name: 'Flat Super Screen',
-                link: '#',
-              },
-              {
-                name: 'Gigantic LED',
-                link: '#',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        name: 'Collections',
-        link: 'collections',
-      },
-      {
-        name: 'Credits',
-        link: 'credits',
-      },
+              { name: 'Smartphones', link: 'smartphones' },
+              { name: 'Laptops', link: 'laptops' }
+            ]
+          }
+        ]
+      }
     ];
+    
+    // Optional: Set additional options
+    this.options.mode = 'overlap';
+    this.options.collapsed = false;
   }
 
+  // Control methods
   collapseMenu(): void {
-    this.multiLevelPushMenuService.collapse();
+    this.menuService.collapse();
   }
 
   expandMenu(): void {
-    this.multiLevelPushMenuService.expand();
+    this.menuService.expand();
   }
 }
 ```
 
-**Important**: Note the menu structure. Each submenu should be defined directly with an `items` array containing its child items. Don't add extra wrapper objects around menu items.
-
-> **Font Awesome 5+ Note**: If using Font Awesome 5+, use class naming pattern `fas fa-icon-name` instead of `fa fa-icon-name`. Update the icon classes in your menu configuration and the options accordingly.
-
-### 4. Replace content in `app.component.html`
+### 4. Add to your template
 
 ```html
 <ramiz4-multi-level-push-menu [options]="options">
-  <button (click)="collapseMenu()">collapse menu</button>
-  <button (click)="expandMenu()">expand menu</button>
+  <button (click)="collapseMenu()">Collapse Menu</button>
+  <button (click)="expandMenu()">Expand Menu</button>
   <router-outlet></router-outlet>
 </ramiz4-multi-level-push-menu>
 ```
 
-### 5. Add to `styles.css` (optional)
+### 5. Add styles (optional)
 
 ```css
-html,
-body {
+html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
 }
 ```
 
-### 6. Run your app from your project directory
+## Component API
 
-```bash
-npm start
-```
+### Inputs
+
+| Name    | Type                       | Default | Description                     |
+|---------|----------------------------|---------|----------------------------------|
+| options | MultiLevelPushMenuOptions  | {}      | Configuration options            |
+
+### Outputs
+
+| Name       | Type                  | Description                           |
+|------------|------------------------|---------------------------------------|
+| menuOpen   | EventEmitter<boolean> | Emitted when menu is opened           |
+| menuClose  | EventEmitter<boolean> | Emitted when menu is closed           |
+| itemClick  | EventEmitter<any>     | Emitted when menu item is clicked     |
+| levelChange| EventEmitter<number>  | Emitted when menu level changes       |
+
+## Service API
+
+The `MultiLevelPushMenuService` provides methods to control the menu programmatically:
+
+| Method               | Parameters | Description                         |
+|----------------------|------------|-------------------------------------|
+| collapse()           | none       | Collapses the menu                  |
+| expand()             | none       | Expands the menu                    |
+| toggleMenu()         | none       | Toggles menu between states         |
+| openMenu()           | none       | Opens the menu                      |
+| closeMenu()          | none       | Closes the menu                     |
+| navigateToLevel(id)  | id: string | Navigates to specific menu level    |
+| goBack()             | none       | Navigates to previous menu level    |
 
 ## Options
 
 ```typescript
-collapsed: false,                                          // Initialize menu in collapsed/expanded mode
-menuID: 'multilevelpushmenu',                              // ID of <nav> element.
-wrapperClass: 'multilevelpushmenu_wrapper',                // Wrapper CSS class.
-menuInactiveClass: 'multilevelpushmenu_inactive',          // CSS class for inactive wrappers.
-menu: arrMenu,                                             // JS array of menu items (if markup not provided).
-menuWidth: 0,                                              // Wrapper width (integer, '%', 'px', 'em').
-menuHeight: 0,                                             // Menu height (integer, '%', 'px', 'em').
-backText: 'Back',                                          // Text for 'Back' menu item.
-backItemClass: 'backItemClass',                            // CSS class for back menu item.
-backItemIcon: 'fa fa-angle-right',                         // FontAvesome icon used for back menu item.
-groupIcon: 'fa fa-angle-left',                             // FontAvesome icon used for menu items contaning sub-items.
-mode: 'overlap',                                           // Menu sliding mode: overlap/cover.
-overlapWidth: 40,                                          // Width in px of menu wrappers overlap
-preventItemClick: true,                                    // set to false if you do not need event callback functionality per item click
-preventGroupItemClick: true,                               // set to false if you do not need event callback functionality per group item click
-direction: 'ltr',                                          // set to 'rtl' for reverse sliding direction
-fullCollapse: false,                                       // set to true to fully hide base level holder when collapsed
-swipe: 'both'                                              // or 'touchscreen', or 'desktop', or 'none'. everything else is concidered as 'none'
+// Default options
+{
+  collapsed: false,                   // Initialize menu collapsed
+  menuID: 'multilevelpushmenu',       // ID for the menu
+  wrapperClass: 'multilevelpushmenu_wrapper',
+  menuInactiveClass: 'multilevelpushmenu_inactive',
+  menu: [],                           // Menu structure
+  menuWidth: 0,                       // Width of menu (integer, %, px, em)
+  menuHeight: 0,                      // Height of menu
+  backText: 'Back',                   // Text for back menu item
+  backItemClass: 'backItemClass',     // CSS class for back item
+  backItemIcon: 'fa fa-angle-right',  // Icon for back item (use fas for FA5+)
+  groupIcon: 'fa fa-angle-left',      // Icon for items with submenus
+  mode: 'overlap',                    // Menu sliding mode: overlap/cover
+  overlapWidth: 40,                   // Width of menu overlap in px
+  preventItemClick: true,             // Event callback per item click
+  preventGroupItemClick: true,        // Event callback per group item click
+  direction: 'ltr',                   // Direction: ltr/rtl
+  fullCollapse: false,                // Hide base level when collapsed
+  swipe: 'both'                       // Swipe support: both/touchscreen/desktop/none
+}
 ```
 
-## Features
+## Menu Structure
 
-- Multi-level menu support
-- Endless nesting of navigation elements
-- Expand/Collapse navigation with a left/right swipe gesture
-- Push/Slide DOM elements of choice
-- Left-to-right and Right-to-left sliding directions
-- Flexible, simple markup
-- JS Array input, as HTML markup replacement
-- A number of exposed Options, Methods and Events
-- Cross-browser compatibility
-  - Chrome
-  - Firefox
-  - Safari
-  - Edge
-  - Android Browser
-  - iOS Safari
-- Angular Versions Support (6+)
-- AoT Compilation Support
-- Font Awesome 4.x, 5.x and 6.x support
-
-## Common Issues & Solutions
-
-### Menu not visible on init
-
-If your menu is not visible when the application loads (shows as a collapsed menu with margin-left: -100%), make sure your `options` object has `collapsed` set to `false` (which is the default). The component now properly initializes in the expanded state.
-
-### Submenu items not appearing
-
-If clicking on menu items with children doesn't show the child menu items, check your menu structure. Each menu item with children should have an `items` array directly containing the child items. Avoid adding extra wrapper objects between a parent and its child items.
-
-Correct structure:
+The menu structure follows this format:
 
 ```typescript
 {
-  name: 'Devices',
-  id: 'devices',
-  icon: 'fa fa-laptop',
-  link: '#',
-  items: [
+  title: 'Menu Title',    // Title displayed at the top
+  id: 'menuID',           // Unique identifier
+  icon: 'fas fa-bars',    // Icon class
+  items: [                // Array of menu items
     {
-      name: 'Mobile Phones',
-      icon: 'fa fa-phone',
-      link: '#',
-      items: [...]
-    },
-    {
-      name: 'Televisions',
-      icon: 'fa fa-desktop',
-      link: '#',
-      items: [...]
+      name: 'Home',       // Display name
+      id: 'home',         // Unique identifier (optional)
+      icon: 'fas fa-home',// Icon class (optional)
+      link: 'home',       // Router link (optional)
+      items: []           // Child items (optional)
     }
   ]
 }
 ```
 
+**Important**: Each submenu should be defined directly within an `items` array. Don't add extra wrapper objects around menu items.
+
+## Features
+
+- Multi-level menu support with endless nesting
+- Expand/Collapse navigation with left/right swipe gestures
+- Support for both overlay and cover sliding modes
+- Flexible sizing options
+- Left-to-right and Right-to-left sliding directions
+- Font Awesome icon integration
+- Keyboard navigation and accessibility features
+- Customizable styling
+- Cross-browser compatibility
+- Angular Versions Support (6+)
+- AoT Compilation Support
+
+## Common Issues & Solutions
+
+### Menu not visible on init
+
+If your menu is not visible initially, check:
+- Ensure `options.collapsed` is set to `false`
+- Verify CSS is properly loaded
+- Check console for errors
+
+### Submenu items not appearing
+
+Ensure your menu structure is correct:
+
+```typescript
+// Correct structure
+{
+  name: 'Products',
+  items: [
+    { name: 'Item 1' },
+    { name: 'Item 2' }
+  ]
+}
+
+// Incorrect structure
+{
+  name: 'Products',
+  items: {
+    item1: { name: 'Item 1' },
+    item2: { name: 'Item 2' }
+  }
+}
+```
+
 ### Mobile Support
 
-The menu supports both touch and mouse interactions. You can customize this with the `swipe` option:
-
-- `both`: Support both touch and mouse (default)
-- `touchscreen`: Support only touch devices
-- `desktop`: Support only mouse interactions
+Configure the swipe behavior with the `swipe` option:
+- `both`: Support touch and mouse (default)
+- `touchscreen`: Support only touch
+- `desktop`: Support only mouse
 - `none`: Disable swipe support
-
-### Custom Styling
-
-You can customize the appearance of the menu by overriding the CSS classes in your global styles.
 
 ### Font Awesome Version Compatibility
 
-If you're using Font Awesome 5+ and icons aren't showing, make sure to:
+For Font Awesome 5+:
+- Update icon prefixes from `fa fa-` to `fas fa-`
+- Example: `backItemIcon: 'fas fa-angle-right'`
 
-1. Update your icon class prefixes from `fa fa-` to `fas fa-`
-2. Adjust the menu configuration, including `backItemIcon` and `groupIcon` options
+## Accessibility
+
+The component includes several accessibility enhancements:
+- ARIA attributes for screen readers
+- Keyboard navigation support
+- Focus management
+- Screen reader announcements for menu changes
+
+## Performance Considerations
+
+For large menus, consider:
+- Lazy loading submenus
+- Using `trackBy` with `*ngFor` directives
+- Implementing virtual scrolling for very large menus
 
 ## Demo
 
-Check out the example project in the repository to see a live implementation:
+To view the demo:
 
 ```bash
 git clone https://github.com/ramiz4/ngx-multi-level-push-menu.git
@@ -364,4 +353,4 @@ npm install
 npm start
 ```
 
-Then navigate to `http://localhost:4200` to view the demo.
+Then navigate to `http://localhost:4200`

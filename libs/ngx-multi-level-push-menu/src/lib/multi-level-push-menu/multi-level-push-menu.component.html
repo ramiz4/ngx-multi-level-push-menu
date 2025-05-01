@@ -1,4 +1,12 @@
 <div class="multilevelpushmenu-wrapper">
+  <!-- Screen reader accessibility enhancements -->
+  <div
+    id="menu-live-region"
+    class="sr-only"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
   <nav
     #menuContainer
     id="{{ options.menuID || 'multilevelpushmenu' }}"
@@ -6,6 +14,9 @@
     [swipeEnabled]="options.swipe"
     [overlapWidth]="toNumber(options.overlapWidth)"
     (swipe)="onSwipeDetected($event)"
+    role="menu"
+    aria-label="Main navigation menu"
+    [attr.aria-orientation]="'vertical'"
   ></nav>
   <div #contentContainer id="content">
     <ng-content></ng-content>

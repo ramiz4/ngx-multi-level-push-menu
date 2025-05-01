@@ -5,6 +5,19 @@
   height: 100%;
 }
 
+// Screen reader only content - visually hidden but available to screen readers
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .level-holder {
   position: absolute;
   overflow: hidden;
@@ -17,6 +30,7 @@
   &.rtl {
     right: 0;
     box-shadow: -5px 0 5px -5px #1f4164;
+
     .title {
       text-align: right;
     }
@@ -25,6 +39,7 @@
   &.ltr {
     left: 0;
     box-shadow: 5px 0 5px -5px #1f4164;
+
     .title {
       text-align: left;
     }
@@ -32,7 +47,6 @@
 
   h2.title {
     font-size: 1.5em;
-    // color: #fff;
     margin: 0;
     padding: 0.6em 0.8em;
   }
@@ -48,7 +62,15 @@
       text-decoration: none;
       color: #fff;
 
-      &:hover {
+      &:hover,
+      &:focus {
+        background: #1f4164;
+        border-left: 3px solid #fff;
+      }
+
+      // Add visual focus state
+      &:focus-visible {
+        border-left: 3px solid #fff;
         background: #1f4164;
       }
     }
@@ -74,7 +96,15 @@
         color: #fff;
         text-decoration: none;
 
-        &:hover {
+        &:hover,
+        &:focus {
+          background: #295685;
+        }
+
+        // Enhanced focus styles for keyboard navigation
+        &:focus-visible,
+        &.menu-item-focus {
+          border-left: 3px solid #fff;
           background: #295685;
         }
 

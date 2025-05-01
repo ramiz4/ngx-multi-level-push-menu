@@ -5,7 +5,7 @@ import { MenuUtils } from '../utilities/menu-utils';
 // Animation duration constants
 const ANIMATION_DURATION = {
   normal: 400,
-  fast: 250
+  fast: 250,
 };
 
 @Injectable()
@@ -31,7 +31,11 @@ export class MenuAnimationService {
 
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
   }
 
   /**
@@ -53,7 +57,11 @@ export class MenuAnimationService {
 
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
 
     // Apply animation state
     const animState = isRtl ? 'outRtl' : 'out';
@@ -94,7 +102,11 @@ export class MenuAnimationService {
 
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
 
     const marginLeft = fullCollapse ? -width : -width + overlapWidth;
 
@@ -123,7 +135,11 @@ export class MenuAnimationService {
   ): void {
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
 
     // Reset transform
     renderer.setStyle(element, 'transform', 'translateX(0)');

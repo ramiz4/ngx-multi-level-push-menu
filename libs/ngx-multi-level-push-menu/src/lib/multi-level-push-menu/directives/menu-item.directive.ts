@@ -51,7 +51,7 @@ export class MenuItemDirective implements OnInit, OnChanges {
   private readonly hoverClass = 'menu-item-hover';
   private readonly focusClass = 'menu-item-focus';
 
-  constructor(private el: ElementRef, private renderer: Renderer2) { }
+  constructor(private el: ElementRef, private renderer: Renderer2) {}
 
   ngOnInit(): void {
     // Set ARIA attributes for accessibility
@@ -203,11 +203,12 @@ export class MenuItemDirective implements OnInit, OnChanges {
     const liveRegion = document.getElementById('menu-live-region');
     if (liveRegion) {
       const announcement = this.isSubmenu
-        ? `${this.menuItem?.title}, submenu. Press Enter to ${this.expanded ? 'close' : 'open'
-        }.`
+        ? `${this.menuItem?.title}, submenu. Press Enter to ${
+            this.expanded ? 'close' : 'open'
+          }.`
         : this.isBackItem
-          ? 'Back to previous menu. Press Enter to go back.'
-          : `${this.menuItem?.title}. Press Enter to select.`;
+        ? 'Back to previous menu. Press Enter to go back.'
+        : `${this.menuItem?.title}. Press Enter to select.`;
 
       liveRegion.textContent = announcement;
     }

@@ -1,8 +1,5 @@
 import { Injectable, Renderer2 } from '@angular/core';
-import {
-  MultiLevelPushMenuItem,
-  MultiLevelPushMenuOptions,
-} from '../models';
+import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from '../models';
 import { MenuUtils } from '../utilities/menu-utils';
 
 /**
@@ -12,8 +9,24 @@ import { MenuUtils } from '../utilities/menu-utils';
  * Checks if a string contains a valid CSS unit
  */
 function hasValidCssUnit(value: string): boolean {
-  const cssUnits = ['px', 'em', 'rem', '%', 'vh', 'vw', 'vmin', 'vmax', 'cm', 'mm', 'in', 'pt', 'pc', 'ex', 'ch'];
-  return cssUnits.some(unit => value.endsWith(unit));
+  const cssUnits = [
+    'px',
+    'em',
+    'rem',
+    '%',
+    'vh',
+    'vw',
+    'vmin',
+    'vmax',
+    'cm',
+    'mm',
+    'in',
+    'pt',
+    'pc',
+    'ex',
+    'ch',
+  ];
+  return cssUnits.some((unit) => value.endsWith(unit));
 }
 
 /**
@@ -95,7 +108,10 @@ export class MenuDomService {
 
     // Create a span element to contain title text for better overflow handling
     const titleTextSpan = renderer.createElement('span');
-    renderer.appendChild(titleTextSpan, renderer.createText(menuData.title || ''));
+    renderer.appendChild(
+      titleTextSpan,
+      renderer.createText(menuData.title || '')
+    );
     renderer.appendChild(title, titleTextSpan);
 
     // Add title icon if exists
@@ -151,7 +167,6 @@ export class MenuDomService {
       renderer.appendChild(spanWrapper, titleIcon);
 
       renderer.appendChild(titleElement, spanWrapper);
-
 
       const titleIcon2 = renderer.createElement('i');
       // Add icon classes to <i>

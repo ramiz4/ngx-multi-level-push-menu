@@ -6,5 +6,5 @@ export class MultiLevelPushMenuItem {
     public icon?: string,
     public link?: string,
     public items?: Array<MultiLevelPushMenuItem>
-  ) { }
+  ) {}
 }

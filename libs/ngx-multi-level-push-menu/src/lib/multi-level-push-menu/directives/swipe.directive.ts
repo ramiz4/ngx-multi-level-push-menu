@@ -52,7 +52,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private deviceDetectorService: DeviceDetectorService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.updateThreshold();
@@ -66,7 +66,8 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
 
   private updateThreshold(): void {
     // Set threshold based on input or device
-    this.threshold = this.swipeThreshold ||
+    this.threshold =
+      this.swipeThreshold ||
       this.deviceDetectorService.getSwipeThreshold(this.overlapWidth);
   }
 
@@ -75,7 +76,12 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
    */
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent): void {
-    if (!this.deviceDetectorService.isSwipeEnabled('touchscreen', this.swipeEnabled))
+    if (
+      !this.deviceDetectorService.isSwipeEnabled(
+        'touchscreen',
+        this.swipeEnabled
+      )
+    )
       return;
 
     if (event.touches.length === 1) {
@@ -145,7 +151,9 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
    */
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent): void {
-    if (!this.deviceDetectorService.isSwipeEnabled('desktop', this.swipeEnabled))
+    if (
+      !this.deviceDetectorService.isSwipeEnabled('desktop', this.swipeEnabled)
+    )
       return;
 
     this.startTracking(event.clientX, event.clientY);
@@ -219,7 +227,10 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
       const diffY = e.clientY - this.startY;
 
       // Use the same threshold as for touch events
-      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
+      if (
+        Math.abs(diffX) > Math.abs(diffY) &&
+        Math.abs(diffX) > this.threshold
+      ) {
         const duration = Date.now() - this.startTime;
         const velocity = Math.abs(diffX) / duration;
 

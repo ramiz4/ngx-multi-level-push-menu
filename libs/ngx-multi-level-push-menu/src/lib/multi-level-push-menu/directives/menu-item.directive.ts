@@ -10,24 +10,8 @@ import {
   Renderer2,
   SimpleChanges,
 } from '@angular/core';
-import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
-
-/**
- * Event emitted when a menu item is clicked
- */
-export interface MenuItemClickEvent {
-  item: MultiLevelPushMenuItem;
-  event: MouseEvent;
-  isSubmenu: boolean;
-}
-
-/**
- * Event emitted when keyboard navigation is needed
- */
-export interface KeyNavigationEvent {
-  direction: 'up' | 'down' | 'left' | 'right';
-  sourceElement: HTMLElement;
-}
+import { KeyNavigationEvent, MenuItemClickEvent } from '../interfaces';
+import { MultiLevelPushMenuItem } from '../models';
 
 /**
  * Directive to handle menu item interactions

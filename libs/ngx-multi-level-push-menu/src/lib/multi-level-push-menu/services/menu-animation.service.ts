@@ -1,11 +1,11 @@
 import { Injectable, Renderer2 } from '@angular/core';
-import { MenuLevelData } from '../multi-level-push-menu.model';
+import { MenuLevelData } from '../interfaces';
 import { MenuUtils } from '../utilities/menu-utils';
 
 // Animation duration constants
 const ANIMATION_DURATION = {
   normal: 400,
-  fast: 250
+  fast: 250,
 };
 
 @Injectable()
@@ -17,7 +17,7 @@ export class MenuAnimationService {
    * @param animationSpeed Speed of animation ('normal' or 'fast')
    */
   public slideIn(
-    renderer: Renderer2, 
+    renderer: Renderer2,
     element: HTMLElement,
     animationSpeed: 'fast' | 'normal' = 'normal'
   ): void {
@@ -28,10 +28,14 @@ export class MenuAnimationService {
     // Apply animation
     renderer.setProperty(element, '_slideState', 'in');
     renderer.setStyle(element, 'transform', 'translateX(0)');
-    
+
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
   }
 
   /**
@@ -53,7 +57,11 @@ export class MenuAnimationService {
 
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
 
     // Apply animation state
     const animState = isRtl ? 'outRtl' : 'out';
@@ -94,7 +102,11 @@ export class MenuAnimationService {
 
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
 
     const marginLeft = fullCollapse ? -width : -width + overlapWidth;
 
@@ -117,14 +129,18 @@ export class MenuAnimationService {
    * @param animationSpeed Speed of animation ('normal' or 'fast')
    */
   public animateExpand(
-    renderer: Renderer2, 
+    renderer: Renderer2,
     element: HTMLElement,
     animationSpeed: 'fast' | 'normal' = 'normal'
   ): void {
     // Set animation duration based on speed
     const duration = ANIMATION_DURATION[animationSpeed];
-    renderer.setStyle(element, 'transition', `transform ${duration}ms ease-in-out`);
-    
+    renderer.setStyle(
+      element,
+      'transition',
+      `transform ${duration}ms ease-in-out`
+    );
+
     // Reset transform
     renderer.setStyle(element, 'transform', 'translateX(0)');
   }
@@ -151,9 +167,9 @@ export class MenuAnimationService {
       })
       .forEach(([, value]) => {
         this.slideOut(
-          renderer, 
-          value.element, 
-          isRtl, 
+          renderer,
+          value.element,
+          isRtl,
           () => renderer.setStyle(value.element, 'visibility', 'hidden'),
           animationSpeed
         );

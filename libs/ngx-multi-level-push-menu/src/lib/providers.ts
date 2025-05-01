@@ -1,6 +1,6 @@
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-push-menu.service';
-import { DeviceDetectorService } from './multi-level-push-menu/services/device-detector.service';
+import { DeviceDetectorService } from './multi-level-push-menu/services';
 
 /**
  * Provides the necessary services for the Multi-Level Push Menu component

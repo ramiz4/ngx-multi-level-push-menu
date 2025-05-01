@@ -1,3 +1,5 @@
+import { MultiLevelPushMenuItem } from './multi-level-push-menu-item.model';
+
 export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
   public menu: MultiLevelPushMenuItem[] = [];
@@ -62,36 +64,4 @@ export class MultiLevelPushMenuOptions {
       Object.assign(this, options);
     }
   }
-}
-
-export class MultiLevelPushMenu {
-  constructor(
-    public title?: string,
-    public id?: string,
-    public icon?: string,
-    public items?: Array<MultiLevelPushMenuItem>
-  ) { }
-}
-
-export class MultiLevelPushMenuItem {
-  constructor(
-    public title?: string,
-    public id?: string,
-    public name?: string,
-    public icon?: string,
-    public link?: string,
-    public items?: Array<MultiLevelPushMenuItem>
-  ) { }
-}
-
-/**
- * Represents the data structure for a menu level in the multi-level push menu
- */
-export interface MenuLevelData {
-  /** The DOM element representing this menu level */
-  element: HTMLElement;
-  /** The menu item data for this level */
-  data: MultiLevelPushMenuItem;
-  /** Optional parent element for nested levels */
-  parent?: HTMLElement;
 }

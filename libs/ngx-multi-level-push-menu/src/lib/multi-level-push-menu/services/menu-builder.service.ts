@@ -1,10 +1,7 @@
 import { Injectable, Renderer2 } from '@angular/core';
-import { MenuItemClickEvent } from '../directives/menu-item.directive';
-import {
-  MenuLevelData,
-  MultiLevelPushMenuItem,
-  MultiLevelPushMenuOptions,
-} from '../multi-level-push-menu.model';
+import { BASE_LEVEL_KEY } from '../constants';
+import { MenuItemClickEvent, MenuLevelData } from '../interfaces';
+import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from '../models';
 import { MenuUtils } from '../utilities/menu-utils';
 import { MenuDomService } from './menu-dom.service';
 
@@ -44,7 +41,7 @@ export class MenuBuilderService {
     // Create a root level data object from the menu items array
     const rootMenuData: MultiLevelPushMenuItem = {
       name: 'Menu',
-      items: options.menu
+      items: options.menu,
     };
 
     // Create base level
@@ -506,7 +503,7 @@ export class MenuBuilderService {
   ): void {
     if (options.mode !== 'overlap') return;
 
-    const baseElement = menuLevels.get('level-0')?.element;
+    const baseElement = menuLevels.get(BASE_LEVEL_KEY)?.element;
     if (!baseElement) return;
 
     const baseWidth = MenuUtils.getElementWidth(baseElement);

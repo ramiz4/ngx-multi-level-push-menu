@@ -21,24 +21,19 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { KeyNavigationEvent } from './directives/menu-item.directive';
-import {
-  SwipeDirection,
-  SwipeDirective,
-  SwipeEvent,
-} from './directives/swipe.directive';
-import {
-  MenuLevelData,
-  MultiLevelPushMenuItem,
-  MultiLevelPushMenuOptions,
-} from './multi-level-push-menu.model';
+import { BASE_LEVEL_KEY } from './constants';
+import { SwipeDirection, SwipeDirective } from './directives/swipe.directive';
+import { KeyNavigationEvent, MenuLevelData, SwipeEvent } from './interfaces';
+import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from './models';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
-import { AccessibilityService } from './services/accessibility.service';
-import { BrowserCompatibilityService } from './services/browser-compatibility/browser-compatibility.service';
-import { DeviceDetectorService } from './services/device-detector.service';
-import { MenuAnimationService } from './services/menu-animation.service';
-import { MenuBuilderService } from './services/menu-builder.service';
-import { MenuDomService } from './services/menu-dom.service';
+import {
+  AccessibilityService,
+  BrowserCompatibilityService,
+  DeviceDetectorService,
+  MenuAnimationService,
+  MenuBuilderService,
+  MenuDomService,
+} from './services';
 import { MenuUtils } from './utilities/menu-utils';
 
 // Constants
@@ -71,12 +66,13 @@ const ANIMATION_DURATION = 400;
     MenuBuilderService,
     MenuDomService,
     AccessibilityService,
-    BrowserCompatibilityService
+    BrowserCompatibilityService,
   ],
   imports: [CommonModule, SwipeDirective],
 })
 export class MultiLevelPushMenuComponent
-  implements OnInit, OnDestroy, AfterViewInit {
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @ViewChild('menuContainer') menuContainer!: ElementRef;
   @ViewChild('contentContainer') contentContainer!: ElementRef;
 
@@ -87,7 +83,7 @@ export class MultiLevelPushMenuComponent
   private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
   private lastActiveLevel = 0;
-  private lastActiveLevelKey = 'level-0';
+  private lastActiveLevelKey = BASE_LEVEL_KEY;
   // Make isSwiping public so it can be accessed from the template
   public isSwiping = false;
 
@@ -140,7 +136,7 @@ export class MultiLevelPushMenuComponent
     private menuDomService: MenuDomService,
     private accessibilityService: AccessibilityService,
     private browserCompatibilityService: BrowserCompatibilityService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.isMobile = this.deviceDetectorService.isMobile();
@@ -256,7 +252,7 @@ export class MultiLevelPushMenuComponent
     );
 
     // Apply browser-specific fixes to all created level holders
-    this.activeLevelHolders.forEach(levelHolder => {
+    this.activeLevelHolders.forEach((levelHolder) => {
       this.browserCompatibilityService.applyBrowserFixes(levelHolder);
     });
 
@@ -345,6 +341,13 @@ export class MultiLevelPushMenuComponent
         this.renderer.setStyle(currentLevelHolder, 'visibility', 'hidden');
         this.updateNavigationState(targetLevel);
 
+        // If navigating back to root level, reset lastActiveLevel variables
+        // This ensures that expand after back button + collapse will open root menu
+        if (targetLevel === 0) {
+          this.lastActiveLevel = 0;
+          this.lastActiveLevelKey = BASE_LEVEL_KEY;
+        }
+
         // Setup focus trap on the target level for accessibility
         this.setupFocusTrap(targetLevelHolder);
 
@@ -394,24 +397,30 @@ export class MultiLevelPushMenuComponent
   }
 
   // Menu collapse/expand methods
-  collapseMenu(level?: number, animationSpeed: 'fast' | 'normal' = 'normal'): void {
+  collapseMenu(
+    level?: number,
+    animationSpeed: 'fast' | 'normal' = 'normal'
+  ): void {
     // Store current state before collapsing
     if (this.currentLevel > 0 && level === undefined) {
       this.lastActiveLevel = this.currentLevel;
       this.lastActiveLevelKey = `level-${this.currentLevel}`;
-      
+
       // Hide all visible submenus when doing a full collapse
-      this.visibleLevelHolders.forEach(holder => {
-        const holderLevel = parseInt(holder.getAttribute('data-level') ?? '0', 10);
+      this.visibleLevelHolders.forEach((holder) => {
+        const holderLevel = parseInt(
+          holder.getAttribute('data-level') ?? '0',
+          10
+        );
         if (holderLevel > 0) {
           this.renderer.setStyle(holder, 'visibility', 'hidden');
         }
       });
-      
+
       // Reset the level tracking variables
       this.currentLevel = 0;
       this.visibleLevelHolders = this.visibleLevelHolders.filter(
-        holder => parseInt(holder.getAttribute('data-level') ?? '0', 10) === 0
+        (holder) => parseInt(holder.getAttribute('data-level') ?? '0', 10) === 0
       );
     }
 
@@ -423,7 +432,7 @@ export class MultiLevelPushMenuComponent
   }
 
   private performFullCollapse(animationSpeed: 'fast' | 'normal'): void {
-    const baseLevel = this.menuLevels.get('level-0');
+    const baseLevel = this.menuLevels.get(BASE_LEVEL_KEY);
     if (!baseLevel) return;
 
     const element = baseLevel.element;
@@ -466,13 +475,17 @@ export class MultiLevelPushMenuComponent
   }
 
   expandMenu(animationSpeed: 'fast' | 'normal' = 'normal'): void {
-    const baseLevel = this.menuLevels.get('level-0');
+    const baseLevel = this.menuLevels.get(BASE_LEVEL_KEY);
     if (!baseLevel) return;
 
     const element = baseLevel.element;
 
     // Animate expand
-    this.menuAnimationService.animateExpand(this.renderer, element, animationSpeed);
+    this.menuAnimationService.animateExpand(
+      this.renderer,
+      element,
+      animationSpeed
+    );
 
     // Show menu items
     const menuUl = element.querySelector('ul');
@@ -498,7 +511,7 @@ export class MultiLevelPushMenuComponent
     );
 
     this._options.collapsed = false;
-    
+
     // Restore previous submenu state if available
     if (this.lastActiveLevel > 0) {
       const sublevel = this.menuLevels.get(this.lastActiveLevelKey);
@@ -603,15 +616,19 @@ export class MultiLevelPushMenuComponent
    */
   onSwipeDetected(event: SwipeEvent): void {
     // Use velocity to determine how fast to animate the menu
-    const animationSpeed = event.velocity && event.velocity > 0.5
-      ? 'fast' // Fast swipe
-      : 'normal'; // Normal swipe
+    const animationSpeed =
+      event.velocity && event.velocity > 0.5
+        ? 'fast' // Fast swipe
+        : 'normal'; // Normal swipe
 
     if (this._options.direction === 'rtl') {
       // Handle RTL mode
       if (event.direction === SwipeDirection.Left) {
         this.expandMenu(animationSpeed);
-      } else if (event.direction === SwipeDirection.Right && this.currentLevel > 0) {
+      } else if (
+        event.direction === SwipeDirection.Right &&
+        this.currentLevel > 0
+      ) {
         this.collapseMenu(this.currentLevel - 1, animationSpeed);
       } else if (event.direction === SwipeDirection.Right) {
         this.collapseMenu(undefined, animationSpeed);
@@ -620,7 +637,10 @@ export class MultiLevelPushMenuComponent
       // Handle LTR mode
       if (event.direction === SwipeDirection.Right) {
         this.expandMenu(animationSpeed);
-      } else if (event.direction === SwipeDirection.Left && this.currentLevel > 0) {
+      } else if (
+        event.direction === SwipeDirection.Left &&
+        this.currentLevel > 0
+      ) {
         this.collapseMenu(this.currentLevel - 1, animationSpeed);
       } else if (event.direction === SwipeDirection.Left) {
         this.collapseMenu(undefined, animationSpeed);

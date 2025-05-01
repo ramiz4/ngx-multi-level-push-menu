@@ -1,8 +1,5 @@
 import { Injectable, Renderer2 } from '@angular/core';
-import {
-  MultiLevelPushMenuItem,
-  MultiLevelPushMenuOptions,
-} from '../multi-level-push-menu.model';
+import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from '../models';
 import { MenuUtils } from '../utilities/menu-utils';
 
 /**
@@ -12,8 +9,24 @@ import { MenuUtils } from '../utilities/menu-utils';
  * Checks if a string contains a valid CSS unit
  */
 function hasValidCssUnit(value: string): boolean {
-  const cssUnits = ['px', 'em', 'rem', '%', 'vh', 'vw', 'vmin', 'vmax', 'cm', 'mm', 'in', 'pt', 'pc', 'ex', 'ch'];
-  return cssUnits.some(unit => value.endsWith(unit));
+  const cssUnits = [
+    'px',
+    'em',
+    'rem',
+    '%',
+    'vh',
+    'vw',
+    'vmin',
+    'vmax',
+    'cm',
+    'mm',
+    'in',
+    'pt',
+    'pc',
+    'ex',
+    'ch',
+  ];
+  return cssUnits.some((unit) => value.endsWith(unit));
 }
 
 /**
@@ -86,16 +99,19 @@ export class MenuDomService {
   ): void {
     const title = renderer.createElement('h2');
     renderer.addClass(title, 'title');
-    
+
     // Add level specific class to create visual hierarchy
     const level = levelHolder.getAttribute('data-level');
     if (level && parseInt(level, 10) > 0) {
       renderer.addClass(title, 'submenu-title');
     }
-    
+
     // Create a span element to contain title text for better overflow handling
     const titleTextSpan = renderer.createElement('span');
-    renderer.appendChild(titleTextSpan, renderer.createText(menuData.title || ''));
+    renderer.appendChild(
+      titleTextSpan,
+      renderer.createText(menuData.title || '')
+    );
     renderer.appendChild(title, titleTextSpan);
 
     // Add title icon if exists
@@ -152,7 +168,6 @@ export class MenuDomService {
 
       renderer.appendChild(titleElement, spanWrapper);
 
-
       const titleIcon2 = renderer.createElement('i');
       // Add icon classes to <i>
       ['fa', 'fa-bars'].forEach((className) => {
@@ -163,34 +178,34 @@ export class MenuDomService {
       const buttonWrapper = renderer.createElement('button');
       renderer.addClass(buttonWrapper, 'title-icon');
       renderer.addClass(buttonWrapper, 'mainmenu-icon');
-      
+
       // Optional accessibility
       renderer.setAttribute(buttonWrapper, 'type', 'button');
       renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
-      
+
       // Append <i> to <button>
       renderer.appendChild(buttonWrapper, titleIcon2);
-      
+
       // Add click listener only to main title icon
       renderer.listen(buttonWrapper, 'click', clickHandler);
-      
+
       renderer.appendChild(titleElement, buttonWrapper);
     } else {
       // Create <button> wrapper for main title icon (still clickable)
       const buttonWrapper = renderer.createElement('button');
       renderer.addClass(buttonWrapper, 'title-icon');
       renderer.addClass(buttonWrapper, 'mainmenu-icon');
-      
+
       // Optional accessibility
       renderer.setAttribute(buttonWrapper, 'type', 'button');
       renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
-      
+
       // Append <i> to <button>
       renderer.appendChild(buttonWrapper, titleIcon);
-      
+
       // Add click listener only to main title icon
       renderer.listen(buttonWrapper, 'click', clickHandler);
-      
+
       renderer.appendChild(titleElement, buttonWrapper);
     }
   }

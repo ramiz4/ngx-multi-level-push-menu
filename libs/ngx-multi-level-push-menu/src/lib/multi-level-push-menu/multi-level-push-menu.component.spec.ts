@@ -1,15 +1,20 @@
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
   Routes,
   withComponentInputBinding,
 } from '@angular/router';
+import { MultiLevelPushMenuItem } from './models';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
-import { MultiLevelPushMenuItem } from './multi-level-push-menu.model';
 
 // Create Dummy components for testing
 @Component({ template: '' })
@@ -26,7 +31,7 @@ const testMenuItems: MultiLevelPushMenuItem[] = [
   {
     name: 'Home',
     icon: 'fa fa-home',
-    link: '/home'
+    link: '/home',
   },
   {
     name: 'Collections',
@@ -35,15 +40,15 @@ const testMenuItems: MultiLevelPushMenuItem[] = [
       {
         name: 'Collection 1',
         icon: 'fa fa-folder',
-        link: '/collections/1'
+        link: '/collections/1',
       },
       {
         name: 'Collection 2',
         icon: 'fa fa-folder',
-        link: '/collections/2'
-      }
-    ]
-  }
+        link: '/collections/2',
+      },
+    ],
+  },
 ];
 
 // Mock window.matchMedia
@@ -75,7 +80,7 @@ describe('MultiLevelPushMenuComponent', () => {
         provideAnimations(),
         MultiLevelPushMenuService,
       ],
-      schemas: [NO_ERRORS_SCHEMA] // Add schema to ignore unknown properties
+      schemas: [NO_ERRORS_SCHEMA], // Add schema to ignore unknown properties
     }).compileComponents();
   }));
 
@@ -83,7 +88,7 @@ describe('MultiLevelPushMenuComponent', () => {
     fixture = TestBed.createComponent(MultiLevelPushMenuComponent);
     component = fixture.componentInstance;
     menuService = TestBed.inject(MultiLevelPushMenuService);
-    
+
     // Spy on various methods and services
     jest.spyOn(component['menuBuilderService'], 'createMenuStructure');
     jest.spyOn(component['menuAnimationService'], 'animateCollapse');
@@ -93,7 +98,7 @@ describe('MultiLevelPushMenuComponent', () => {
 
     // Supply test menu data
     component.menu = testMenuItems;
-    
+
     fixture.detectChanges();
   });
 
@@ -106,11 +111,15 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(component.options.collapsed).toBeFalsy();
     // Checking for string or number is valid since we now support both
     const menuWidth = component.options.menuWidth;
-    expect(typeof menuWidth === 'string' ? menuWidth : String(menuWidth)).toContain('300');
+    expect(
+      typeof menuWidth === 'string' ? menuWidth : String(menuWidth)
+    ).toContain('300');
   });
 
   it('should create menu structure when initialized with menu items', () => {
-    expect(component['menuBuilderService'].createMenuStructure).toHaveBeenCalled();
+    expect(
+      component['menuBuilderService'].createMenuStructure
+    ).toHaveBeenCalled();
   });
 
   it('should apply custom options when provided', () => {
@@ -118,13 +127,13 @@ describe('MultiLevelPushMenuComponent', () => {
       collapsed: true,
       menuWidth: 400,
       mode: 'overlap',
-      overlapWidth: '50'
+      overlapWidth: '50',
     };
-    
+
     // Apply to the component options - no type assertion needed this way
     component.options = { ...component.options, ...customOptions };
     fixture.detectChanges();
-    
+
     expect(component.options.collapsed).toBe(true);
     expect(component.options.menuWidth).toBe(400);
     expect(component.options.mode).toBe('overlap');
@@ -135,33 +144,35 @@ describe('MultiLevelPushMenuComponent', () => {
     // Mock the event object
     const mockEvent = {
       preventDefault: jest.fn(),
-      stopPropagation: jest.fn()
+      stopPropagation: jest.fn(),
     } as unknown as MouseEvent;
-    
+
     // Test expanding when collapsed
     component.options = { ...component.options, collapsed: true };
     fixture.detectChanges();
-    
+
     component.titleIconClick(mockEvent);
     expect(component['menuAnimationService'].animateExpand).toHaveBeenCalled();
     expect(component.options.collapsed).toBe(false);
-    
+
     // Test collapsing when expanded
     component.titleIconClick(mockEvent);
-    expect(component['menuAnimationService'].animateCollapse).toHaveBeenCalled();
+    expect(
+      component['menuAnimationService'].animateCollapse
+    ).toHaveBeenCalled();
   });
 
   it('should emit events when menu items are clicked', fakeAsync(() => {
     // Create a mock menu item
     const mockItem: MultiLevelPushMenuItem = {
       name: 'Test Item',
-      link: '/test'
+      link: '/test',
     };
-    
+
     // Test the handleMenuItemClick method
     component['handleMenuItemClick'](mockItem);
     tick();
-    
+
     expect(menuService.menuItemClicked).toHaveBeenCalledWith(mockItem);
   }));
 
@@ -169,33 +180,44 @@ describe('MultiLevelPushMenuComponent', () => {
     // Create a mock group item
     const mockGroupItem: MultiLevelPushMenuItem = {
       name: 'Test Group',
-      items: [
-        { name: 'Child 1', link: '/child1' }
-      ]
+      items: [{ name: 'Child 1', link: '/child1' }],
     };
     const mockParentLevelHolder = document.createElement('div');
-    
+
     // Mock the submenu creation method
-    jest.spyOn(component['menuBuilderService'], 'createSubmenu').mockImplementation(() => {
-      // Do nothing but in a non-empty way
-      return;
-    });
-    
+    jest
+      .spyOn(component['menuBuilderService'], 'createSubmenu')
+      .mockImplementation(() => {
+        // Do nothing but in a non-empty way
+        return;
+      });
+
     // Test the group item click method
-    component['handleSubmenuClick']('test-key', 1, mockGroupItem, mockParentLevelHolder);
+    component['handleSubmenuClick'](
+      'test-key',
+      1,
+      mockGroupItem,
+      mockParentLevelHolder
+    );
     tick(20);
-    
+
     expect(menuService.groupItemClicked).toHaveBeenCalledWith(mockGroupItem);
   }));
 
   // Test for proper cleanup
   it('should unsubscribe from subscriptions on destroy', () => {
     // Setup spies
-    const collapseUnsubSpy = jest.spyOn(component['collapseSubscription'], 'unsubscribe');
-    const expandUnsubSpy = jest.spyOn(component['expandSubscription'], 'unsubscribe');
-    
+    const collapseUnsubSpy = jest.spyOn(
+      component['collapseSubscription'],
+      'unsubscribe'
+    );
+    const expandUnsubSpy = jest.spyOn(
+      component['expandSubscription'],
+      'unsubscribe'
+    );
+
     component.ngOnDestroy();
-    
+
     expect(collapseUnsubSpy).toHaveBeenCalled();
     expect(expandUnsubSpy).toHaveBeenCalled();
   });
@@ -203,10 +225,13 @@ describe('MultiLevelPushMenuComponent', () => {
   // Test accessibility features
   it('should set up ARIA landmarks after view init', () => {
     // Spy on accessibility service
-    const ariaSetupSpy = jest.spyOn(component['accessibilityService'], 'setupAriaLandmarks');
-    
+    const ariaSetupSpy = jest.spyOn(
+      component['accessibilityService'],
+      'setupAriaLandmarks'
+    );
+
     component.ngAfterViewInit();
-    
+
     expect(ariaSetupSpy).toHaveBeenCalled();
   });
 });

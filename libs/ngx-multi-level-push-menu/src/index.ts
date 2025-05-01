@@ -1,5 +1,5 @@
 // Public API Surface of ngx-multi-level-push-menu
-export * from './lib/multi-level-push-menu/multi-level-push-menu.model';
+export * from './lib/multi-level-push-menu/models';
 export * from './lib/multi-level-push-menu/multi-level-push-menu.service';
 export * from './lib/multi-level-push-menu/multi-level-push-menu.component';
 

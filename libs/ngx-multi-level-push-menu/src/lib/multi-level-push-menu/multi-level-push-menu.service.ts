@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { MultiLevelPushMenuItem } from './multi-level-push-menu.model';
+import { MultiLevelPushMenuItem } from './models';
 
 @Injectable()
 export class MultiLevelPushMenuService {

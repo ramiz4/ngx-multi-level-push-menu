@@ -5,6 +5,7 @@ import { DeviceDetectorService } from '../services/device-detector.service';
 import { SwipeDirection, SwipeDirective, SwipeEvent } from './swipe.directive';
 
 @Component({
+  imports: [SwipeDirective],
   template: `
     <div
       ramiz4Swipe
@@ -42,7 +43,7 @@ describe('SwipeDirective', () => {
     } as unknown as DeviceDetectorService;
 
     await TestBed.configureTestingModule({
-      declarations: [TestComponent, SwipeDirective],
+      imports: [TestComponent],
       providers: [
         { provide: DeviceDetectorService, useValue: deviceDetectorServiceMock },
       ],

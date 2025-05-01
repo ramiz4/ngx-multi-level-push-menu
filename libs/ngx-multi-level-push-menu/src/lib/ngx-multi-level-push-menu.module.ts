@@ -1,21 +1,16 @@
-import { CommonModule } from '@angular/common';
-import { ModuleWithProviders, NgModule } from '@angular/core';
-import { MenuItemDirective } from './multi-level-push-menu/directives/menu-item.directive';
-import { SwipeDirective } from './multi-level-push-menu/directives/swipe.directive';
+import { NgModule } from '@angular/core';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu/multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-push-menu.service';
 
+/**
+ * @deprecated Use standalone imports instead. This module is kept for backward compatibility.
+ */
 @NgModule({
-  imports: [CommonModule],
-  declarations: [
-    MultiLevelPushMenuComponent,
-    SwipeDirective,
-    MenuItemDirective,
-  ],
-  exports: [MultiLevelPushMenuComponent, SwipeDirective, MenuItemDirective],
+  imports: [MultiLevelPushMenuComponent],
+  exports: [MultiLevelPushMenuComponent],
 })
 export class NgxMultiLevelPushMenuModule {
-  public static forRoot(): ModuleWithProviders<NgxMultiLevelPushMenuModule> {
+  public static forRoot() {
     return {
       ngModule: NgxMultiLevelPushMenuModule,
       providers: [MultiLevelPushMenuService],

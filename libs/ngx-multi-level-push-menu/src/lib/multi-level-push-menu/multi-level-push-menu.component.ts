@@ -5,6 +5,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -19,7 +20,11 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { SwipeDirection, SwipeEvent } from './directives/swipe.directive';
+import {
+  SwipeDirection,
+  SwipeDirective,
+  SwipeEvent,
+} from './directives/swipe.directive';
 import {
   MenuLevelData,
   MultiLevelPushMenuItem,
@@ -37,7 +42,6 @@ const ANIMATION_DURATION = 400;
 
 @Component({
   selector: 'ramiz4-multi-level-push-menu',
-  standalone: false,
   templateUrl: './multi-level-push-menu.component.html',
   styleUrls: ['./multi-level-push-menu.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -62,6 +66,7 @@ const ANIMATION_DURATION = 400;
     MenuBuilderService,
     MenuDomService,
   ],
+  imports: [CommonModule, SwipeDirective],
 })
 export class MultiLevelPushMenuComponent
   implements OnInit, OnDestroy, AfterViewInit

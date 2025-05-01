@@ -5,6 +5,7 @@ import { MultiLevelPushMenuItem } from '../multi-level-push-menu.model';
 import { MenuItemClickEvent, MenuItemDirective } from './menu-item.directive';
 
 @Component({
+  imports: [MenuItemDirective],
   template: `
     <div
       ramiz4MenuItem
@@ -38,7 +39,7 @@ describe('MenuItemDirective', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TestComponent, MenuItemDirective],
+      imports: [TestComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);

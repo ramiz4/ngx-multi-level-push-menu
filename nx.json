@@ -1,8 +1,5 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "affected": {
-    "defaultBase": "master"
-  },
   "cli": {
     "packageManager": "npm"
   },
@@ -44,7 +41,7 @@
       "cache": true
     },
     "@nx/jest:jest": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.config.ts"],
       "cache": true,
       "options": {
         "passWithNoTests": true
@@ -60,5 +57,7 @@
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     }
-  }
+  },
+  "useInferencePlugins": false,
+  "defaultBase": "master"
 }

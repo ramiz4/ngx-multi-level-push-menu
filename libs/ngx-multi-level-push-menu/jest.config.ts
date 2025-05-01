@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
   displayName: 'ngx-multi-level-push-menu',
-  preset: '../../jest.preset.js',
+  preset: '../../node_modules/@nx/jest/preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   testEnvironment: 'jsdom',
   transform: {

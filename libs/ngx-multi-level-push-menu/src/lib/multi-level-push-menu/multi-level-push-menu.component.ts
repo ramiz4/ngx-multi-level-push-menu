@@ -345,6 +345,13 @@ export class MultiLevelPushMenuComponent
         this.renderer.setStyle(currentLevelHolder, 'visibility', 'hidden');
         this.updateNavigationState(targetLevel);
 
+        // If navigating back to root level, reset lastActiveLevel variables
+        // This ensures that expand after back button + collapse will open root menu
+        if (targetLevel === 0) {
+          this.lastActiveLevel = 0;
+          this.lastActiveLevelKey = 'level-0';
+        }
+
         // Setup focus trap on the target level for accessibility
         this.setupFocusTrap(targetLevelHolder);
 

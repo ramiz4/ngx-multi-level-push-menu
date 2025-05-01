@@ -20,6 +20,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { KeyNavigationEvent } from './directives/menu-item.directive';
 import {
   SwipeDirection,
   SwipeDirective,
@@ -31,6 +32,7 @@ import {
   MultiLevelPushMenuOptions,
 } from './multi-level-push-menu.model';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
+import { AccessibilityService } from './services/accessibility.service';
 import { DeviceDetectorService } from './services/device-detector.service';
 import { MenuAnimationService } from './services/menu-animation.service';
 import { MenuBuilderService } from './services/menu-builder.service';
@@ -65,6 +67,7 @@ const ANIMATION_DURATION = 400;
     MenuAnimationService,
     MenuBuilderService,
     MenuDomService,
+    AccessibilityService,
   ],
   imports: [CommonModule, SwipeDirective],
 })
@@ -80,6 +83,11 @@ export class MultiLevelPushMenuComponent
   private isMobile = false;
   private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
+
+  // Focus management
+  private focusTrapCleanupFn: (() => void) | null = null;
+  // Store previous focus to restore when menu is closed
+  private previousActiveElement: Element | null = null;
 
   // Subscriptions
   private collapseSubscription: Subscription = new Subscription();
@@ -109,21 +117,43 @@ export class MultiLevelPushMenuComponent
     private deviceDetectorService: DeviceDetectorService,
     private menuAnimationService: MenuAnimationService,
     private menuBuilderService: MenuBuilderService,
-    private menuDomService: MenuDomService
+    private menuDomService: MenuDomService,
+    private accessibilityService: AccessibilityService
   ) {}
 
   ngOnInit(): void {
     this.isMobile = this.deviceDetectorService.isMobile();
     this.setupSubscriptions();
+
+    // Store the currently focused element to restore later
+    this.previousActiveElement = document.activeElement;
   }
 
   ngAfterViewInit(): void {
     this.initMenu();
+
+    // Set up ARIA landmarks on the menu container
+    if (this.menuContainer) {
+      this.accessibilityService.setupAriaLandmarks(
+        this.renderer,
+        this.menuContainer.nativeElement
+      );
+    }
+
     this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe();
+    this.cleanupFocusTrap();
+
+    // Restore focus to previous element if it exists
+    if (
+      this.previousActiveElement &&
+      this.previousActiveElement instanceof HTMLElement
+    ) {
+      this.previousActiveElement.focus();
+    }
   }
 
   /**
@@ -288,6 +318,17 @@ export class MultiLevelPushMenuComponent
       () => {
         this.renderer.setStyle(currentLevelHolder, 'visibility', 'hidden');
         this.updateNavigationState(targetLevel);
+
+        // Setup focus trap on the target level for accessibility
+        this.setupFocusTrap(targetLevelHolder);
+
+        // Announce to screen readers
+        const levelTitle =
+          targetLevelHolder.querySelector('.title')?.textContent ||
+          'Previous menu';
+        this.accessibilityService.announceToScreenReader(
+          `Returned to ${levelTitle} level. Use arrow keys to navigate.`
+        );
       }
     );
   }
@@ -400,6 +441,15 @@ export class MultiLevelPushMenuComponent
       this._options.menuWidth
     );
 
+    // Accessibility enhancements
+    this.setupFocusTrap(element);
+    this.bindKeyNavigationEvents(element);
+
+    // Announce menu expansion to screen readers
+    this.accessibilityService.announceToScreenReader(
+      'Menu expanded. Use arrow keys to navigate.'
+    );
+
     this._options.collapsed = false;
   }
 
@@ -433,6 +483,19 @@ export class MultiLevelPushMenuComponent
         this.contentContainer.nativeElement,
         overlapWidth * level,
         this._options.menuWidth
+      );
+    }
+
+    // Accessibility enhancements
+    // Set up focus trap and bind keyboard navigation events
+    this.setupFocusTrap(element);
+    this.bindKeyNavigationEvents(element);
+
+    // Announce the submenu to screen readers
+    const menuTitle = element.querySelector('.title')?.textContent;
+    if (menuTitle) {
+      this.accessibilityService.announceToScreenReader(
+        `Opened submenu: ${menuTitle}. Use arrow keys to navigate.`
       );
     }
 
@@ -488,5 +551,73 @@ export class MultiLevelPushMenuComponent
         this.collapseMenu(this.currentLevel - 1);
       }
     }
+  }
+
+  /**
+   * Handle keyboard navigation events from menu items
+   */
+  handleKeyNavigation(
+    event: KeyNavigationEvent,
+    levelElement: HTMLElement
+  ): void {
+    this.accessibilityService.handleKeyboardNavigation(
+      event.direction,
+      event.sourceElement,
+      levelElement,
+      this._options.direction === 'rtl'
+    );
+
+    // Announce navigation to screen readers
+    this.accessibilityService.announceToScreenReader(
+      `Navigated ${event.direction}.`
+    );
+  }
+
+  /**
+   * Setup focus trap for the current level
+   */
+  setupFocusTrap(element: HTMLElement): void {
+    // Clean up any existing focus trap
+    this.cleanupFocusTrap();
+
+    // Create a new focus trap
+    this.focusTrapCleanupFn = this.accessibilityService.createFocusTrap(
+      this.renderer,
+      element
+    );
+
+    // Announce level to screen readers
+    const levelTitle = element.querySelector('.title')?.textContent || 'Menu';
+    this.accessibilityService.announceToScreenReader(
+      `${levelTitle} level. Use arrow keys to navigate.`
+    );
+  }
+
+  /**
+   * Clean up any existing focus trap
+   */
+  private cleanupFocusTrap(): void {
+    if (this.focusTrapCleanupFn) {
+      this.focusTrapCleanupFn();
+      this.focusTrapCleanupFn = null;
+    }
+  }
+
+  /**
+   * Add event listeners for keyboard navigation
+   */
+  private bindKeyNavigationEvents(element: HTMLElement): void {
+    // Add event listeners for keyNavigation events from menu items
+    const menuItems = element.querySelectorAll('[ramiz4MenuItem]');
+
+    menuItems.forEach((item: Element) => {
+      this.renderer.listen(
+        item,
+        'keyNavigation',
+        (event: KeyNavigationEvent) => {
+          this.handleKeyNavigation(event, element);
+        }
+      );
+    });
   }
 }

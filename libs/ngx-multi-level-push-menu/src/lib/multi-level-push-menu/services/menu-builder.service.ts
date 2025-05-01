@@ -89,6 +89,17 @@ export class MenuBuilderService {
     renderer.addClass(levelHolder, 'level-holder');
     renderer.setAttribute(levelHolder, 'data-level', level.toString());
 
+    // Add accessibility attributes
+    renderer.setAttribute(levelHolder, 'role', 'menu');
+    renderer.setAttribute(levelHolder, 'aria-orientation', 'vertical');
+    if (menuData.title || menuData.name) {
+      renderer.setAttribute(
+        levelHolder,
+        'aria-label',
+        menuData.title || menuData.name || `Menu level ${level}`
+      );
+    }
+
     const initialState =
       level === 0 ? 'in' : options.direction === 'rtl' ? 'outRtl' : 'out';
     renderer.setProperty(levelHolder, '_slideState', initialState);
@@ -160,6 +171,9 @@ export class MenuBuilderService {
     );
     renderer.addClass(listItem, 'list-item');
 
+    // Add list item accessibility attributes
+    renderer.setAttribute(listItem, 'role', 'presentation');
+
     const anchor = this.createMenuItemAnchor(renderer, item);
 
     // Add ramiz4MenuItem directive attribute
@@ -168,6 +182,9 @@ export class MenuBuilderService {
     // Add data attributes for the directive to use
     renderer.setAttribute(anchor, 'data-item-id', item.id || '');
     renderer.setAttribute(anchor, 'data-item-name', item.name || '');
+
+    // Add accessibility information about menu level
+    renderer.setAttribute(anchor, 'data-level', parentLevel.toString());
 
     // Add item icon if exists
     if (item.icon) {
@@ -242,11 +259,20 @@ export class MenuBuilderService {
     const backItem = renderer.createElement('div');
     renderer.addClass(backItem, options.backItemClass);
 
+    // Add accessibility attributes to back item container
+    renderer.setAttribute(backItem, 'role', 'presentation');
+
     const backAnchor = renderer.createElement('a');
     renderer.setAttribute(backAnchor, 'href', '#');
     renderer.setAttribute(backAnchor, 'ramiz4MenuItem', '');
     renderer.setAttribute(backAnchor, 'data-is-back-item', 'true');
     renderer.addClass(backAnchor, 'back-anchor');
+
+    // Add enhanced accessibility attributes to back anchor
+    renderer.setAttribute(backAnchor, 'role', 'menuitem');
+    renderer.setAttribute(backAnchor, 'aria-label', 'Go back to previous menu');
+    renderer.setAttribute(backAnchor, 'tabindex', '0');
+
     renderer.appendChild(backAnchor, renderer.createText(options.backText));
 
     // Create back icon
@@ -289,6 +315,17 @@ export class MenuBuilderService {
     ) => void
   ): void {
     const itemGroup = renderer.createElement('ul');
+
+    // Add accessibility attributes
+    renderer.setAttribute(itemGroup, 'role', 'group');
+    if (menuData.title || menuData.name) {
+      renderer.setAttribute(
+        itemGroup,
+        'aria-label',
+        `${menuData.title || menuData.name} items`
+      );
+    }
+
     renderer.appendChild(levelHolder, itemGroup);
 
     if (menuData.items && menuData.items.length) {

@@ -21,6 +21,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { BASE_LEVEL_KEY } from './constants';
 import { SwipeDirection, SwipeDirective } from './directives/swipe.directive';
 import { KeyNavigationEvent, MenuLevelData, SwipeEvent } from './interfaces';
 import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from './models';
@@ -82,7 +83,7 @@ export class MultiLevelPushMenuComponent
   private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
   private lastActiveLevel = 0;
-  private lastActiveLevelKey = 'level-0';
+  private lastActiveLevelKey = BASE_LEVEL_KEY;
   // Make isSwiping public so it can be accessed from the template
   public isSwiping = false;
 
@@ -344,7 +345,7 @@ export class MultiLevelPushMenuComponent
         // This ensures that expand after back button + collapse will open root menu
         if (targetLevel === 0) {
           this.lastActiveLevel = 0;
-          this.lastActiveLevelKey = 'level-0';
+          this.lastActiveLevelKey = BASE_LEVEL_KEY;
         }
 
         // Setup focus trap on the target level for accessibility
@@ -431,7 +432,7 @@ export class MultiLevelPushMenuComponent
   }
 
   private performFullCollapse(animationSpeed: 'fast' | 'normal'): void {
-    const baseLevel = this.menuLevels.get('level-0');
+    const baseLevel = this.menuLevels.get(BASE_LEVEL_KEY);
     if (!baseLevel) return;
 
     const element = baseLevel.element;
@@ -474,7 +475,7 @@ export class MultiLevelPushMenuComponent
   }
 
   expandMenu(animationSpeed: 'fast' | 'normal' = 'normal'): void {
-    const baseLevel = this.menuLevels.get('level-0');
+    const baseLevel = this.menuLevels.get(BASE_LEVEL_KEY);
     if (!baseLevel) return;
 
     const element = baseLevel.element;

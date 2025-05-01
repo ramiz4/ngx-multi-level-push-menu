@@ -1,4 +1,5 @@
 import { Injectable, Renderer2 } from '@angular/core';
+import { BASE_LEVEL_KEY } from '../constants';
 import { MenuItemClickEvent, MenuLevelData } from '../interfaces';
 import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from '../models';
 import { MenuUtils } from '../utilities/menu-utils';
@@ -502,7 +503,7 @@ export class MenuBuilderService {
   ): void {
     if (options.mode !== 'overlap') return;
 
-    const baseElement = menuLevels.get('level-0')?.element;
+    const baseElement = menuLevels.get(BASE_LEVEL_KEY)?.element;
     if (!baseElement) return;
 
     const baseWidth = MenuUtils.getElementWidth(baseElement);

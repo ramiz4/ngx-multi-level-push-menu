@@ -3,7 +3,7 @@ import { MultiLevelPushMenuComponent } from './multi-level-push-menu/multi-level
 import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-push-menu.service';
 
 /**
- * @deprecated Use standalone imports instead. This module is kept for backward compatibility.
+ * @deprecated Use provideMultiLevelPushMenu() instead. This module is kept for backward compatibility.
  */
 @NgModule({
   imports: [MultiLevelPushMenuComponent],

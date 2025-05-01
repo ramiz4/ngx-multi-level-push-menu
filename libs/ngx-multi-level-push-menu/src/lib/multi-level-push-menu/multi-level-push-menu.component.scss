@@ -18,6 +18,14 @@
   border: 0;
 }
 
+// Wrapper for the entire component
+.multilevelpushmenu-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); // Remove tap highlight on mobile
+}
+
 .level-holder {
   position: absolute;
   overflow: hidden;
@@ -26,31 +34,89 @@
   min-height: 100%;
   color: #fff;
   transition: transform 0.4s ease-in-out;
+  
+  // Add overscroll-behavior to prevent body scrolling on iOS
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+
+  // Set appropriate z-index based on level
+  &[data-level="0"] {
+    z-index: 10;
+  }
+  
+  &[data-level="1"] {
+    z-index: 20;
+  }
+  
+  &[data-level="2"] {
+    z-index: 30;
+  }
+  
+  &[data-level="3"] {
+    z-index: 40;
+  }
+  
+  &[data-level="4"] {
+    z-index: 50;
+  }
 
   &.rtl {
     right: 0;
     box-shadow: -5px 0 5px -5px #1f4164;
-
-    .title {
-      text-align: right;
-    }
   }
 
   &.ltr {
     left: 0;
     box-shadow: 5px 0 5px -5px #1f4164;
+  }
 
-    .title {
-      text-align: left;
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: inherit;
+    margin: 0;
+    padding: .4em;
+    position: relative;
+    
+    // Submenu title styles with enhanced visual appearance
+    &.submenu-title {
+      background-color: #2e6196;
+      border-bottom: 1px solid #1f4164;
+      
+      // Add extra shadow to prevent title overlay issues
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    // Title text container to prevent overflow
+    span {
+      flex: 1;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .title-icon {
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.3em .4em;
+      margin: 0 0 0 0.5em;
+      font-size: inherit;
+      color: inherit;
+      outline: none;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 100;
+    }
+    
+    .mainmenu-icon {
+      background: #2e6196;
+      cursor: pointer;
     }
   }
-
-  h2.title {
-    font-size: 1.5em;
-    margin: 0;
-    padding: 0.6em 0.8em;
-  }
-
+  
   .back-item {
     display: block;
     background: #2e6196;
@@ -61,6 +127,11 @@
       padding: 1em 1.2em;
       text-decoration: none;
       color: #fff;
+      
+      // Make touch targets bigger on mobile
+      @media (max-width: 768px) {
+        padding: 1.2em;
+      }
 
       &:hover,
       &:focus {
@@ -80,7 +151,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
-
+    
     li.list-item {
       display: block;
       border-top: 1px solid #295685;
@@ -95,6 +166,11 @@
         cursor: pointer;
         color: #fff;
         text-decoration: none;
+        
+        // Make touch targets bigger on mobile
+        @media (max-width: 768px) {
+          padding: 1.2em;
+        }
 
         &:hover,
         &:focus {
@@ -137,4 +213,50 @@
   height: 100%;
   transition: left 0.4s ease, width 0.4s ease;
   overflow: auto;
+  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+}
+
+// Visual feedback for swipe gestures
+nav.is-swiping {
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    animation: pulse 1s infinite;
+  }
+}
+
+// Responsive adjustments for mobile devices
+@media (max-width: 768px) {
+  .level-holder {
+    width: 85% !important; // Override inline styles with important
+    max-width: 300px;
+    
+    h2.title {
+      font-size: 1.3em;
+      padding: 0.4em;
+    }
+  }
+  
+  // Make sure the touch area is responsive
+  #content {
+    width: 100% !important; // Override inline styles
+  }
+}
+
+// Animation for swipe indicator
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.3;
+  }
 }

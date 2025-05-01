@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "cli": "nx",
+  "$id": "menu-item",
+  "title": "Create a new menu item for ngx-multi-level-push-menu",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the menu item",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What's the name of the menu item?"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon for the menu item",
+      "default": "fa fa-list",
+      "x-prompt": "What icon would you like to use? (default: fa fa-list)"
+    },
+    "link": {
+      "type": "string",
+      "description": "The link for the menu item",
+      "default": "#",
+      "x-prompt": "What link would you like to use? (default: #)"
+    },
+    "parentId": {
+      "type": "string",
+      "description": "The ID of the parent menu item",
+      "default": "",
+      "x-prompt": "What's the ID of the parent menu item? (leave empty for root level)"
+    }
+  },
+  "required": ["name"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "<%= id %>",
+  "name": "<%= name %>",
+  "icon": "<%= icon %>",
+  "link": "<%= link %>"<% if (parentId) { %>,
+  "parentId": "<%= parentId %>"<% } %>
+}

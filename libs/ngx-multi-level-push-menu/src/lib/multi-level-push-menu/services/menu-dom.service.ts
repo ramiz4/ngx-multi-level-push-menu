@@ -5,6 +5,30 @@ import {
 } from '../multi-level-push-menu.model';
 import { MenuUtils } from '../utilities/menu-utils';
 
+/**
+ * Convert menuWidth to string to ensure consistent usage
+ */
+/**
+ * Checks if a string contains a valid CSS unit
+ */
+function hasValidCssUnit(value: string): boolean {
+  const cssUnits = ['px', 'em', 'rem', '%', 'vh', 'vw', 'vmin', 'vmax', 'cm', 'mm', 'in', 'pt', 'pc', 'ex', 'ch'];
+  return cssUnits.some(unit => value.endsWith(unit));
+}
+
+/**
+ * Convert menuWidth to string to ensure consistent usage
+ */
+function ensureMenuWidthString(value: string | number): string {
+  if (typeof value === 'number') {
+    return `${value}px`;
+  }
+  if (!hasValidCssUnit(value)) {
+    return `${value}px`;
+  }
+  return value;
+}
+
 // Content padding constant
 const CONTENT_PADDING = 20;
 
@@ -16,17 +40,18 @@ export class MenuDomService {
   public setContentPositionAndWidth(
     renderer: Renderer2,
     contentElement: HTMLElement,
-    menuWidth: string
+    menuWidth: string | number
   ): void {
+    const menuWidthStr = ensureMenuWidthString(menuWidth);
     renderer.setStyle(
       contentElement,
       'left',
-      `calc(${menuWidth} + ${CONTENT_PADDING}px)`
+      `calc(${menuWidthStr} + ${CONTENT_PADDING}px)`
     );
     renderer.setStyle(
       contentElement,
       'width',
-      `calc(100% - (${menuWidth} + ${CONTENT_PADDING}px))`
+      `calc(100% - (${menuWidthStr} + ${CONTENT_PADDING}px))`
     );
   }
 
@@ -37,11 +62,12 @@ export class MenuDomService {
     renderer: Renderer2,
     contentElement: HTMLElement,
     amount: number,
-    menuWidth: string
+    menuWidth: string | number
   ): void {
     if (!contentElement) return;
 
-    const menuWidthPx = MenuUtils.parseSize(menuWidth);
+    const menuWidthStr = ensureMenuWidthString(menuWidth);
+    const menuWidthPx = MenuUtils.parseSize(menuWidthStr);
     const totalPush = menuWidthPx + amount + CONTENT_PADDING;
 
     renderer.setStyle(contentElement, 'left', `${totalPush}px`);
@@ -60,7 +86,17 @@ export class MenuDomService {
   ): void {
     const title = renderer.createElement('h2');
     renderer.addClass(title, 'title');
-    renderer.appendChild(title, renderer.createText(menuData.title || ''));
+    
+    // Add level specific class to create visual hierarchy
+    const level = levelHolder.getAttribute('data-level');
+    if (level && parseInt(level, 10) > 0) {
+      renderer.addClass(title, 'submenu-title');
+    }
+    
+    // Create a span element to contain title text for better overflow handling
+    const titleTextSpan = renderer.createElement('span');
+    renderer.appendChild(titleTextSpan, renderer.createText(menuData.title || ''));
+    renderer.appendChild(title, titleTextSpan);
 
     // Add title icon if exists
     if (menuData.icon) {
@@ -69,7 +105,18 @@ export class MenuDomService {
         title,
         menuData.icon,
         options,
-        titleClickHandler
+        titleClickHandler,
+        level !== null && parseInt(level, 10) > 0
+      );
+    } else {
+      // Add default icon if no icon is provided
+      this.appendTitleIcon(
+        renderer,
+        title,
+        options.titleIcon,
+        options,
+        titleClickHandler,
+        level !== null && parseInt(level, 10) > 0
       );
     }
 
@@ -84,31 +131,68 @@ export class MenuDomService {
     titleElement: HTMLElement,
     iconClasses: string,
     options: MultiLevelPushMenuOptions,
-    clickHandler: (event: MouseEvent) => void
+    clickHandler: (event: MouseEvent) => void,
+    isSubmenu = false
   ): void {
     const titleIcon = renderer.createElement('i');
 
-    // Add icon classes
+    // Add icon classes to <i>
     iconClasses.split(' ').forEach((className) => {
       if (className) renderer.addClass(titleIcon, className);
     });
 
-    // Add positioning classes
-    renderer.addClass(
-      titleIcon,
-      options.direction === 'rtl' ? 'floatLeft' : 'floatRight'
-    );
-    renderer.addClass(titleIcon, 'cursorPointer');
+    if (isSubmenu) {
+      // Create <div> wrapper for submenu title icon
+      const spanWrapper = renderer.createElement('div');
+      renderer.addClass(spanWrapper, 'title-icon');
+      renderer.addClass(spanWrapper, 'submenu-icon');
 
-    // Apply styles
-    const floatDirection = options.direction === 'rtl' ? 'left' : 'right';
-    renderer.setStyle(titleIcon, 'float', floatDirection);
-    renderer.setStyle(titleIcon, 'cursor', 'pointer');
+      // Append <i> to <div>
+      renderer.appendChild(spanWrapper, titleIcon);
 
-    // Add click listener
-    renderer.listen(titleIcon, 'click', clickHandler);
+      renderer.appendChild(titleElement, spanWrapper);
 
-    renderer.appendChild(titleElement, titleIcon);
+
+      const titleIcon2 = renderer.createElement('i');
+      // Add icon classes to <i>
+      ['fa', 'fa-bars'].forEach((className) => {
+        if (className) renderer.addClass(titleIcon2, className);
+      });
+
+      // Create <button> wrapper for main title icon (still clickable)
+      const buttonWrapper = renderer.createElement('button');
+      renderer.addClass(buttonWrapper, 'title-icon');
+      renderer.addClass(buttonWrapper, 'mainmenu-icon');
+      
+      // Optional accessibility
+      renderer.setAttribute(buttonWrapper, 'type', 'button');
+      renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
+      
+      // Append <i> to <button>
+      renderer.appendChild(buttonWrapper, titleIcon2);
+      
+      // Add click listener only to main title icon
+      renderer.listen(buttonWrapper, 'click', clickHandler);
+      
+      renderer.appendChild(titleElement, buttonWrapper);
+    } else {
+      // Create <button> wrapper for main title icon (still clickable)
+      const buttonWrapper = renderer.createElement('button');
+      renderer.addClass(buttonWrapper, 'title-icon');
+      renderer.addClass(buttonWrapper, 'mainmenu-icon');
+      
+      // Optional accessibility
+      renderer.setAttribute(buttonWrapper, 'type', 'button');
+      renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
+      
+      // Append <i> to <button>
+      renderer.appendChild(buttonWrapper, titleIcon);
+      
+      // Add click listener only to main title icon
+      renderer.listen(buttonWrapper, 'click', clickHandler);
+      
+      renderer.appendChild(titleElement, buttonWrapper);
+    }
   }
 
   /**

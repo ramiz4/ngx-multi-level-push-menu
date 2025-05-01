@@ -1,6 +1,6 @@
 export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
-  public menu = new MultiLevelPushMenu('Explorer', 'explorer', 'fa fa-bars');
+  public menu: MultiLevelPushMenuItem[] = [];
 
   /** Menu sliding mode: overlap/cover */
   public mode = 'cover';
@@ -18,7 +18,10 @@ export class MultiLevelPushMenuOptions {
   public menuInactiveClass?: string;
 
   /** Wrapper width (integer, '%', 'px', 'em') */
-  public menuWidth = '300px';
+  public menuWidth: string | number = '300px';
+
+  /** Menu title default icon */
+  public titleIcon = 'fa fa-bars';
 
   /** Menu height (integer, '%', 'px', 'em') */
   public menuHeight?: string;
@@ -50,8 +53,8 @@ export class MultiLevelPushMenuOptions {
   /** Set to true to fully hide base level holder when collapsed */
   public fullCollapse = false;
 
-  /** 'touchscreen', 'desktop', or 'none'. Everything else is considered as 'none' */
-  public swipe = 'both';
+  /** Direction to enable swipe: 'both', 'left', 'right' */
+  public swipe: 'both' | 'left' | 'right' = 'both';
 
   constructor(options?: Partial<MultiLevelPushMenuOptions>) {
     if (options) {
@@ -67,7 +70,7 @@ export class MultiLevelPushMenu {
     public id?: string,
     public icon?: string,
     public items?: Array<MultiLevelPushMenuItem>
-  ) {}
+  ) { }
 }
 
 export class MultiLevelPushMenuItem {
@@ -78,7 +81,7 @@ export class MultiLevelPushMenuItem {
     public icon?: string,
     public link?: string,
     public items?: Array<MultiLevelPushMenuItem>
-  ) {}
+  ) { }
 }
 
 /**

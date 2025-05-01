@@ -11,7 +11,16 @@
       "options": {
         "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json",
         "project": "libs/ngx-multi-level-push-menu/ng-package.json"
-      }
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -24,5 +33,5 @@
       "executor": "@nx/eslint:lint"
     }
   },
-  "tags": []
+  "tags": ["lib", "ui", "navigation", "menu"]
 }

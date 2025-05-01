@@ -4,144 +4,271 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnChanges,
+  OnInit,
   Output,
+  Renderer2,
+  SimpleChanges, OnDestroy,
 } from '@angular/core';
 import { DeviceDetectorService } from '../services/device-detector.service';
 
-/**
- * Direction of the swipe
- */
 export enum SwipeDirection {
   Left = 'left',
   Right = 'right',
 }
 
-/**
- * Event emitted when a swipe is detected
- */
 export interface SwipeEvent {
   direction: SwipeDirection;
   distance: number;
+  velocity?: number;
 }
 
 /**
- * Directive to handle swipe gestures on both mobile and desktop devices
+ * Enhanced directive to handle swipe gestures on mobile and desktop devices
+ * with improved touch detection and velocity tracking
  */
 @Directive({
   selector: '[ramiz4Swipe]',
   exportAs: 'swipe',
-  host: {
-    '(touchstart)': 'onTouchStart($event)',
-    '(mousedown)': 'onMouseDown($event)',
-  },
+  standalone: true,
 })
-export class SwipeDirective {
-  // Inputs
-  @Input() swipeEnabled = 'both'; // 'touchscreen', 'desktop', 'both', or 'none'
-  @Input() overlapWidth = 55; // Used to calculate threshold
+export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
+  @Input() swipeEnabled: 'both' | 'left' | 'right' = 'both';
+  @Input() swipeThreshold: number | null = null;
+  @Input() overlapWidth = 60;
+  @Input() preventBodyScroll = true;
 
-  // Outputs
   @Output() swipe = new EventEmitter<SwipeEvent>();
+  @Output() swipeStart = new EventEmitter<{ x: number; y: number }>();
+  @Output() swipeCancel = new EventEmitter<void>();
 
+  private isTracking = false;
   private startX = 0;
+  private startY = 0;
+  private startTime = 0;
+  private threshold = 30; // Default threshold - will be updated based on device and input
+  private originalBodyOverflow: string | null = null;
+
+  private mouseMoveHandler: ((e: MouseEvent) => void) | null = null;
+  private mouseUpHandler: ((e: MouseEvent) => void) | null = null;
 
   constructor(
-    private el: ElementRef,
+    private elementRef: ElementRef,
+    private renderer: Renderer2,
     private deviceDetectorService: DeviceDetectorService
   ) {}
+
+  ngOnInit(): void {
+    this.updateThreshold();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['overlapWidth'] || changes['swipeThreshold']) {
+      this.updateThreshold();
+    }
+  }
+
+  private updateThreshold(): void {
+    // Set threshold based on input or device
+    this.threshold = this.swipeThreshold || 
+      this.deviceDetectorService.getSwipeThreshold(this.overlapWidth);
+  }
 
   /**
    * Handle touch start event
    */
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent): void {
-    if (
-      !this.deviceDetectorService.isSwipeEnabled(
-        'touchscreen',
-        this.swipeEnabled
-      )
-    )
+    if (!this.deviceDetectorService.isSwipeEnabled('touchscreen', this.swipeEnabled))
       return;
-    this.startX = event.touches[0].clientX;
-  }
 
-  /**
-   * Handle touch move event
-   */
-  @HostListener('touchmove', ['$event'])
-  onTouchMove(event: TouchEvent): void {
-    if (
-      !this.deviceDetectorService.isSwipeEnabled(
-        'touchscreen',
-        this.swipeEnabled
-      )
-    )
-      return;
-    if (this.startX === 0) return;
-
-    const currentX = event.touches[0].clientX;
-    const diff = currentX - this.startX;
-    const threshold = this.deviceDetectorService.getSwipeThreshold(
-      this.overlapWidth
-    );
-
-    if (Math.abs(diff) > threshold) {
-      this.emitSwipeEvent(diff);
-      this.startX = 0;
+    if (event.touches.length === 1) {
+      const touch = event.touches[0];
+      this.startTracking(touch.clientX, touch.clientY);
     }
   }
 
   /**
-   * Handle mouse down event (for desktop swipe)
+   * Handle touch move event with improved tracking
+   */
+  @HostListener('touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isTracking) return;
+    
+    const touch = event.touches[0];
+    const currentX = touch.clientX;
+    const currentY = touch.clientY;
+    
+    // Calculate horizontal and vertical distance
+    const diffX = currentX - this.startX;
+    const diffY = currentY - this.startY;
+    
+    // Update threshold from current overlapWidth to ensure it's current
+    this.updateThreshold();
+    
+    // Determine if this is primarily a horizontal or vertical swipe
+    // For menu purposes, we only care about horizontal swipes
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
+      // This is a horizontal swipe that exceeds threshold
+      const duration = Date.now() - this.startTime;
+      let velocity = 0; // Default velocity to 0
+      if (duration > 0) {
+        velocity = Math.abs(diffX) / duration; // pixels per millisecond
+      }
+      
+      this.emitSwipeEvent(diffX, velocity);
+      this.resetTracking();
+      // Prevent default to avoid page scrolling
+      event.preventDefault();
+    } else if (Math.abs(diffY) > Math.abs(diffX) * 2) {
+      // This is a vertical swipe - cancel the tracking as it's not relevant for our menu
+      this.swipeCancel.emit();
+      this.resetTracking();
+    }
+  }
+
+  /**
+   * Handle touch end event
+   */
+  @HostListener('touchend')
+  onTouchEnd(): void {
+    this.resetTracking();
+  }
+
+  /**
+   * Handle touch cancel event
+   */
+  @HostListener('touchcancel')
+  onTouchCancel(): void {
+    this.swipeCancel.emit();
+    this.resetTracking();
+  }
+
+  /**
+   * Handle mouse down event for desktop devices
    */
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent): void {
-    if (
-      !this.deviceDetectorService.isSwipeEnabled('desktop', this.swipeEnabled)
-    )
+    if (!this.deviceDetectorService.isSwipeEnabled('desktop', this.swipeEnabled))
       return;
-
-    this.startX = event.clientX;
-    this.setupMouseSwipeHandlers();
+    
+    this.startTracking(event.clientX, event.clientY);
+    
+    // Setup document-level listeners for mouse move and up
+    this.setupMouseEventHandlers();
   }
 
   /**
-   * Set up handlers for mouse move and mouse up during a swipe operation
+   * Set up tracking on start of a touch/drag
    */
-  private setupMouseSwipeHandlers(): void {
-    const threshold = this.deviceDetectorService.getSwipeThreshold(
-      this.overlapWidth
-    );
-
-    const mouseMoveHandler = (e: MouseEvent) => {
-      if (this.startX === 0) return;
-
-      const diff = e.clientX - this.startX;
-      if (Math.abs(diff) > threshold) {
-        this.emitSwipeEvent(diff);
-        this.startX = 0;
-        document.removeEventListener('mousemove', mouseMoveHandler);
-      }
-    };
-
-    const mouseUpHandler = () => {
-      this.startX = 0;
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-    };
-
-    document.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
+  private startTracking(x: number, y: number): void {
+    this.isTracking = true;
+    this.startX = x;
+    this.startY = y;
+    this.startTime = Date.now();
+    this.swipeStart.emit({ x, y });
+    
+    // Prevent body scrolling if enabled
+    if (this.preventBodyScroll) {
+      this.originalBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
   }
 
   /**
-   * Emit a swipe event with the appropriate direction
+   * Reset tracking flags and data
    */
-  private emitSwipeEvent(diff: number): void {
-    const direction = diff > 0 ? SwipeDirection.Right : SwipeDirection.Left;
+  private resetTracking(): void {
+    this.isTracking = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.startTime = 0;
+    
+    // Restore body scrolling
+    if (this.preventBodyScroll && this.originalBodyOverflow !== null) {
+      document.body.style.overflow = this.originalBodyOverflow;
+      this.originalBodyOverflow = null;
+    }
+    
+    // Clean up mouse event handlers if they exist
+    this.cleanupMouseEventHandlers();
+  }
+
+  /**
+   * Emit a swipe event based on the distance moved
+   */
+  private emitSwipeEvent(diffX: number, velocity: number): void {
+    const direction = diffX > 0 ? SwipeDirection.Right : SwipeDirection.Left;
+    const distance = Math.abs(diffX);
+    
     this.swipe.emit({
       direction,
-      distance: Math.abs(diff),
+      distance,
+      velocity,
     });
+  }
+
+  /**
+   * Set up document-level mouse event handlers for desktop swipe
+   */
+  private setupMouseEventHandlers(): void {
+    // Clean up existing handlers if any
+    this.cleanupMouseEventHandlers();
+    
+    // Create new handlers
+    this.mouseMoveHandler = (e: MouseEvent) => {
+      if (!this.isTracking) return;
+      
+      const diffX = e.clientX - this.startX;
+      const diffY = e.clientY - this.startY;
+      
+      // Use the same threshold as for touch events
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
+        const duration = Date.now() - this.startTime;
+        const velocity = Math.abs(diffX) / duration;
+        
+        this.emitSwipeEvent(diffX, velocity);
+        this.resetTracking();
+      } else if (Math.abs(diffY) > Math.abs(diffX) * 2) {
+        // Vertical movement - cancel swipe
+        this.swipeCancel.emit();
+        this.resetTracking();
+      }
+    };
+    
+    this.mouseUpHandler = () => {
+      this.resetTracking();
+    };
+    
+    // Attach handlers to document
+    document.addEventListener('mousemove', this.mouseMoveHandler);
+    document.addEventListener('mouseup', this.mouseUpHandler);
+  }
+
+  /**
+   * Clean up document-level mouse event handlers
+   */
+  private cleanupMouseEventHandlers(): void {
+    if (this.mouseMoveHandler) {
+      document.removeEventListener('mousemove', this.mouseMoveHandler);
+      this.mouseMoveHandler = null;
+    }
+    
+    if (this.mouseUpHandler) {
+      document.removeEventListener('mouseup', this.mouseUpHandler);
+      this.mouseUpHandler = null;
+    }
+  }
+
+  /**
+   * Ensure all event handlers are removed when directive is destroyed
+   */
+  ngOnDestroy(): void {
+    // Restore body overflow if it was changed
+    if (this.preventBodyScroll && this.originalBodyOverflow !== null) {
+      document.body.style.overflow = this.originalBodyOverflow;
+    }
+    
+    this.cleanupMouseEventHandlers();
   }
 }

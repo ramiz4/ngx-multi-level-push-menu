@@ -17,6 +17,9 @@
     },
     "@nx/angular:component": {
       "style": "scss"
+    },
+    "menu-item": {
+      "factory": "./tools/generators/menu-item"
     }
   },
   "namedInputs": {
@@ -28,13 +31,29 @@
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/.eslintrc.json"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [],
+    "styles": ["{projectRoot}/**/*.scss", "{projectRoot}/**/*.css"],
+    "dependencies": [
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/tsconfig.base.json"
+    ]
   },
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["production", "^production"],
+      "inputs": ["production", "^production", "dependencies"],
       "cache": true
+    },
+    "test": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.config.ts"],
+      "cache": true,
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
     },
     "e2e": {
       "inputs": ["default", "^production"],
@@ -56,8 +75,13 @@
     "@nx/eslint:lint": {
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
+    },
+    "serve": {
+      "inputs": ["default", "^production", "styles"],
+      "cache": true
     }
   },
-  "useInferencePlugins": false,
-  "defaultBase": "master"
+  "useInferencePlugins": true,
+  "defaultBase": "master",
+  "plugins": []
 }

@@ -2,31 +2,63 @@ name: PR Validation
 
 on:
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
     types: [opened, synchronize, reopened]
 
 jobs:
   validate:
+    name: Validate on Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --omit=dev
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Build Library
+        run: npm run build:lib
+
+      - name: Build Example App
+        run: npm run build:app
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
-      - name: Lint
-        run: npm run lint
-      
-      - name: Test
-        run: npm run test
-      
-      - name: Build
-        run: npm run build
+
+      - name: Run npm audit
+        run: npm audit || true
+
+      - name: Check for outdated dependencies
+        run: npm outdated || true

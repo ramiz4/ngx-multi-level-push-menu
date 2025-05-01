@@ -5,7 +5,18 @@
 
 Multi-level push menu is a cross-browser compatible Angular component allowing endless nesting of navigation elements.
 
-`@ramiz4/ngx-multi-level-push-menu` is built for modern browsers using _TypeScript, CSS3 and HTML5_ and is compatible with **Angular 6+** up through **Angular 16+**.
+`@ramiz4/ngx-multi-level-push-menu` is built for modern browsers using _TypeScript, CSS3 and HTML5_ and is compatible with **Angular 6+** up through **Angular 19+**.
+
+## Angular Compatibility
+
+| Library Version | Angular Version |
+|-----------------|-----------------|
+| 1.x.x           | 6.x - 8.x       |
+| 2.x.x           | 9.x - 11.x      |
+| 3.x.x - 12.x.x  | Not Available   |
+| 13.x.x - 14.x.x | 12.x - 14.x     |
+| 16.x.x - 17.x.x | 15.x - 17.x     |
+| 18.x.x - 19.x.x | 18.x - 19.x     |
 
 - [Installation](#installation)
 - [Usage](#usage)

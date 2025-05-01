@@ -111,7 +111,10 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
       // This is a horizontal swipe that exceeds threshold
       const duration = Date.now() - this.startTime;
-      const velocity = Math.abs(diffX) / duration; // pixels per millisecond
+      let velocity = 0; // Default velocity to 0
+      if (duration > 0) {
+        velocity = Math.abs(diffX) / duration; // pixels per millisecond
+      }
       
       this.emitSwipeEvent(diffX, velocity);
       this.resetTracking();

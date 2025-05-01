@@ -86,6 +86,13 @@ export class MenuDomService {
   ): void {
     const title = renderer.createElement('h2');
     renderer.addClass(title, 'title');
+    
+    // Add level specific class to create visual hierarchy
+    const level = levelHolder.getAttribute('data-level');
+    if (level && parseInt(level, 10) > 0) {
+      renderer.addClass(title, 'submenu-title');
+    }
+    
     renderer.appendChild(title, renderer.createText(menuData.title || ''));
 
     // Add title icon if exists
@@ -95,7 +102,8 @@ export class MenuDomService {
         title,
         menuData.icon,
         options,
-        titleClickHandler
+        titleClickHandler,
+        level !== null && parseInt(level, 10) > 0
       );
     } else {
       // Add default icon if no icon is provided
@@ -104,7 +112,8 @@ export class MenuDomService {
         title,
         options.titleIcon,
         options,
-        titleClickHandler
+        titleClickHandler,
+        level !== null && parseInt(level, 10) > 0
       );
     }
 
@@ -119,7 +128,8 @@ export class MenuDomService {
     titleElement: HTMLElement,
     iconClasses: string,
     options: MultiLevelPushMenuOptions,
-    clickHandler: (event: MouseEvent) => void
+    clickHandler: (event: MouseEvent) => void,
+    isSubmenu: boolean = false
   ): void {
     const titleIcon = renderer.createElement('i');
 
@@ -131,10 +141,15 @@ export class MenuDomService {
     // Create <button> wrapper
     const buttonWrapper = renderer.createElement('button');
     renderer.addClass(buttonWrapper, 'title-icon');
+    
+    // Add submenu-specific class if needed
+    if (isSubmenu) {
+      renderer.addClass(buttonWrapper, 'submenu-icon');
+    }
 
     // Optional accessibility
     renderer.setAttribute(buttonWrapper, 'type', 'button');
-    renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
+    renderer.setAttribute(buttonWrapper, 'aria-label', isSubmenu ? 'Return to previous menu' : 'Toggle menu');
 
     // Append <i> to <button>
     renderer.appendChild(buttonWrapper, titleIcon);

@@ -39,6 +39,27 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
 
+  // Set appropriate z-index based on level
+  &[data-level="0"] {
+    z-index: 10;
+  }
+  
+  &[data-level="1"] {
+    z-index: 20;
+  }
+  
+  &[data-level="2"] {
+    z-index: 30;
+  }
+  
+  &[data-level="3"] {
+    z-index: 40;
+  }
+  
+  &[data-level="4"] {
+    z-index: 50;
+  }
+
   &.rtl {
     right: 0;
     box-shadow: -5px 0 5px -5px #1f4164;
@@ -55,6 +76,17 @@
     direction: inherit;
     margin: 0;
     padding: 0.6em 0.8em;
+    position: relative;
+    
+    // Submenu title styles with enhanced visual appearance
+    &.submenu-title {
+      background-color: #295685;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: bold;
+      
+      // Add extra shadow to prevent title overlay issues
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
 
     .title-icon {
       background: none;
@@ -70,6 +102,16 @@
 
       // Push icon to the far end depending on direction
       margin-left: auto;
+      
+      // Style for submenu icons
+      &.submenu-icon {
+        color: #fff;
+        opacity: 0.9;
+        
+        &:hover {
+          opacity: 1;
+        }
+      }
   
       // In RTL, push icon to far left
       [dir="rtl"] & {

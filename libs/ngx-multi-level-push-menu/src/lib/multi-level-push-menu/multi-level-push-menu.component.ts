@@ -86,6 +86,8 @@ export class MultiLevelPushMenuComponent
   private isMobile = false;
   private currentLevel = 0;
   private visibleLevelHolders: HTMLElement[] = [];
+  private lastActiveLevel = 0;
+  private lastActiveLevelKey = 'level-0';
   // Make isSwiping public so it can be accessed from the template
   public isSwiping = false;
 
@@ -393,9 +395,12 @@ export class MultiLevelPushMenuComponent
 
   // Menu collapse/expand methods
   collapseMenu(level?: number, animationSpeed: 'fast' | 'normal' = 'normal'): void {
-    // When collapsing from any level, we need to hide all currently visible submenus first
+    // Store current state before collapsing
     if (this.currentLevel > 0 && level === undefined) {
-      // Hide all submenus first
+      this.lastActiveLevel = this.currentLevel;
+      this.lastActiveLevelKey = `level-${this.currentLevel}`;
+      
+      // Hide all visible submenus when doing a full collapse
       this.visibleLevelHolders.forEach(holder => {
         const holderLevel = parseInt(holder.getAttribute('data-level') ?? '0', 10);
         if (holderLevel > 0) {
@@ -493,6 +498,24 @@ export class MultiLevelPushMenuComponent
     );
 
     this._options.collapsed = false;
+    
+    // Restore previous submenu state if available
+    if (this.lastActiveLevel > 0) {
+      const sublevel = this.menuLevels.get(this.lastActiveLevelKey);
+      if (sublevel) {
+        // Use a timeout to ensure the base menu is fully expanded first
+        setTimeout(() => {
+          // For each level up to the last active level, expand the submenu
+          for (let i = 1; i <= this.lastActiveLevel; i++) {
+            const levelKey = `level-${i}`;
+            const levelData = this.menuLevels.get(levelKey);
+            if (levelData) {
+              this.expandSubMenu(levelKey, i);
+            }
+          }
+        }, 100);
+      }
+    }
   }
 
   expandSubMenu(sublevelKey: string, level: number): void {

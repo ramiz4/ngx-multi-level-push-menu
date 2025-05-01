@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'ramiz4-collections',
-  standalone: false,
-  templateUrl: './collections.component.html',
-  styleUrls: ['./collections.component.scss'],
+  standalone: true,
+  templateUrl: './collections.component.html'
 })
 export class CollectionsComponent {}

@@ -1,14 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import {
+  MultiLevelPushMenuComponent,
   MultiLevelPushMenuOptions,
   MultiLevelPushMenuService,
 } from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
   selector: 'ramiz4-root',
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet, MultiLevelPushMenuComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   title = 'multi-level-push-menu-example';

@@ -1,9 +1,19 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { SwipeDirective } from './directives/swipe.directive';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideRouter, Routes, withComponentInputBinding } from '@angular/router';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
-import { DeviceDetectorService } from './services/device-detector.service';
+
+// Create Dummy components for testing
+@Component({ template: '' })
+class DummyComponent {}
+
+export const routes: Routes = [
+  { path: '', component: DummyComponent },
+  { path: 'dummy', component: DummyComponent },
+  { path: '**', component: DummyComponent },
+];
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -26,10 +36,13 @@ describe('MultiLevelPushMenuComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([]), SwipeDirective],
-      declarations: [MultiLevelPushMenuComponent],
-      providers: [MultiLevelPushMenuService, DeviceDetectorService],
-      teardown: { destroyAfterEach: false },
+      imports: [MultiLevelPushMenuComponent],
+      providers: [
+        { provide: 'WINDOW', useValue: window },
+        provideRouter(routes, withComponentInputBinding()),
+        provideAnimations(),
+        MultiLevelPushMenuService
+      ],
     }).compileComponents();
   }));
 

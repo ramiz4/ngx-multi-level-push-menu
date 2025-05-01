@@ -1,7 +1,7 @@
 {
   "name": "@ramiz4/ngx-multi-level-push-menu",
-  "version": "18.0.0",
-  "description": "a package manager for JavaScript",
+  "version": "18.2.0",
+  "description": "Angular multi-level push menu component",
   "homepage": "https://github.com/ramiz4/ngx-multi-level-push-menu#readme",
   "author": "Ramiz Loki <me@ramizloki.com> (https://ramizloki.com)",
   "repository": {
@@ -16,14 +16,22 @@
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
-    "@angular/common": "^16.0.0",
-    "@angular/core": "^16.0.0",
-    "@angular/router": "^16.0.0",
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@angular/router": "^19.0.0",
     "font-awesome": "^4.7.0",
     "rxjs": "^7.8.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.15.0"
   },
+  "keywords": [
+    "angular",
+    "menu",
+    "push-menu",
+    "multi-level",
+    "navigation"
+  ],
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "sideEffects": false
 }

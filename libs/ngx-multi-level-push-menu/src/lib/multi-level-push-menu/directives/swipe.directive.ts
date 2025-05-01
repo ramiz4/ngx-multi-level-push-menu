@@ -5,12 +5,13 @@ import {
   HostListener,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   Renderer2,
-  SimpleChanges, OnDestroy,
+  SimpleChanges,
 } from '@angular/core';
-import { DeviceDetectorService } from '../services/device-detector.service';
+import { DeviceDetectorService } from '../services';
 
 export enum SwipeDirection {
   Left = 'left',
@@ -56,7 +57,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private deviceDetectorService: DeviceDetectorService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.updateThreshold();
@@ -70,7 +71,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
 
   private updateThreshold(): void {
     // Set threshold based on input or device
-    this.threshold = this.swipeThreshold || 
+    this.threshold = this.swipeThreshold ||
       this.deviceDetectorService.getSwipeThreshold(this.overlapWidth);
   }
 
@@ -94,18 +95,18 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
   @HostListener('touchmove', ['$event'])
   onTouchMove(event: TouchEvent): void {
     if (!this.isTracking) return;
-    
+
     const touch = event.touches[0];
     const currentX = touch.clientX;
     const currentY = touch.clientY;
-    
+
     // Calculate horizontal and vertical distance
     const diffX = currentX - this.startX;
     const diffY = currentY - this.startY;
-    
+
     // Update threshold from current overlapWidth to ensure it's current
     this.updateThreshold();
-    
+
     // Determine if this is primarily a horizontal or vertical swipe
     // For menu purposes, we only care about horizontal swipes
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
@@ -115,7 +116,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
       if (duration > 0) {
         velocity = Math.abs(diffX) / duration; // pixels per millisecond
       }
-      
+
       this.emitSwipeEvent(diffX, velocity);
       this.resetTracking();
       // Prevent default to avoid page scrolling
@@ -151,9 +152,9 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
   onMouseDown(event: MouseEvent): void {
     if (!this.deviceDetectorService.isSwipeEnabled('desktop', this.swipeEnabled))
       return;
-    
+
     this.startTracking(event.clientX, event.clientY);
-    
+
     // Setup document-level listeners for mouse move and up
     this.setupMouseEventHandlers();
   }
@@ -167,7 +168,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
     this.startY = y;
     this.startTime = Date.now();
     this.swipeStart.emit({ x, y });
-    
+
     // Prevent body scrolling if enabled
     if (this.preventBodyScroll) {
       this.originalBodyOverflow = document.body.style.overflow;
@@ -183,13 +184,13 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
     this.startX = 0;
     this.startY = 0;
     this.startTime = 0;
-    
+
     // Restore body scrolling
     if (this.preventBodyScroll && this.originalBodyOverflow !== null) {
       document.body.style.overflow = this.originalBodyOverflow;
       this.originalBodyOverflow = null;
     }
-    
+
     // Clean up mouse event handlers if they exist
     this.cleanupMouseEventHandlers();
   }
@@ -200,7 +201,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
   private emitSwipeEvent(diffX: number, velocity: number): void {
     const direction = diffX > 0 ? SwipeDirection.Right : SwipeDirection.Left;
     const distance = Math.abs(diffX);
-    
+
     this.swipe.emit({
       direction,
       distance,
@@ -214,19 +215,19 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
   private setupMouseEventHandlers(): void {
     // Clean up existing handlers if any
     this.cleanupMouseEventHandlers();
-    
+
     // Create new handlers
     this.mouseMoveHandler = (e: MouseEvent) => {
       if (!this.isTracking) return;
-      
+
       const diffX = e.clientX - this.startX;
       const diffY = e.clientY - this.startY;
-      
+
       // Use the same threshold as for touch events
       if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
         const duration = Date.now() - this.startTime;
         const velocity = Math.abs(diffX) / duration;
-        
+
         this.emitSwipeEvent(diffX, velocity);
         this.resetTracking();
       } else if (Math.abs(diffY) > Math.abs(diffX) * 2) {
@@ -235,11 +236,11 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
         this.resetTracking();
       }
     };
-    
+
     this.mouseUpHandler = () => {
       this.resetTracking();
     };
-    
+
     // Attach handlers to document
     document.addEventListener('mousemove', this.mouseMoveHandler);
     document.addEventListener('mouseup', this.mouseUpHandler);
@@ -253,7 +254,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
       document.removeEventListener('mousemove', this.mouseMoveHandler);
       this.mouseMoveHandler = null;
     }
-    
+
     if (this.mouseUpHandler) {
       document.removeEventListener('mouseup', this.mouseUpHandler);
       this.mouseUpHandler = null;
@@ -268,7 +269,7 @@ export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
     if (this.preventBodyScroll && this.originalBodyOverflow !== null) {
       document.body.style.overflow = this.originalBodyOverflow;
     }
-    
+
     this.cleanupMouseEventHandlers();
   }
 }

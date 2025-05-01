@@ -1,7 +1,7 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DeviceDetectorService } from '../services/device-detector.service';
+import { DeviceDetectorService } from '../services';
 import { SwipeDirection, SwipeDirective, SwipeEvent } from './swipe.directive';
 
 @Component({
@@ -107,32 +107,32 @@ describe('SwipeDirective', () => {
       // Mock the deviceDetectorService behavior for this test
       (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(true);
       (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockReturnValue(10);
-      
+
       // Create a spy on the component's swipe event handler
       const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
-      
+
       // Dispatch touchstart event
       const touchstartEvent = new TouchEvent('touchstart', {
         touches: [{ clientX: 100, clientY: 100 } as Touch],
       });
       directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-      
+
       // Dispatch touchmove event with a significant horizontal movement
       const touchmoveEvent = new TouchEvent('touchmove', {
         touches: [{ clientX: 130, clientY: 105 } as Touch], // 30px right movement
       });
       directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-      
+
       // Verify that the swipe event was emitted with correct params
       expect(swipeSpy).toHaveBeenCalled();
-      
+
       // Manually set the lastSwipeEvent on the component
       // This simulates what would happen in a real component when the event is emitted
       component.lastSwipeEvent = {
         direction: SwipeDirection.Right,
         distance: 30
       };
-      
+
       expect(component.lastSwipeEvent).toBeDefined();
       expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Right);
       expect(component.lastSwipeEvent?.distance).toBe(30);
@@ -142,56 +142,56 @@ describe('SwipeDirective', () => {
       // Mock the deviceDetectorService behavior for this test
       (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(true);
       (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockReturnValue(10);
-      
+
       // Create a spy on the component's swipe event handler
       const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
-      
+
       // Dispatch touchstart event
       const touchstartEvent = new TouchEvent('touchstart', {
         touches: [{ clientX: 100, clientY: 100 } as Touch],
       });
       directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-      
+
       // Dispatch touchmove event with a significant horizontal movement
       const touchmoveEvent = new TouchEvent('touchmove', {
         touches: [{ clientX: 70, clientY: 105 } as Touch], // 30px left movement
       });
       directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-      
+
       // Verify that the swipe event was emitted with correct params
       expect(swipeSpy).toHaveBeenCalled();
-      
+
       // Manually set the lastSwipeEvent on the component
       // This simulates what would happen in a real component when the event is emitted
       component.lastSwipeEvent = {
         direction: SwipeDirection.Left,
         distance: 30
       };
-      
+
       expect(component.lastSwipeEvent).toBeDefined();
       expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Left);
       expect(component.lastSwipeEvent?.distance).toBe(30);
     });
-    
+
     it('should not emit swipe event when movement is below threshold', () => {
       // Set threshold to 20
       (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockReturnValue(20);
-      
+
       // Create a spy on the component's swipe event handler
       const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
-      
+
       // Touchstart
       const touchstartEvent = new TouchEvent('touchstart', {
         touches: [{ clientX: 100, clientY: 100 } as Touch],
       });
       directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-      
+
       // Touchmove with small movement
       const touchmoveEvent = new TouchEvent('touchmove', {
         touches: [{ clientX: 110, clientY: 100 } as Touch], // Move only 10px right
       });
       directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-      
+
       // Verify that the swipe event was NOT emitted
       expect(swipeSpy).not.toHaveBeenCalled();
       expect(component.lastSwipeEvent).toBeUndefined();

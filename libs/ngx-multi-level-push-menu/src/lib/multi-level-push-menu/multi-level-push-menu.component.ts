@@ -33,12 +33,14 @@ import {
   MultiLevelPushMenuOptions,
 } from './multi-level-push-menu.model';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
-import { AccessibilityService } from './services/accessibility.service';
-import { BrowserCompatibilityService } from './services/browser-compatibility/browser-compatibility.service';
-import { DeviceDetectorService } from './services/device-detector.service';
-import { MenuAnimationService } from './services/menu-animation.service';
-import { MenuBuilderService } from './services/menu-builder.service';
-import { MenuDomService } from './services/menu-dom.service';
+import {
+  AccessibilityService,
+  BrowserCompatibilityService,
+  DeviceDetectorService,
+  MenuAnimationService,
+  MenuBuilderService,
+  MenuDomService
+} from './services';
 import { MenuUtils } from './utilities/menu-utils';
 
 // Constants
@@ -399,7 +401,7 @@ export class MultiLevelPushMenuComponent
     if (this.currentLevel > 0 && level === undefined) {
       this.lastActiveLevel = this.currentLevel;
       this.lastActiveLevelKey = `level-${this.currentLevel}`;
-      
+
       // Hide all visible submenus when doing a full collapse
       this.visibleLevelHolders.forEach(holder => {
         const holderLevel = parseInt(holder.getAttribute('data-level') ?? '0', 10);
@@ -407,7 +409,7 @@ export class MultiLevelPushMenuComponent
           this.renderer.setStyle(holder, 'visibility', 'hidden');
         }
       });
-      
+
       // Reset the level tracking variables
       this.currentLevel = 0;
       this.visibleLevelHolders = this.visibleLevelHolders.filter(
@@ -498,7 +500,7 @@ export class MultiLevelPushMenuComponent
     );
 
     this._options.collapsed = false;
-    
+
     // Restore previous submenu state if available
     if (this.lastActiveLevel > 0) {
       const sublevel = this.menuLevels.get(this.lastActiveLevelKey);

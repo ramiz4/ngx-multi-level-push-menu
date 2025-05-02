@@ -7,7 +7,7 @@ import { MenuDomService } from './menu-dom.service';
 
 @Injectable()
 export class MenuBuilderService {
-  constructor(private menuDomService: MenuDomService) {}
+  constructor(private menuDomService: MenuDomService) { }
 
   /**
    * Creates the entire menu structure

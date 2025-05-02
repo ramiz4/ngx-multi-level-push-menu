@@ -16,7 +16,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
   align-items: center;
   justify-content: center;
   vertical-align: middle;
-  
+
   svg {
     width: 1em;
     height: 1em;
@@ -91,10 +91,8 @@ $shadow-color: rgba(0, 0, 0, 0.2);
     margin: 0;
     padding: 0.4em;
     position: relative;
-    
+
     &.submenu-title {
-      background-color: $primary-dark;
-      border-bottom: 1px solid $primary-darkest;
       box-shadow: 0 2px 5px $shadow-color;
     }
 
@@ -133,7 +131,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       }
     }
   }
-  
+
   // Back navigation
   .back-item {
     display: block;
@@ -145,7 +143,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       padding: 1em 1.2em;
       text-decoration: none;
       color: $text-color;
-      
+
       &:hover,
       &:focus {
         background: $primary-darkest;
@@ -164,7 +162,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
     list-style: none;
     padding: 0;
     margin: 0;
-    
+
     li.list-item {
       display: block;
       border-top: 1px solid $primary-darker;
@@ -179,7 +177,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
         cursor: pointer;
         color: $text-color;
         text-decoration: none;
-        
+
         &:hover,
         &:focus {
           background: $primary-darker;
@@ -204,7 +202,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       }
     }
 
-    &:empty + li.list-item {
+    &:empty+li.list-item {
       border-bottom: 1px solid $primary-darker;
     }
   }
@@ -237,9 +235,17 @@ nav.is-swiping {
 
 // Animations
 @keyframes pulse {
-  0% { opacity: 0.3; }
-  50% { opacity: 0.7; }
-  100% { opacity: 0.3; }
+  0% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0.3;
+  }
 }
 
 // Responsive styles
@@ -247,18 +253,18 @@ nav.is-swiping {
   .level-holder {
     width: $menu-width-mobile !important;
     max-width: $menu-max-width-mobile;
-    
+
     h2.title {
       font-size: 1.3em;
       padding: 0.4em;
     }
-    
+
     .back-item a.back-anchor,
     ul li.list-item a.anchor {
       padding: 1.2em;
     }
   }
-  
+
   #content {
     width: 100% !important;
   }

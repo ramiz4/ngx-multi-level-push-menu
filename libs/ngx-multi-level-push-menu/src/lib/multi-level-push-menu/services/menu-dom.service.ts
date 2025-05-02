@@ -109,19 +109,19 @@ export class MenuDomService {
       // Create span to hold the SVG
       const iconSpan = renderer.createElement('span');
       renderer.addClass(iconSpan, 'svg-icon');
-      
+
       // Use innerHTML to set the SVG content
       iconSpan.innerHTML = iconContent;
       return iconSpan;
     } else {
       // For backward compatibility - create a CSS icon
       const iconElement = renderer.createElement('i');
-      
+
       // Add CSS classes
       iconContent.split(' ').forEach((className) => {
         if (className) renderer.addClass(iconElement, className);
       });
-      
+
       return iconElement;
     }
   }
@@ -149,7 +149,7 @@ export class MenuDomService {
     const titleTextSpan = renderer.createElement('span');
     renderer.appendChild(
       titleTextSpan,
-      renderer.createText(menuData.title || '')
+      renderer.createText(menuData.title || options.title || '')
     );
     renderer.appendChild(title, titleTextSpan);
 
@@ -196,10 +196,29 @@ export class MenuDomService {
 
       // Create icon element
       const titleIcon = this.createIconElement(renderer, iconContent);
-      
+
       // Append icon to wrapper
       renderer.appendChild(divWrapper, titleIcon);
       renderer.appendChild(titleElement, divWrapper);
+
+      // Create a second icon element with a button wrapper to toggle the menu
+      const titleIcon2 = this.createIconElement(renderer, options.titleIcon);
+
+      // Create <button> wrapper for main title icon (clickable)
+      const buttonWrapper = renderer.createElement('button');
+      renderer.addClass(buttonWrapper, 'menu-icon-container');
+      renderer.addClass(buttonWrapper, 'mainmenu-button');
+
+      // Add accessibility attributes
+      renderer.setAttribute(buttonWrapper, 'type', 'button');
+      renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
+
+      // Append to button
+      renderer.appendChild(buttonWrapper, titleIcon2);
+
+      // Add click listener
+      renderer.listen(buttonWrapper, 'click', clickHandler);
+      renderer.appendChild(titleElement, buttonWrapper);
     } else {
       // Create <button> wrapper for main title icon (clickable)
       const buttonWrapper = renderer.createElement('button');
@@ -212,7 +231,7 @@ export class MenuDomService {
 
       // Create icon element
       const titleIcon = this.createIconElement(renderer, iconContent);
-      
+
       // Append to button
       renderer.appendChild(buttonWrapper, titleIcon);
 
@@ -233,7 +252,7 @@ export class MenuDomService {
   ): void {
     // Create the icon element
     const itemIcon = this.createIconElement(renderer, iconContent);
-    
+
     renderer.addClass(itemIcon, 'anchor-icon');
 
     // Set float direction based on RTL setting

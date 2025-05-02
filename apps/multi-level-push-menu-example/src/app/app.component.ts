@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
+    this.options.titleIcon = 'fa fa-home'; // Override default icon
     // Create menu items array
     this.options.menu = [
       { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },

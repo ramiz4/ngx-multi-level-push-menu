@@ -12,7 +12,7 @@ import {
   Routes,
   withComponentInputBinding,
 } from '@angular/router';
-import { MultiLevelPushMenuItem } from './models';
+import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from './models';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 
@@ -123,12 +123,12 @@ describe('MultiLevelPushMenuComponent', () => {
   });
 
   it('should apply custom options when provided', () => {
-    const customOptions = {
+    const customOptions = new MultiLevelPushMenuOptions({
       collapsed: true,
       menuWidth: 400,
-      mode: 'overlap',
+      mode: 'overlap', // Type assertion to ensure it's recognized as the literal type
       overlapWidth: '50',
-    };
+    } as Partial<MultiLevelPushMenuOptions>);
 
     // Apply to the component options - no type assertion needed this way
     component.options = { ...component.options, ...customOptions };

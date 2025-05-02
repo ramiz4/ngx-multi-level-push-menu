@@ -21,6 +21,8 @@ export class AppComponent implements OnInit {
   constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
+    this.options.title = 'Company Name'; // Set menu title
+
     // Create menu items array
     this.options.menu = [
       { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },

@@ -16,7 +16,7 @@ A modern, accessible Angular component for responsive multi-level push menus wit
 - Swipe gesture support (configurable for touch, desktop, or both)
 - Router integration
 - Comprehensive styling options
-- Support for Font Awesome icons (4.x, 5.x, and 6.x)
+- Flexible icon support - use SVG content directly or CSS classes from any icon library
 - Compatible with Angular 6+ through 19+
 
 ## Installation
@@ -27,28 +27,9 @@ Install the package via npm:
 npm install @ramiz4/ngx-multi-level-push-menu --save
 ```
 
-Install required dependencies:
-
-```bash
-# For Font Awesome 4.x
-npm install font-awesome --save
-
-# OR for Font Awesome 5+/6+ (recommended for newer projects)
-npm install @fortawesome/fontawesome-free --save
-```
-
 ## Quick Start
 
-1. Update your `angular.json` to include Font Awesome:
-
-```json
-"styles": [
-  "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-  "styles.css"
-],
-```
-
-2. Import the module in your application:
+1. Import the module in your application:
 
 ### For NgModule-based applications:
 
@@ -58,8 +39,8 @@ import { NgxMultiLevelPushMenuModule } from '@ramiz4/ngx-multi-level-push-menu';
 @NgModule({
   imports: [
     // ...other imports
-    NgxMultiLevelPushMenuModule.forRoot()
-  ]
+    NgxMultiLevelPushMenuModule.forRoot(),
+  ],
   // ...
 })
 export class AppModule {}
@@ -76,7 +57,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // ...other providers
     provideMultiLevelPushMenu(),
-  ]
+  ],
 };
 ```
 
@@ -88,14 +69,14 @@ import { MultiLevelPushMenuComponent } from '@ramiz4/ngx-multi-level-push-menu';
 @Component({
   // ...
   standalone: true,
-  imports: [MultiLevelPushMenuComponent]
+  imports: [MultiLevelPushMenuComponent],
 })
 export class AppComponent {
   // ...
 }
 ```
 
-3. Add the component to your template:
+2. Add the component to your template:
 
 ```html
 <ramiz4-multi-level-push-menu [options]="options">
@@ -103,7 +84,9 @@ export class AppComponent {
 </ramiz4-multi-level-push-menu>
 ```
 
-4. Define your menu structure in your component:
+3. Define your menu structure in your component:
+
+**Option 1: Using SVG icons directly** (recommended for best performance and no external dependencies)
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
@@ -111,7 +94,7 @@ import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ng
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
   options = new MultiLevelPushMenuOptions();
@@ -119,31 +102,69 @@ export class AppComponent implements OnInit {
   constructor(private menuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
-    this.options.menu = {
-      title: 'All Categories',
-      id: 'menu',
-      icon: 'fas fa-bars'
-    };
-    
-    this.options.menu.items = [
+    this.options.title = 'Company Name'; // Set menu title
+
+    // Menu items with SVG icons
+    this.options.menu = [
       {
         name: 'Home',
-        icon: 'fas fa-home',
-        link: 'home'
+        // SVG home icon
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>',
+        link: 'home',
       },
+      // ...more menu items with SVG icons
+    ];
+  }
+}
+```
+
+**Option 2: Using CSS classes from an icon library** (e.g., Font Awesome)
+
+First, include the icon library in your project. For Font Awesome, add to your main styles.scss:
+
+```scss
+/* Import Font Awesome from CDN */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+/* Or if installed via npm */
+/* @import '~@fortawesome/fontawesome-free/css/all.min.css'; */
+```
+
+Then define your menu with CSS classes as icons:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+})
+export class AppComponent implements OnInit {
+  options = new MultiLevelPushMenuOptions();
+
+  constructor(private menuService: MultiLevelPushMenuService) {}
+
+  ngOnInit() {
+    this.options.title = 'Company Name'; // Set menu title
+
+    // Menu items with Font Awesome icons
+    this.options.menu = [
+      { name: 'Home', icon: 'fa fa-home', link: 'home' },
+      { name: 'About Us', icon: 'fa fa-user', link: 'about-us' },
       {
-        name: 'Products',
-        icon: 'fas fa-shopping-bag',
+        name: 'Devices',
+        icon: 'fa fa-laptop',
         items: [
           {
-            name: 'Electronics',
-            items: [
-              { name: 'Smartphones', link: 'smartphones' },
-              { name: 'Laptops', link: 'laptops' }
-            ]
-          }
-        ]
-      }
+            name: 'Mobile Phones',
+            icon: 'fa fa-phone',
+            // ...submenu items
+          },
+          // ...more submenu items
+        ],
+      },
+      // ...more menu items
     ];
   }
 
@@ -197,12 +218,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project uses semantic commit messages to automate version bumping:
 
-| Commit Prefix | Description | Version Bump |
-|---------------|-------------|--------------|
-| `feat: `      | A new feature | Minor version bump |
-| `fix: `       | A bug fix | Patch version bump |
-| `docs: `      | Documentation only changes | Patch version bump |
-| `BREAKING CHANGE: ` | Breaking changes | Major version bump |
+| Commit Prefix       | Description                | Version Bump       |
+| ------------------- | -------------------------- | ------------------ |
+| `feat: `            | A new feature              | Minor version bump |
+| `fix: `             | A bug fix                  | Patch version bump |
+| `docs: `            | Documentation only changes | Patch version bump |
+| `BREAKING CHANGE: ` | Breaking changes           | Major version bump |
 
 ## License
 

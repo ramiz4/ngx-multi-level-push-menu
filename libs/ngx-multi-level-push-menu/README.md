@@ -23,7 +23,7 @@ See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases
 ## Angular Compatibility
 
 | Library Version | Angular Version |
-|-----------------|-----------------|
+| --------------- | --------------- |
 | 1.x.x           | 6.x - 8.x       |
 | 2.x.x           | 9.x - 11.x      |
 | 3.x.x - 12.x.x  | Not Available   |
@@ -69,8 +69,8 @@ import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/
 @NgModule({
   imports: [
     // ...
-    NgxMultiLevelPushMenuModule.forRoot()
-  ]
+    NgxMultiLevelPushMenuModule.forRoot(),
+  ],
 })
 export class AppModule {}
 ```
@@ -86,7 +86,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     // ...other providers
     provideMultiLevelPushMenu(),
-  ]
+  ],
 };
 ```
 
@@ -107,13 +107,17 @@ export class AppComponent {
 
 ### 3. Configure your component
 
+You can use either SVG content directly or CSS classes from an icon library for your menu icons.
+
+#### Option 1: Using SVG icons directly (recommended)
+
 ```ts
 import { Component, OnInit } from '@angular/core';
 import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
   options = new MultiLevelPushMenuOptions();
@@ -121,38 +125,103 @@ export class AppComponent implements OnInit {
   constructor(private menuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
-    // Menu configuration
-    this.options.menu = {
-      title: 'All Categories',
-      id: 'menu',
-      icon: 'fas fa-bars'
-    };
-    
-    // Define menu items
-    this.options.menu.items = [
+    // Menu configuration with SVG icons
+    this.options.title = 'All Categories';
+
+    // Define menu items with SVG icons
+    this.options.menu = [
       {
         name: 'Home',
-        icon: 'fas fa-home',
-        link: 'home'
+        // SVG home icon
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>',
+        link: 'home',
       },
       {
         name: 'Products',
-        icon: 'fas fa-shopping-bag',
+        // SVG shopping bag icon
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 112c0-35.3 28.7-64 64-64s64 28.7 64 64v48H160V112zm-48 48H48c-26.5 0-48 21.5-48 48V416c0 53 43 96 96 96H352c53 0 96-43 96-96V208c0-26.5-21.5-48-48-48H336V112C336 50.1 285.9 0 224 0S112 50.1 112 112v48zm24 48a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm152 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"/></svg>',
         items: [
           {
             name: 'Electronics',
             items: [
               { name: 'Smartphones', link: 'smartphones' },
-              { name: 'Laptops', link: 'laptops' }
-            ]
-          }
-        ]
-      }
+              { name: 'Laptops', link: 'laptops' },
+            ],
+          },
+        ],
+      },
     ];
-    
+
+    // Set default back and group icons
+    this.options.backItemIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/></svg>';
+    this.options.groupIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>';
+
     // Optional: Set additional options
     this.options.mode = 'overlap';
     this.options.collapsed = false;
+  }
+
+  // Control methods
+  collapseMenu(): void {
+    this.menuService.collapse();
+  }
+
+  expandMenu(): void {
+    this.menuService.expand();
+  }
+}
+```
+
+#### Option 2: Using CSS classes from an icon library
+
+If you prefer using an icon library like Font Awesome, include it in your project and use CSS classes:
+
+```ts
+import { Component, OnInit } from '@angular/core';
+import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+})
+export class AppComponent implements OnInit {
+  options = new MultiLevelPushMenuOptions();
+
+  constructor(private menuService: MultiLevelPushMenuService) {}
+
+  ngOnInit() {
+    // Menu configuration with Font Awesome icons
+    this.options.title = 'All Categories';
+
+    // Define menu items
+    this.options.menu = [
+      {
+        name: 'Home',
+        icon: 'fa fa-home',
+        link: 'home',
+      },
+      {
+        name: 'Products',
+        icon: 'fa fa-shopping-bag',
+        items: [
+          {
+            name: 'Electronics',
+            items: [
+              { name: 'Smartphones', link: 'smartphones' },
+              { name: 'Laptops', link: 'laptops' },
+            ],
+          },
+        ],
+      },
+    ];
+
+    // Optional: Set additional options
+    this.options.mode = 'overlap';
+    this.options.collapsed = false;
+
+    // Font Awesome icon classes for back and group icons
+    this.options.backItemIcon = 'fa fa-angle-right';
+    this.options.groupIcon = 'fa fa-angle-left';
   }
 
   // Control methods
@@ -179,7 +248,8 @@ export class AppComponent implements OnInit {
 ### 5. Add styles (optional)
 
 ```css
-html, body {
+html,
+body {
   margin: 0;
   height: 100%;
   overflow: hidden;
@@ -190,32 +260,32 @@ html, body {
 
 ### Inputs
 
-| Name    | Type                       | Default | Description                     |
-|---------|----------------------------|---------|----------------------------------|
-| options | MultiLevelPushMenuOptions  | {}      | Configuration options            |
+| Name    | Type                      | Default | Description           |
+| ------- | ------------------------- | ------- | --------------------- |
+| options | MultiLevelPushMenuOptions | {}      | Configuration options |
 
 ### Outputs
 
-| Name       | Type                  | Description                           |
-|------------|------------------------|---------------------------------------|
-| menuOpen   | EventEmitter<boolean> | Emitted when menu is opened           |
-| menuClose  | EventEmitter<boolean> | Emitted when menu is closed           |
-| itemClick  | EventEmitter<any>     | Emitted when menu item is clicked     |
-| levelChange| EventEmitter<number>  | Emitted when menu level changes       |
+| Name        | Type                  | Description                       |
+| ----------- | --------------------- | --------------------------------- |
+| menuOpen    | EventEmitter<boolean> | Emitted when menu is opened       |
+| menuClose   | EventEmitter<boolean> | Emitted when menu is closed       |
+| itemClick   | EventEmitter<any>     | Emitted when menu item is clicked |
+| levelChange | EventEmitter<number>  | Emitted when menu level changes   |
 
 ## Service API
 
 The `MultiLevelPushMenuService` provides methods to control the menu programmatically:
 
-| Method               | Parameters | Description                         |
-|----------------------|------------|-------------------------------------|
-| collapse()           | none       | Collapses the menu                  |
-| expand()             | none       | Expands the menu                    |
-| toggleMenu()         | none       | Toggles menu between states         |
-| openMenu()           | none       | Opens the menu                      |
-| closeMenu()          | none       | Closes the menu                     |
-| navigateToLevel(id)  | id: string | Navigates to specific menu level    |
-| goBack()             | none       | Navigates to previous menu level    |
+| Method              | Parameters | Description                      |
+| ------------------- | ---------- | -------------------------------- |
+| collapse()          | none       | Collapses the menu               |
+| expand()            | none       | Expands the menu                 |
+| toggleMenu()        | none       | Toggles menu between states      |
+| openMenu()          | none       | Opens the menu                   |
+| closeMenu()         | none       | Closes the menu                  |
+| navigateToLevel(id) | id: string | Navigates to specific menu level |
+| goBack()            | none       | Navigates to previous menu level |
 
 ## Options
 
@@ -231,8 +301,8 @@ The `MultiLevelPushMenuService` provides methods to control the menu programmati
   menuHeight: 0,                      // Height of menu
   backText: 'Back',                   // Text for back menu item
   backItemClass: 'backItemClass',     // CSS class for back item
-  backItemIcon: 'fa fa-angle-right',  // Icon for back item (use fas for FA5+)
-  groupIcon: 'fa fa-angle-left',      // Icon for items with submenus
+  backItemIcon: '<svg>...</svg>',     // Icon for back item (SVG content or CSS class)
+  groupIcon: '<svg>...</svg>',        // Icon for items with submenus (SVG content or CSS class)
   mode: 'overlap',                    // Menu sliding mode: overlap/cover
   overlapWidth: 40,                   // Width of menu overlap in px
   preventItemClick: true,             // Event callback per item click
@@ -249,16 +319,16 @@ The menu structure follows this format:
 
 ```typescript
 {
-  title: 'Menu Title',    // Title displayed at the top
-  id: 'menuID',           // Unique identifier
-  icon: 'fas fa-bars',    // Icon class
-  items: [                // Array of menu items
+  title: 'Menu Title',                // Title displayed at the top
+  id: 'menuID',                       // Unique identifier
+  icon: '<svg>...</svg>',             // Icon (SVG content or CSS class)
+  items: [                            // Array of menu items
     {
-      name: 'Home',       // Display name
-      id: 'home',         // Unique identifier (optional)
-      icon: 'fas fa-home',// Icon class (optional)
-      link: 'home',       // Router link (optional)
-      items: []           // Child items (optional)
+      name: 'Home',                   // Display name
+      id: 'home',                     // Unique identifier (optional)
+      icon: '<svg>...</svg>',         // Icon (SVG content or CSS class)
+      link: 'home',                   // Router link (optional)
+      items: []                       // Child items (optional)
     }
   ]
 }
@@ -273,7 +343,7 @@ The menu structure follows this format:
 - Support for both overlay and cover sliding modes
 - Flexible sizing options
 - Left-to-right and Right-to-left sliding directions
-- Font Awesome icon integration
+- Flexible icon support - use SVG content directly or CSS classes from any icon library
 - Keyboard navigation and accessibility features
 - Customizable styling
 - Cross-browser compatibility
@@ -285,6 +355,7 @@ The menu structure follows this format:
 ### Menu not visible on init
 
 If your menu is not visible initially, check:
+
 - Ensure `options.collapsed` is set to `false`
 - Verify CSS is properly loaded
 - Check console for errors
@@ -316,6 +387,7 @@ Ensure your menu structure is correct:
 ### Mobile Support
 
 Configure the swipe behavior with the `swipe` option:
+
 - `both`: Support touch and mouse (default)
 - `touchscreen`: Support only touch
 - `desktop`: Support only mouse
@@ -323,13 +395,23 @@ Configure the swipe behavior with the `swipe` option:
 
 ### Font Awesome Version Compatibility
 
-For Font Awesome 5+:
-- Update icon prefixes from `fa fa-` to `fas fa-`
-- Example: `backItemIcon: 'fas fa-angle-right'`
+This library supports two ways to provide icons:
+
+1. **SVG content directly** (recommended):
+
+   - Better performance and accessibility
+   - No external dependencies
+   - Example: `icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">...</svg>'`
+
+2. **CSS classes from icon libraries**:
+   - For Font Awesome 4.x: `icon: 'fa fa-home'`
+   - For Font Awesome 5+: `icon: 'fas fa-home'`
+   - Other icon libraries with similar class-based approaches
 
 ## Accessibility
 
 The component includes several accessibility enhancements:
+
 - ARIA attributes for screen readers
 - Keyboard navigation support
 - Focus management
@@ -338,6 +420,7 @@ The component includes several accessibility enhancements:
 ## Performance Considerations
 
 For large menus, consider:
+
 - Lazy loading submenus
 - Using `trackBy` with `*ngFor` directives
 - Implementing virtual scrolling for very large menus

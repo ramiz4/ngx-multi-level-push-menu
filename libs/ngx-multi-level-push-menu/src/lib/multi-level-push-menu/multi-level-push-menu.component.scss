@@ -105,7 +105,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       white-space: nowrap;
     }
 
-    .title-icon {
+    .menu-icon-container {
       border: none;
       display: flex;
       justify-content: center;
@@ -119,20 +119,18 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       position: relative;
       z-index: 100;
 
-      &.mainmenu-icon {
-        .svg-icon {
-          display: flex;
-          width: 100%;
-          height: 100%;
-          align-items: center;
-          justify-content: center;
-        }
+      &.mainmenu-button {
+        background: $primary-dark;
+        cursor: pointer;
       }
-    }
-    
-    .mainmenu-icon {
-      background: $primary-dark;
-      cursor: pointer;
+
+      .svg-icon {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
   

@@ -191,21 +191,20 @@ export class MenuDomService {
   ): void {
     if (isSubmenu) {
       // Create <div> wrapper for submenu title icon
-      const spanWrapper = renderer.createElement('div');
-      renderer.addClass(spanWrapper, 'title-icon');
-      renderer.addClass(spanWrapper, 'submenu-icon');
+      const divWrapper = renderer.createElement('div');
+      renderer.addClass(divWrapper, 'menu-icon-container');
 
       // Create icon element
       const titleIcon = this.createIconElement(renderer, iconContent);
       
       // Append icon to wrapper
-      renderer.appendChild(spanWrapper, titleIcon);
-      renderer.appendChild(titleElement, spanWrapper);
+      renderer.appendChild(divWrapper, titleIcon);
+      renderer.appendChild(titleElement, divWrapper);
     } else {
       // Create <button> wrapper for main title icon (clickable)
       const buttonWrapper = renderer.createElement('button');
-      renderer.addClass(buttonWrapper, 'title-icon');
-      renderer.addClass(buttonWrapper, 'mainmenu-icon');
+      renderer.addClass(buttonWrapper, 'menu-icon-container');
+      renderer.addClass(buttonWrapper, 'mainmenu-button');
 
       // Add accessibility attributes
       renderer.setAttribute(buttonWrapper, 'type', 'button');

@@ -10,6 +10,20 @@ $menu-max-width-mobile: 300px;
 $menu-default-width: 300px;
 $shadow-color: rgba(0, 0, 0, 0.2);
 
+// SVG icon styling
+.svg-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  
+  svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+  }
+}
+
 // Host container
 :host {
   display: block;
@@ -104,6 +118,16 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       flex-shrink: 0;
       position: relative;
       z-index: 100;
+
+      &.mainmenu-icon {
+        .svg-icon {
+          display: flex;
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          justify-content: center;
+        }
+      }
     }
     
     .mainmenu-icon {

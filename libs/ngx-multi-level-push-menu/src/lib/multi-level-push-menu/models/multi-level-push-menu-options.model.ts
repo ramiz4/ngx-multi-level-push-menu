@@ -1,4 +1,5 @@
 import { MultiLevelPushMenuItem } from './multi-level-push-menu-item.model';
+import { ANGLE_LEFT_SVG, ANGLE_RIGHT_SVG, MENU_BARS_SVG } from '../utilities/svg-icons';
 
 export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
@@ -22,8 +23,8 @@ export class MultiLevelPushMenuOptions {
   /** Wrapper width (integer, '%', 'px', 'em') */
   public menuWidth: string | number = '300px';
 
-  /** Menu title default icon */
-  public titleIcon = 'fa fa-bars';
+  /** Menu title default icon - SVG content */
+  public titleIcon = MENU_BARS_SVG;
 
   /** Menu height (integer, '%', 'px', 'em') */
   public menuHeight?: string;
@@ -34,11 +35,11 @@ export class MultiLevelPushMenuOptions {
   /** CSS class for back menu item */
   public backItemClass = 'back-item';
 
-  /** FontAwesome icon used for back menu item */
-  public backItemIcon = 'fa fa-angle-right';
+  /** Icon used for back menu item - SVG content */
+  public backItemIcon = ANGLE_RIGHT_SVG;
 
-  /** FontAwesome icon used for menu items containing sub-items */
-  public groupIcon = 'fa fa-angle-left';
+  /** Icon used for menu items containing sub-items - SVG content */
+  public groupIcon = ANGLE_LEFT_SVG;
 
   /** Width in px of menu wrappers overlap */
   public overlapWidth = '55';

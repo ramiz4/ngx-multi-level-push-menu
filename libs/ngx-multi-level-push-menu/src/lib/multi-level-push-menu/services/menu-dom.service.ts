@@ -88,6 +88,45 @@ export class MenuDomService {
   }
 
   /**
+   * Checks if a string is SVG content by looking for opening and closing SVG tags
+   */
+  private isSvgContent(iconContent: string): boolean {
+    return (
+      typeof iconContent === 'string' &&
+      iconContent.trim().startsWith('<svg') &&
+      iconContent.trim().endsWith('</svg>')
+    );
+  }
+
+  /**
+   * Creates an icon element - either an SVG element or a CSS icon (i tag)
+   */
+  private createIconElement(
+    renderer: Renderer2,
+    iconContent: string
+  ): HTMLElement {
+    if (this.isSvgContent(iconContent)) {
+      // Create span to hold the SVG
+      const iconSpan = renderer.createElement('span');
+      renderer.addClass(iconSpan, 'svg-icon');
+      
+      // Use innerHTML to set the SVG content
+      iconSpan.innerHTML = iconContent;
+      return iconSpan;
+    } else {
+      // For backward compatibility - create a CSS icon
+      const iconElement = renderer.createElement('i');
+      
+      // Add CSS classes
+      iconContent.split(' ').forEach((className) => {
+        if (className) renderer.addClass(iconElement, className);
+      });
+      
+      return iconElement;
+    }
+  }
+
+  /**
    * Creates and appends a level title to a level holder
    */
   public appendLevelTitle(
@@ -145,67 +184,41 @@ export class MenuDomService {
   private appendTitleIcon(
     renderer: Renderer2,
     titleElement: HTMLElement,
-    iconClasses: string,
+    iconContent: string,
     options: MultiLevelPushMenuOptions,
     clickHandler: (event: MouseEvent) => void,
     isSubmenu = false
   ): void {
-    const titleIcon = renderer.createElement('i');
-
-    // Add icon classes to <i>
-    iconClasses.split(' ').forEach((className) => {
-      if (className) renderer.addClass(titleIcon, className);
-    });
-
     if (isSubmenu) {
       // Create <div> wrapper for submenu title icon
       const spanWrapper = renderer.createElement('div');
       renderer.addClass(spanWrapper, 'title-icon');
       renderer.addClass(spanWrapper, 'submenu-icon');
 
-      // Append <i> to <div>
+      // Create icon element
+      const titleIcon = this.createIconElement(renderer, iconContent);
+      
+      // Append icon to wrapper
       renderer.appendChild(spanWrapper, titleIcon);
-
       renderer.appendChild(titleElement, spanWrapper);
-
-      const titleIcon2 = renderer.createElement('i');
-      // Add icon classes to <i>
-      ['fa', 'fa-bars'].forEach((className) => {
-        if (className) renderer.addClass(titleIcon2, className);
-      });
-
-      // Create <button> wrapper for main title icon (still clickable)
-      const buttonWrapper = renderer.createElement('button');
-      renderer.addClass(buttonWrapper, 'title-icon');
-      renderer.addClass(buttonWrapper, 'mainmenu-icon');
-
-      // Optional accessibility
-      renderer.setAttribute(buttonWrapper, 'type', 'button');
-      renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
-
-      // Append <i> to <button>
-      renderer.appendChild(buttonWrapper, titleIcon2);
-
-      // Add click listener only to main title icon
-      renderer.listen(buttonWrapper, 'click', clickHandler);
-
-      renderer.appendChild(titleElement, buttonWrapper);
     } else {
-      // Create <button> wrapper for main title icon (still clickable)
+      // Create <button> wrapper for main title icon (clickable)
       const buttonWrapper = renderer.createElement('button');
       renderer.addClass(buttonWrapper, 'title-icon');
       renderer.addClass(buttonWrapper, 'mainmenu-icon');
 
-      // Optional accessibility
+      // Add accessibility attributes
       renderer.setAttribute(buttonWrapper, 'type', 'button');
       renderer.setAttribute(buttonWrapper, 'aria-label', 'Toggle menu');
 
-      // Append <i> to <button>
+      // Create icon element
+      const titleIcon = this.createIconElement(renderer, iconContent);
+      
+      // Append to button
       renderer.appendChild(buttonWrapper, titleIcon);
 
-      // Add click listener only to main title icon
+      // Add click listener
       renderer.listen(buttonWrapper, 'click', clickHandler);
-
       renderer.appendChild(titleElement, buttonWrapper);
     }
   }
@@ -216,16 +229,12 @@ export class MenuDomService {
   public appendItemIcon(
     renderer: Renderer2,
     anchor: HTMLElement,
-    iconClasses: string,
+    iconContent: string,
     isRtl: boolean
   ): void {
-    const itemIcon = renderer.createElement('i');
-
-    // Add icon classes
-    iconClasses.split(' ').forEach((className) => {
-      if (className) renderer.addClass(itemIcon, className);
-    });
-
+    // Create the icon element
+    const itemIcon = this.createIconElement(renderer, iconContent);
+    
     renderer.addClass(itemIcon, 'anchor-icon');
 
     // Set float direction based on RTL setting
@@ -240,15 +249,11 @@ export class MenuDomService {
    */
   public createGroupIcon(
     renderer: Renderer2,
-    groupIconClass: string,
+    groupIconContent: string,
     isRtl: boolean
   ): HTMLElement {
-    const groupIcon = renderer.createElement('i');
-
-    // Add icon classes
-    groupIconClass.split(' ').forEach((className) => {
-      if (className) renderer.addClass(groupIcon, className);
-    });
+    // Create the icon element
+    const groupIcon = this.createIconElement(renderer, groupIconContent);
 
     // Add positioning styles
     renderer.setStyle(groupIcon, 'float', isRtl ? 'right' : 'left');
@@ -267,15 +272,11 @@ export class MenuDomService {
   public appendBackIcon(
     renderer: Renderer2,
     backAnchor: HTMLElement,
-    iconClasses: string,
+    iconContent: string,
     isRtl: boolean
   ): void {
-    const backIcon = renderer.createElement('i');
-
-    // Add icon classes
-    iconClasses.split(' ').forEach((className) => {
-      if (className) renderer.addClass(backIcon, className);
-    });
+    // Create the icon element
+    const backIcon = this.createIconElement(renderer, iconContent);
 
     // Set float based on direction
     const floatDirection = isRtl ? 'left' : 'right';

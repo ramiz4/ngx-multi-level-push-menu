@@ -66,7 +66,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
 
   // Z-index for different levels
   @for $i from 0 through 4 {
-    &[data-level="#{$i}"] {
+    &[data-level='#{$i}'] {
       z-index: 10 + ($i * 10);
     }
   }
@@ -202,7 +202,7 @@ $shadow-color: rgba(0, 0, 0, 0.2);
       }
     }
 
-    &:empty+li.list-item {
+    &:empty + li.list-item {
       border-bottom: 1px solid $primary-darker;
     }
   }

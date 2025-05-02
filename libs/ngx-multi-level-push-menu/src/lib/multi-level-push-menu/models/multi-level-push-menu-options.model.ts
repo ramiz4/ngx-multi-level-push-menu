@@ -1,4 +1,8 @@
-import { ANGLE_LEFT_SVG, ANGLE_RIGHT_SVG, MENU_BARS_SVG } from '../utilities/svg-icons';
+import {
+  ANGLE_LEFT_SVG,
+  ANGLE_RIGHT_SVG,
+  MENU_BARS_SVG,
+} from '../utilities/svg-icons';
 import { MultiLevelPushMenuItem } from './multi-level-push-menu-item.model';
 
 export class MultiLevelPushMenuOptions {
@@ -7,21 +11,21 @@ export class MultiLevelPushMenuOptions {
 
   /**
    * Menu sliding mode: overlap/cover
-   * 
+   *
    *  - `overlap` - menus are stacked on top of each other and visible at the same time
    *  - `cover` - menus are stacked on top of each other and only one is visible at a time
-   * 
-   * 
+   *
+   *
    * **Note:** `overlap` mode is not supported in mobile view
-   * 
+   *
    * and will be automatically set to 'cover' if the screen width is less than 768px
-   * 
-   * 
+   *
+   *
    * **Issue:** `overlap` mode does not work as expected.
-   * 
+   *
    * Consider using `cover` mode for a more reliable experience.
-   * 
-   * 
+   *
+   *
    * We are working on a fix for this issue.
    * */
   public mode: 'cover' | 'overlap' = 'cover';
@@ -73,13 +77,13 @@ export class MultiLevelPushMenuOptions {
 
   /**
    * Direction of the menu:
-   * 
-   *  - `ltr` - left to right 
+   *
+   *  - `ltr` - left to right
    *  - `rtl` - right to left
    *  - TODO: `auto` - auto-detect based on the browser's language setting
-   * 
+   *
    * **Issue:** `rtl` mode does not work as expected.
-   * 
+   *
    * We are working on a fix for this issue.
    */
   public direction: 'ltr' | 'rtl' = 'ltr';

@@ -102,8 +102,8 @@ export class AppComponent implements OnInit {
   constructor(private menuService: MultiLevelPushMenuService) {}
 
   ngOnInit() {
-    this.options.title = 'All Categories'; // Set menu title
-    
+    this.options.title = 'Company Name'; // Set menu title
+
     // Menu items with SVG icons
     this.options.menu = [
       {

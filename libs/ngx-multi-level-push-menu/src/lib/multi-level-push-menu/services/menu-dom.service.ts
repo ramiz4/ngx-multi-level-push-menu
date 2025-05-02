@@ -91,11 +91,11 @@ export class MenuDomService {
    * Checks if a string is SVG content by looking for opening and closing SVG tags
    */
   private isSvgContent(iconContent: string): boolean {
-    return (
-      typeof iconContent === 'string' &&
-      iconContent.trim().startsWith('<svg') &&
-      iconContent.trim().endsWith('</svg>')
-    );
+    if (typeof iconContent !== 'string') {
+      return false;
+    }
+    const trimmedContent = iconContent.trim();
+    return trimmedContent.startsWith('<svg') && trimmedContent.endsWith('</svg>');
   }
 
   /**

@@ -1,7 +1,5 @@
-/* eslint-disable */
 export default {
   displayName: 'ngx-multi-level-push-menu',
-  preset: '../../node_modules/@nx/jest/preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   testEnvironment: 'jsdom',
   transform: {
@@ -23,8 +21,6 @@ export default {
   // CI specific settings to prevent memory issues
   ...(process.env['CI'] === 'true'
     ? {
-        // Run tests in sequence when in CI environment
-        runInBand: true,
         // Limit the number of workers to avoid memory issues
         maxWorkers: 2,
         // Increase timeout for CI environment

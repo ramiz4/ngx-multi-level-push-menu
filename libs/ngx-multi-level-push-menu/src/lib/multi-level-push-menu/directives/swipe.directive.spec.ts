@@ -1,275 +1,168 @@
-import { Component, DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { SwipeEvent } from '../interfaces';
-import { DeviceDetectorService } from '../services';
+import { ElementRef, Renderer2 } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { SwipeDirection, SwipeDirective } from './swipe.directive';
 
-@Component({
-  imports: [SwipeDirective],
-  template: `
-    <div
-      ramiz4Swipe
-      [swipeEnabled]="swipeEnabled"
-      [overlapWidth]="overlapWidth"
-      (swipe)="onSwipe($event)"
-    ></div>
-  `,
-})
-class TestComponent {
-  swipeEnabled = 'both';
-  overlapWidth = 60;
-  lastSwipeEvent: SwipeEvent | undefined;
-
-  onSwipe(event: SwipeEvent): void {
-    this.lastSwipeEvent = event;
-  }
-}
-
 describe('SwipeDirective', () => {
-  let component: TestComponent;
-  let fixture: ComponentFixture<TestComponent>;
-  let directiveElement: DebugElement;
-  let directiveInstance: SwipeDirective;
-  let deviceDetectorServiceMock: DeviceDetectorService;
+  let directive: SwipeDirective;
+  let element: HTMLElement;
 
-  beforeEach(async () => {
-    // Create a mock for DeviceDetectorService using Jest
-    deviceDetectorServiceMock = {
-      isSwipeEnabled: jest.fn().mockReturnValue(true),
-      getSwipeThreshold: jest
-        .fn()
-        .mockImplementation((overlapWidth: number) => overlapWidth * 0.3),
-      isMobile: jest.fn().mockReturnValue(false),
-    } as unknown as DeviceDetectorService;
-
-    await TestBed.configureTestingModule({
-      imports: [TestComponent],
+  beforeEach(() => {
+    element = document.createElement('div');
+    element.setPointerCapture = jest.fn();
+    element.releasePointerCapture = jest.fn();
+    element.hasPointerCapture = jest.fn().mockReturnValue(true);
+    TestBed.configureTestingModule({
       providers: [
-        { provide: DeviceDetectorService, useValue: deviceDetectorServiceMock },
+        { provide: ElementRef, useValue: new ElementRef(element) },
+        {
+          provide: Renderer2,
+          useValue: {
+            listen: (
+              target: HTMLElement,
+              eventName: string,
+              callback: EventListener,
+              options?: AddEventListenerOptions,
+            ) => {
+              target.addEventListener(eventName, callback, options);
+              return () =>
+                target.removeEventListener(eventName, callback, options);
+            },
+          },
+        },
       ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(TestComponent);
-    component = fixture.componentInstance;
-    directiveElement = fixture.debugElement.query(By.directive(SwipeDirective));
-    directiveInstance = directiveElement.injector.get(SwipeDirective);
-    fixture.detectChanges();
-  });
-
-  it('should create the directive', () => {
-    expect(directiveInstance).toBeTruthy();
-  });
-
-  it('should call isSwipeEnabled with correct parameters on touchstart', () => {
-    const touchEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100 } as Touch],
     });
-
-    directiveElement.nativeElement.dispatchEvent(touchEvent);
-
-    expect(deviceDetectorServiceMock.isSwipeEnabled).toHaveBeenCalledWith(
-      'touchscreen',
-      'both'
-    );
+    directive = TestBed.runInInjectionContext(() => new SwipeDirective());
   });
 
-  it('should call isSwipeEnabled with correct parameters on mousedown', () => {
-    const mouseEvent = new MouseEvent('mousedown', { clientX: 100 });
+  afterEach(() => directive.ngOnDestroy());
 
-    directiveElement.nativeElement.dispatchEvent(mouseEvent);
+  it('emits a measured right swipe once', () => {
+    const emit = jest.spyOn(directive.swipe, 'emit');
+    directive.onPointerDown(pointerEvent({ clientX: 10, clientY: 10 }));
+    directive.onPointerMove(pointerEvent({ clientX: 90, clientY: 12 }));
+    directive.onPointerUp(pointerEvent({ clientX: 90, clientY: 12 }));
 
-    expect(deviceDetectorServiceMock.isSwipeEnabled).toHaveBeenCalledWith(
-      'desktop',
-      'both'
-    );
-  });
-
-  it('should not process touch events when touchscreen swipe is disabled', () => {
-    (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
-      false
-    );
-
-    const touchstartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100 } as Touch],
-    });
-    directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-    const touchmoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 200 } as Touch],
-    });
-    directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-    expect(component.lastSwipeEvent).toBeUndefined();
-  });
-
-  describe('Touch Events', () => {
-    it('should emit swipe event on right swipe (touchmove)', () => {
-      // Mock the deviceDetectorService behavior for this test
-      (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
-        true
-      );
-      (
-        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
-      ).mockReturnValue(10);
-
-      // Create a spy on the component's swipe event handler
-      const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
-
-      // Dispatch touchstart event
-      const touchstartEvent = new TouchEvent('touchstart', {
-        touches: [{ clientX: 100, clientY: 100 } as Touch],
-      });
-      directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-      // Dispatch touchmove event with a significant horizontal movement
-      const touchmoveEvent = new TouchEvent('touchmove', {
-        touches: [{ clientX: 130, clientY: 105 } as Touch], // 30px right movement
-      });
-      directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-      // Verify that the swipe event was emitted with correct params
-      expect(swipeSpy).toHaveBeenCalled();
-
-      // Manually set the lastSwipeEvent on the component
-      // This simulates what would happen in a real component when the event is emitted
-      component.lastSwipeEvent = {
+    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
         direction: SwipeDirection.Right,
-        distance: 30,
-      };
-
-      expect(component.lastSwipeEvent).toBeDefined();
-      expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Right);
-      expect(component.lastSwipeEvent?.distance).toBe(30);
-    });
-
-    it('should emit swipe event on left swipe (touchmove)', () => {
-      // Mock the deviceDetectorService behavior for this test
-      (deviceDetectorServiceMock.isSwipeEnabled as jest.Mock).mockReturnValue(
-        true
-      );
-      (
-        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
-      ).mockReturnValue(10);
-
-      // Create a spy on the component's swipe event handler
-      const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
-
-      // Dispatch touchstart event
-      const touchstartEvent = new TouchEvent('touchstart', {
-        touches: [{ clientX: 100, clientY: 100 } as Touch],
-      });
-      directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-      // Dispatch touchmove event with a significant horizontal movement
-      const touchmoveEvent = new TouchEvent('touchmove', {
-        touches: [{ clientX: 70, clientY: 105 } as Touch], // 30px left movement
-      });
-      directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-      // Verify that the swipe event was emitted with correct params
-      expect(swipeSpy).toHaveBeenCalled();
-
-      // Manually set the lastSwipeEvent on the component
-      // This simulates what would happen in a real component when the event is emitted
-      component.lastSwipeEvent = {
-        direction: SwipeDirection.Left,
-        distance: 30,
-      };
-
-      expect(component.lastSwipeEvent).toBeDefined();
-      expect(component.lastSwipeEvent?.direction).toBe(SwipeDirection.Left);
-      expect(component.lastSwipeEvent?.distance).toBe(30);
-    });
-
-    it('should not emit swipe event when movement is below threshold', () => {
-      // Set threshold to 20
-      (
-        deviceDetectorServiceMock.getSwipeThreshold as jest.Mock
-      ).mockReturnValue(20);
-
-      // Create a spy on the component's swipe event handler
-      const swipeSpy = jest.spyOn(directiveInstance.swipe, 'emit');
-
-      // Touchstart
-      const touchstartEvent = new TouchEvent('touchstart', {
-        touches: [{ clientX: 100, clientY: 100 } as Touch],
-      });
-      directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-      // Touchmove with small movement
-      const touchmoveEvent = new TouchEvent('touchmove', {
-        touches: [{ clientX: 110, clientY: 100 } as Touch], // Move only 10px right
-      });
-      directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-      // Verify that the swipe event was NOT emitted
-      expect(swipeSpy).not.toHaveBeenCalled();
-      expect(component.lastSwipeEvent).toBeUndefined();
-    });
-  });
-
-  describe('Mouse Events', () => {
-    it('should setup mouse event handlers on mousedown', () => {
-      jest.spyOn(document, 'addEventListener');
-
-      const mousedownEvent = new MouseEvent('mousedown', { clientX: 100 });
-      directiveElement.nativeElement.dispatchEvent(mousedownEvent);
-
-      expect(document.addEventListener).toHaveBeenCalledTimes(2);
-      expect(document.addEventListener).toHaveBeenCalledWith(
-        'mousemove',
-        expect.any(Function)
-      );
-      expect(document.addEventListener).toHaveBeenCalledWith(
-        'mouseup',
-        expect.any(Function)
-      );
-    });
-
-    it('should not setup mouse event handlers when desktop swipe is disabled', () => {
-      // Override the default mock to return false for desktop swipes
-      (
-        deviceDetectorServiceMock.isSwipeEnabled as jest.Mock
-      ).mockImplementation((deviceType: string) => {
-        if (deviceType === 'desktop') return false;
-        return true;
-      });
-
-      // Spy on document.addEventListener
-      const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
-
-      // Clear any previous calls
-      addEventListenerSpy.mockClear();
-
-      const mousedownEvent = new MouseEvent('mousedown', { clientX: 100 });
-      directiveElement.nativeElement.dispatchEvent(mousedownEvent);
-
-      expect(addEventListenerSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  it('should use the correct overlapWidth to calculate threshold', () => {
-    // Reset mock call history
-    (deviceDetectorServiceMock.getSwipeThreshold as jest.Mock).mockClear();
-
-    // First call the touchstart handler to initialize
-    component.overlapWidth = 80;
-    fixture.detectChanges();
-
-    // Then trigger a touchmove to ensure getSwipeThreshold is called
-    const touchstartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100 } as Touch],
-    });
-    directiveElement.nativeElement.dispatchEvent(touchstartEvent);
-
-    const touchmoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 150 } as Touch],
-    });
-    directiveElement.nativeElement.dispatchEvent(touchmoveEvent);
-
-    expect(deviceDetectorServiceMock.getSwipeThreshold).toHaveBeenCalledWith(
-      80
+        distance: 80,
+      }),
     );
   });
+
+  it('honors left/right direction restrictions', () => {
+    const emit = jest.spyOn(directive.swipe, 'emit');
+    directive.swipeEnabled = 'left';
+    directive.onPointerDown(pointerEvent({ clientX: 0 }));
+    directive.onPointerUp(pointerEvent({ clientX: 100 }));
+    expect(emit).not.toHaveBeenCalled();
+
+    directive.onPointerDown(pointerEvent({ clientX: 100 }));
+    directive.onPointerUp(pointerEvent({ clientX: 0 }));
+    expect(emit).toHaveBeenCalledWith(
+      expect.objectContaining({ direction: SwipeDirection.Left }),
+    );
+  });
+
+  it('still blocks the drag click when the swipe direction is disabled', () => {
+    const button = document.createElement('button');
+    button.setPointerCapture = jest.fn();
+    button.releasePointerCapture = jest.fn();
+    button.hasPointerCapture = jest.fn().mockReturnValue(true);
+    const click = jest.fn();
+    button.addEventListener('click', click);
+    element.append(button);
+    directive.swipeEnabled = 'left';
+
+    directive.onPointerDown(
+      pointerEvent({ target: button, clientX: 0, clientY: 0 }),
+    );
+    directive.onPointerMove(
+      pointerEvent({ target: button, clientX: 100, clientY: 0 }),
+    );
+    directive.onPointerUp(
+      pointerEvent({ target: button, clientX: 100, clientY: 0 }),
+    );
+    button.click();
+
+    expect(click).not.toHaveBeenCalled();
+  });
+
+  it('cancels vertical gestures without changing body overflow', () => {
+    const cancel = jest.spyOn(directive.swipeCancel, 'emit');
+    document.body.style.overflow = 'auto';
+
+    directive.onPointerDown(pointerEvent({ clientX: 10, clientY: 10 }));
+    directive.onPointerMove(pointerEvent({ clientX: 12, clientY: 100 }));
+
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(document.body.style.overflow).toBe('auto');
+  });
+
+  it('supports touchscreen-only mode', () => {
+    const start = jest.spyOn(directive.swipeStart, 'emit');
+    directive.swipeEnabled = 'touchscreen';
+
+    directive.onPointerDown(pointerEvent({ pointerType: 'mouse' }));
+    expect(start).not.toHaveBeenCalled();
+
+    directive.onPointerDown(pointerEvent({ pointerType: 'touch' }));
+    expect(start).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps normal child clicks intact and does not capture on pointerdown', () => {
+    const button = document.createElement('button');
+    const click = jest.fn();
+    button.addEventListener('click', click);
+    element.append(button);
+
+    directive.onPointerDown(pointerEvent({ target: button }));
+    directive.onPointerUp(pointerEvent({ target: button }));
+    button.click();
+
+    expect(element.setPointerCapture).not.toHaveBeenCalled();
+    expect(click).toHaveBeenCalledTimes(1);
+  });
+
+  it('captures horizontal intent on the original target and blocks its drag click', () => {
+    const button = document.createElement('button');
+    button.setPointerCapture = jest.fn();
+    button.releasePointerCapture = jest.fn();
+    button.hasPointerCapture = jest.fn().mockReturnValue(true);
+    const click = jest.fn();
+    button.addEventListener('click', click);
+    element.append(button);
+
+    directive.onPointerDown(
+      pointerEvent({ target: button, clientX: 10, clientY: 10 }),
+    );
+    directive.onPointerMove(
+      pointerEvent({ target: button, clientX: 90, clientY: 12 }),
+    );
+    directive.onPointerUp(
+      pointerEvent({ target: button, clientX: 90, clientY: 12 }),
+    );
+    button.click();
+
+    expect(button.setPointerCapture).toHaveBeenCalledWith(1);
+    expect(click).not.toHaveBeenCalled();
+  });
+
+  it('uses native touch behavior when swipe handling is disabled', () => {
+    directive.swipeEnabled = 'none';
+    expect(directive.touchAction).toBe('auto');
+  });
+
+  function pointerEvent(overrides: Partial<PointerEvent> = {}): PointerEvent {
+    return {
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      button: 0,
+      clientX: 0,
+      clientY: 0,
+      ...overrides,
+    } as PointerEvent;
+  }
 });

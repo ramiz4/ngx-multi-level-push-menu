@@ -1,38 +1,136 @@
-name: Publish to NPM
+name: Publish to npm
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+env:
+  CI: true
+  NX_DAEMON: false
+  NX_ISOLATE_PLUGINS: false
 
 jobs:
-  build-and-publish:
+  publish:
+    name: Verify and publish
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify release tag and branch ancestry
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Release tag must have the form vX.Y.Z (received: $RELEASE_TAG)." >&2
+            exit 1
+          fi
+
+          git fetch --no-tags origin "$DEFAULT_BRANCH"
+          TAG_COMMIT=$(git rev-list -n 1 "$GITHUB_REF")
+          if ! git merge-base --is-ancestor "$TAG_COMMIT" "origin/$DEFAULT_BRANCH"; then
+            echo "The tagged commit must be reachable from $DEFAULT_BRANCH." >&2
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-      
+          node-version: 22.x
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
         run: npm ci
-      
-      - name: Run linting
-        run: npm run lint
-        
-      - name: Run tests
-        run: npm run test:lib
 
-      - name: Build library
-        run: npm run build:lib
-      
-      - name: Publish to NPM
-        run: npm run publish:ci
+      - name: Install and verify Cypress
+        run: |
+          npx cypress install
+          npx cypress verify
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Check formatting
+        run: npm run format
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test:ci
+
+      - name: Build library and example application
+        run: |
+          npm run build:lib
+          npm run build:app
+
+      - name: Run end-to-end tests
+        run: >-
+          npx nx e2e multi-level-push-menu-example-e2e
+          --configuration=production
+          --browser=chrome
+
+      - name: Upload Cypress failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-publish-failure-artifacts
+          path: |
+            dist/cypress/apps/multi-level-push-menu-example-e2e/screenshots
+            dist/cypress/apps/multi-level-push-menu-example-e2e/videos
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Validate release versions
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node tools/scripts/validate-package.mjs --tag "$RELEASE_TAG"
+
+      - name: Create package tarball
+        id: package
+        run: |
+          mkdir -p release-artifacts
+          PACK_OUTPUT=$(npm pack ./dist/libs/ngx-multi-level-push-menu \
+            --pack-destination release-artifacts \
+            --json)
+          TARBALL=$(node -e "const value = JSON.parse(process.argv[1]); process.stdout.write(value[0].filename)" "$PACK_OUTPUT")
+          PACKAGE_PATH="$PWD/release-artifacts/$TARBALL"
+          test -f "$PACKAGE_PATH"
+          sha256sum "$PACKAGE_PATH"
+          echo "path=$PACKAGE_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package-${{ github.ref_name }}
+          path: ${{ steps.package.outputs.path }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish package with provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PACKAGE_PATH: ${{ steps.package.outputs.path }}
+        run: npm publish "$PACKAGE_PATH" --access=public --provenance --ignore-scripts

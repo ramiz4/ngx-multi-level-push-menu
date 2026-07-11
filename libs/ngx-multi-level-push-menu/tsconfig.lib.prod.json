@@ -3,13 +3,12 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "declaration": true,
-    "declarationMap": true,
-    "inlineSources": true,
+    "declarationMap": false,
     "types": [],
     "target": "ES2022",
     "useDefineForClassFields": false,
     "stripInternal": true,
-    "removeComments": true
+    "removeComments": false
   },
   "exclude": [
     "src/test-setup.ts",

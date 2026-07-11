@@ -1,439 +1,408 @@
-# NgxMultiLevelPushMenu
+<!-- Mirrored from the repository root README.md, which is canonical. -->
 
-<a href="https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu"><img src="https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg" alt="npm version" height="18"></a>
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# ngx-multi-level-push-menu
 
-A comprehensive Angular component for creating accessible, responsive multi-level push menus with extensive customization options.
+[![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/LICENSE)
 
-- [Angular Compatibility](#angular-compatibility)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Component API](#component-api)
-- [Service API](#service-api)
-- [Options](#options)
-- [Menu Structure](#menu-structure)
-- [Features](#features)
-- [Common Issues & Solutions](#common-issues--solutions)
-- [Accessibility](#accessibility)
-- [Performance Considerations](#performance-considerations)
-- [Demo](#demo)
+Accessible, responsive, SSR-safe multi-level push navigation for Angular. The library is standalone-first, has no icon or animation dependency, and still supports existing NgModule applications.
 
-See the [changelog](https://github.com/ramiz4/ngx-multi-level-push-menu/releases) for recent changes.
+## Why use it?
 
-## Angular Compatibility
+- One declarative menu tree; no imperative DOM construction
+- Standalone component with zero required providers
+- Typed item, group, level, and collapsed-state events
+- Optional targeted service commands for applications with one or many menus
+- Native buttons and links, keyboard navigation, focus management, live announcements, RTL, reduced motion, and forced-colors support
+- Pointer-based swipe gestures that preserve vertical scrolling
+- Safe inline path icons or CSS classes from any icon library
+- Signals and `OnPush` change detection; compatible with zoneless applications
+- Guarded browser APIs for server-side rendering and hydration
+- Cover and overlap layouts with responsive behavior
 
-| Library Version | Angular Version |
-| --------------- | --------------- |
-| 1.x.x           | 6.x - 8.x       |
-| 2.x.x           | 9.x - 11.x      |
-| 3.x.x - 12.x.x  | Not Available   |
-| 13.x.x - 14.x.x | 12.x - 14.x     |
-| 16.x.x - 17.x.x | 15.x - 17.x     |
-| 18.x.x - 19.x.x | 18.x - 19.x     |
+## Compatibility
+
+| Library line                      | Angular peer range                  | RxJS peer range          | Node.js                             |
+| --------------------------------- | ----------------------------------- | ------------------------ | ----------------------------------- |
+| `20.x` (current declarative line) | `>=20 <23` (Angular 20, 21, and 22) | `>=7.8 <8`               | Follow your Angular major's support |
+| `19.x` (legacy)                   | Angular 19                          | See the release metadata | See the release metadata            |
+| `<=18.x` (archived)               | See the exact npm release metadata  | See the release metadata | See the release metadata            |
+
+Older library major numbers did not consistently match Angular major numbers. Do not infer compatibility from the package version; inspect the chosen release's `peerDependencies`. For the current line, use the [Node.js version supported by your Angular major](https://angular.dev/reference/versions). The repository development toolchain uses Node `>=20.19 <25` and npm 10.
+
+Angular 19 applications must remain on `@ramiz4/ngx-multi-level-push-menu@^19` until the application is upgraded to Angular 20 or newer. That legacy line no longer receives supported security fixes after `20.x` publishes, so plan the Angular upgrade; do not force-install the `20.x` library over an incompatible peer range.
 
 ## Installation
 
 ```bash
-npm i @ramiz4/ngx-multi-level-push-menu --save
+npm install @ramiz4/ngx-multi-level-push-menu
 ```
 
-### Install dependencies
+There are no required Font Awesome, Angular Animations, or application-level stylesheet imports.
 
-```bash
-# For Font Awesome 4.x
-npm i font-awesome --save
+## Quick start: standalone
 
-# OR for Font Awesome 5+/6+ (recommended for newer projects)
-npm i @fortawesome/fontawesome-free --save
-```
-
-## Usage
-
-### 1. Update your `angular.json`
-
-```json
-"styles": [
-  "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-  "styles.css"
-],
-"scripts": [],
-```
-
-### 2. Import the module
-
-#### For NgModule-based applications:
+Import the standalone component. No provider function is required.
 
 ```ts
-import { NgxMultiLevelPushMenuModule, MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { MenuActivationEvent, MultiLevelPushMenuComponent, MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
+
+@Component({
+  selector: 'app-shell',
+  standalone: true,
+  imports: [MultiLevelPushMenuComponent, RouterOutlet],
+  templateUrl: './app-shell.component.html',
+  styleUrl: './app-shell.component.scss',
+})
+export class AppShellComponent {
+  readonly menu: readonly MultiLevelPushMenuItem[] = [
+    { id: 'home', name: 'Home', link: '/' },
+    {
+      id: 'products',
+      name: 'Products',
+      items: [
+        { id: 'new', name: 'New products', link: '/products/new' },
+        { id: 'all', name: 'All products', link: '/products' },
+      ],
+    },
+    { id: 'help', name: 'Help', link: 'https://example.com/help', target: '_blank' },
+  ];
+
+  readonly options = new MultiLevelPushMenuOptions({
+    title: 'Acme',
+    ariaLabel: 'Primary navigation',
+    menuWidth: '19rem',
+    mode: 'cover',
+    closeOnNavigation: true,
+  });
+
+  collapsed = false;
+
+  onItemActivate(event: MenuActivationEvent): void {
+    console.log(event.item, event.level, event.path, event.originalEvent);
+  }
+}
+```
+
+```html
+<ngx-multi-level-push-menu [menu]="menu" [options]="options" [(collapsed)]="collapsed" (itemActivate)="onItemActivate($event)">
+  <router-outlet />
+</ngx-multi-level-push-menu>
+```
+
+Give the component (or its containing layout) a height. `menuHeight` defaults to `100%`.
+
+```scss
+:host,
+ngx-multi-level-push-menu {
+  display: block;
+  height: 100dvh;
+}
+```
+
+`ngx-multi-level-push-menu` is the canonical selector. The historical
+`ramiz4-multi-level-push-menu` selector remains available as a compatibility
+alias for existing templates.
+
+The deprecated `provideMultiLevelPushMenu()` helper remains exported only for source compatibility. Remove it when convenient: `MultiLevelPushMenuService` is provided in root.
+
+## Existing NgModule applications
+
+The NgModule API remains available for compatibility:
+
+```ts
+import { NgModule } from '@angular/core';
+import { NgxMultiLevelPushMenuModule } from '@ramiz4/ngx-multi-level-push-menu';
 
 @NgModule({
-  imports: [
-    // ...
-    NgxMultiLevelPushMenuModule.forRoot(),
-  ],
+  imports: [NgxMultiLevelPushMenuModule],
 })
 export class AppModule {}
 ```
 
-#### For standalone applications (Angular 14+):
+`NgxMultiLevelPushMenuModule.forRoot()` also continues to work. Both the module and `forRoot()` are compatibility APIs; new code should import `MultiLevelPushMenuComponent` directly, even inside an NgModule.
+
+## Menu data
+
+`MultiLevelPushMenuItem<TData>` accepts application-specific data while keeping the navigation fields typed.
 
 ```ts
-// In app.config.ts
-import { ApplicationConfig } from '@angular/core';
-import { provideMultiLevelPushMenu } from '@ramiz4/ngx-multi-level-push-menu';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    // ...other providers
-    provideMultiLevelPushMenu(),
-  ],
-};
-```
-
-```ts
-// In your component
-import { Component } from '@angular/core';
-import { MultiLevelPushMenuComponent } from '@ramiz4/ngx-multi-level-push-menu';
-
-@Component({
-  // ...
-  standalone: true,
-  imports: [MultiLevelPushMenuComponent],
-})
-export class AppComponent {
-  // ...
+interface NavMetadata {
+  permission?: string;
+  analyticsId: string;
 }
+
+const menu: MultiLevelPushMenuItem<NavMetadata>[] = [
+  {
+    id: 'reports',
+    name: 'Reports',
+    ariaLabel: 'Open reports',
+    icon: '<svg viewBox="0 0 24 24"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    link: '/reports',
+    data: { permission: 'reports.read', analyticsId: 'nav-reports' },
+  },
+];
 ```
 
-### 3. Configure your component
+| Field       | Type                              | Meaning                                                                    |
+| ----------- | --------------------------------- | -------------------------------------------------------------------------- |
+| `name`      | `string`                          | Preferred visible label                                                    |
+| `title`     | `string`                          | Fallback label; retained for older menu models                             |
+| `id`        | `string`                          | Stable identity and service navigation target                              |
+| `icon`      | `string`                          | Safe SVG path document or CSS class list                                   |
+| `link`      | `string`                          | Internal Angular URL, external URL, fragment, or other anchor URL          |
+| `items`     | `MultiLevelPushMenuItem<TData>[]` | Child items; a non-empty array makes the item a group                      |
+| `disabled`  | `boolean`                         | Renders a non-navigating disabled control and prevents activation          |
+| `ariaLabel` | `string`                          | Accessible name override                                                   |
+| `target`    | `string`                          | Native anchor target, such as `_blank`                                     |
+| `rel`       | `string`                          | Native anchor relationship; `_blank` gets `noopener noreferrer` by default |
+| `data`      | `TData`                           | Consumer-owned metadata                                                    |
 
-You can use either SVG content directly or CSS classes from an icon library for your menu icons.
+The visible-label fallback order is `name`, `title`, `id`, then `Untitled item`. Use immutable updates (a new menu array or options object) when changing inputs in an `OnPush` application. If both `[menu]` and `options.menu` are supplied, the explicit `[menu]` input wins.
 
-#### Option 1: Using SVG icons directly (recommended)
+### Routing behavior
 
-```ts
-import { Component, OnInit } from '@angular/core';
-import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-})
-export class AppComponent implements OnInit {
-  options = new MultiLevelPushMenuOptions();
-
-  constructor(private menuService: MultiLevelPushMenuService) {}
-
-  ngOnInit() {
-    // Menu configuration with SVG icons
-    this.options.title = 'All Categories';
-
-    // Define menu items with SVG icons
-    this.options.menu = [
-      {
-        name: 'Home',
-        // SVG home icon
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>',
-        link: 'home',
-      },
-      {
-        name: 'Products',
-        // SVG shopping bag icon
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 112c0-35.3 28.7-64 64-64s64 28.7 64 64v48H160V112zm-48 48H48c-26.5 0-48 21.5-48 48V416c0 53 43 96 96 96H352c53 0 96-43 96-96V208c0-26.5-21.5-48-48-48H336V112C336 50.1 285.9 0 224 0S112 50.1 112 112v48zm24 48a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm152 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"/></svg>',
-        items: [
-          {
-            name: 'Electronics',
-            items: [
-              { name: 'Smartphones', link: 'smartphones' },
-              { name: 'Laptops', link: 'laptops' },
-            ],
-          },
-        ],
-      },
-    ];
-
-    // Set default back and group icons
-    this.options.backItemIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/></svg>';
-    this.options.groupIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>';
-
-    // Optional: Set additional options
-    this.options.mode = 'overlap';
-    this.options.collapsed = false;
-  }
-
-  // Control methods
-  collapseMenu(): void {
-    this.menuService.collapse();
-  }
-
-  expandMenu(): void {
-    this.menuService.expand();
-  }
-}
-```
-
-#### Option 2: Using CSS classes from an icon library
-
-If you prefer using an icon library like Font Awesome, include it in your project and use CSS classes:
-
-```ts
-import { Component, OnInit } from '@angular/core';
-import { MultiLevelPushMenuService, MultiLevelPushMenuOptions } from '@ramiz4/ngx-multi-level-push-menu';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-})
-export class AppComponent implements OnInit {
-  options = new MultiLevelPushMenuOptions();
-
-  constructor(private menuService: MultiLevelPushMenuService) {}
-
-  ngOnInit() {
-    // Menu configuration with Font Awesome icons
-    this.options.title = 'All Categories';
-
-    // Define menu items
-    this.options.menu = [
-      {
-        name: 'Home',
-        icon: 'fa fa-home',
-        link: 'home',
-      },
-      {
-        name: 'Products',
-        icon: 'fa fa-shopping-bag',
-        items: [
-          {
-            name: 'Electronics',
-            items: [
-              { name: 'Smartphones', link: 'smartphones' },
-              { name: 'Laptops', link: 'laptops' },
-            ],
-          },
-        ],
-      },
-    ];
-
-    // Optional: Set additional options
-    this.options.mode = 'overlap';
-    this.options.collapsed = false;
-
-    // Font Awesome icon classes for back and group icons
-    this.options.backItemIcon = 'fa fa-angle-right';
-    this.options.groupIcon = 'fa fa-angle-left';
-  }
-
-  // Control methods
-  collapseMenu(): void {
-    this.menuService.collapse();
-  }
-
-  expandMenu(): void {
-    this.menuService.expand();
-  }
-}
-```
-
-### 4. Add to your template
-
-```html
-<ramiz4-multi-level-push-menu [options]="options">
-  <button (click)="collapseMenu()">Collapse Menu</button>
-  <button (click)="expandMenu()">Expand Menu</button>
-  <router-outlet></router-outlet>
-</ramiz4-multi-level-push-menu>
-```
-
-### 5. Add styles (optional)
-
-```css
-html,
-body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden;
-}
-```
+- Same-context internal links use the optional Angular `Router` when one is available.
+- External, protocol-relative, fragment, modified-click, and non-`_self` links keep native anchor behavior.
+- `target="_blank"` is protected with `rel="noopener noreferrer"` unless `rel` is supplied.
+- Set `closeOnNavigation` to collapse after native navigation starts or Angular Router navigation succeeds.
+- The legacy-named `preventItemClick: false` option bypasses Angular Router interception. Component and service click events still emit.
 
 ## Component API
 
 ### Inputs
 
-| Name    | Type                      | Default | Description           |
-| ------- | ------------------------- | ------- | --------------------- |
-| options | MultiLevelPushMenuOptions | {}      | Configuration options |
+| Input       | Type                                                                                   | Default             | Notes                                                                   |
+| ----------- | -------------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------- |
+| `menu`      | `readonly MultiLevelPushMenuItem[] \| null \| undefined`                               | Uses `options.menu` | Explicit menu tree; once bound, it takes precedence over `options.menu` |
+| `options`   | `MultiLevelPushMenuOptions \| Partial<MultiLevelPushMenuOptions> \| null \| undefined` | Class defaults      | Each assignment is merged over fresh defaults                           |
+| `collapsed` | `boolean \| null \| undefined`                                                         | `options.collapsed` | Supports `[(collapsed)]`; `null` and `undefined` do not change state    |
 
 ### Outputs
 
-| Name        | Type                  | Description                       |
-| ----------- | --------------------- | --------------------------------- |
-| menuOpen    | EventEmitter<boolean> | Emitted when menu is opened       |
-| menuClose   | EventEmitter<boolean> | Emitted when menu is closed       |
-| itemClick   | EventEmitter<any>     | Emitted when menu item is clicked |
-| levelChange | EventEmitter<number>  | Emitted when menu level changes   |
+| Output            | Payload                  | When it emits                                                                |
+| ----------------- | ------------------------ | ---------------------------------------------------------------------------- |
+| `collapsedChange` | `boolean`                | The collapsed state changes through user or public API interaction           |
+| `menuOpen`        | `boolean`                | The menu expands (`true`)                                                    |
+| `menuClose`       | `boolean`                | The menu collapses (`true`)                                                  |
+| `itemClick`       | `MultiLevelPushMenuItem` | A leaf item activates; compatibility event                                   |
+| `groupItemClick`  | `MultiLevelPushMenuItem` | A group opens; compatibility event                                           |
+| `itemActivate`    | `MenuActivationEvent`    | A leaf activates, with item, zero-based level, full path, and original event |
+| `groupActivate`   | `MenuActivationEvent`    | A group activates, with item, level, path, and original event                |
+| `levelChange`     | `number`                 | Active zero-based depth changes; root is `0`                                 |
 
-## Service API
+Prefer `itemActivate` and `groupActivate` when you need context. The shorter click outputs remain useful for existing consumers.
 
-The `MultiLevelPushMenuService` provides methods to control the menu programmatically:
+### Public component methods
 
-| Method              | Parameters | Description                      |
-| ------------------- | ---------- | -------------------------------- |
-| collapse()          | none       | Collapses the menu               |
-| expand()            | none       | Expands the menu                 |
-| toggleMenu()        | none       | Toggles menu between states      |
-| openMenu()          | none       | Opens the menu                   |
-| closeMenu()         | none       | Closes the menu                  |
-| navigateToLevel(id) | id: string | Navigates to specific menu level |
-| goBack()            | none       | Navigates to previous menu level |
+Obtain a component instance with `@ViewChild(MultiLevelPushMenuComponent)` when controls belong to the same view.
 
-## Options
+| Method                       | Effect                                                                  |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `collapseMenu(level?)`       | Collapse the menu, or navigate back to an already-open numeric depth    |
+| `expandMenu()`               | Expand and move focus into the active level                             |
+| `toggleMenu()`               | Toggle expanded/collapsed state                                         |
+| `openMenu()`                 | Alias for `expandMenu()`                                                |
+| `closeMenu()`                | Alias for `collapseMenu()`                                              |
+| `navigateToLevel(levelOrId)` | Navigate to an open depth, or find a group by `id`, then `name`/`title` |
+| `goBack(focusParent = true)` | Return one level and optionally restore focus to the parent group       |
 
-```typescript
-// Default options
-{
-  collapsed: false,                   // Initialize menu collapsed
-  menuID: 'multilevelpushmenu',       // ID for the menu
-  wrapperClass: 'multilevelpushmenu_wrapper',
-  menuInactiveClass: 'multilevelpushmenu_inactive',
-  menu: [],                           // Menu structure
-  menuWidth: 0,                       // Width of menu (integer, %, px, em)
-  menuHeight: 0,                      // Height of menu
-  backText: 'Back',                   // Text for back menu item
-  backItemClass: 'backItemClass',     // CSS class for back item
-  backItemIcon: '<svg>...</svg>',     // Icon for back item (SVG content or CSS class)
-  groupIcon: '<svg>...</svg>',        // Icon for items with submenus (SVG content or CSS class)
-  mode: 'overlap',                    // Menu sliding mode: overlap/cover
-  overlapWidth: 40,                   // Width of menu overlap in px
-  preventItemClick: true,             // Event callback per item click
-  preventGroupItemClick: true,        // Event callback per group item click
-  direction: 'ltr',                   // Direction: ltr/rtl
-  fullCollapse: false,                // Hide base level when collapsed
-  swipe: 'both'                       // Swipe support: both/touchscreen/desktop/none
+`collapseMenu` and `expandMenu` also accept a legacy animation-speed argument. Animation timing is configured by `animationDuration`; the speed argument is retained only for source compatibility.
+
+## Service API and menu targeting
+
+`MultiLevelPushMenuService` is useful when the controller is outside the menu's view. Inject it normally; no provider setup is required.
+
+```ts
+import { inject } from '@angular/core';
+import { MultiLevelPushMenuService } from '@ramiz4/ngx-multi-level-push-menu';
+
+const menus = inject(MultiLevelPushMenuService);
+
+menus.openMenu('primary');
+menus.navigateToLevel('products', 'primary');
+menus.goBack('primary');
+menus.closeMenu('primary');
+```
+
+Set `options.menuID` on each menu to target it. A command without `targetId` is broadcast to every mounted menu using that service instance.
+
+| Method            | Signature                                                  | Notes                                                                                                        |
+| ----------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `collapse`        | `(level?: number, targetId?: string) => void`              | Collapse, or move to an already-open depth; use `collapse(undefined, 'primary')` to target a normal collapse |
+| `expand`          | `(targetId?: string) => void`                              | Expand                                                                                                       |
+| `toggleMenu`      | `(targetId?: string) => void`                              | Toggle                                                                                                       |
+| `openMenu`        | `(targetId?: string) => void`                              | Alias for `expand`                                                                                           |
+| `closeMenu`       | `(targetId?: string) => void`                              | Alias for targeted collapse                                                                                  |
+| `navigateToLevel` | `(levelOrId: number \| string, targetId?: string) => void` | Navigate to an open depth or group identity                                                                  |
+| `goBack`          | `(targetId?: string) => void`                              | Return one level                                                                                             |
+
+Compatibility observables are also available: `collapsed()`, `expanded()`, `onMenuItemClick()`, and `onGroupItemClick()`. The item streams emit typed `MultiLevelPushMenuItem` values.
+
+## Options and defaults
+
+Create options with `new MultiLevelPushMenuOptions({...})` or pass a `Partial<MultiLevelPushMenuOptions>` directly.
+
+| Option                          | Type                                                                  | Default              | Behavior                                                                                                                 |
+| ------------------------------- | --------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `menu`                          | `MultiLevelPushMenuItem[]`                                            | `[]`                 | Menu fallback when `[menu]` is not bound                                                                                 |
+| `mode`                          | `'cover' \| 'overlap'`                                                | `'cover'`            | Cover shows one panel; overlap offsets stacked levels. At `48rem` and below, overlap uses the single-panel mobile layout |
+| `collapsed`                     | `boolean`                                                             | `false`              | Applied when this configured value changes; a separate `[collapsed]` input takes precedence                              |
+| `menuID`                        | `string \| undefined`                                                 | `undefined`          | `<nav>` ID and service-command target                                                                                    |
+| `wrapperClass`                  | `string \| undefined`                                                 | `undefined`          | Extra class on the rendered wrapper                                                                                      |
+| `menuInactiveClass`             | `string \| undefined`                                                 | `undefined`          | Extra wrapper class while collapsed                                                                                      |
+| `menuWidth`                     | `string \| number`                                                    | `'300px'`            | Any CSS length; a number is pixels                                                                                       |
+| `menuHeight`                    | `string \| number`                                                    | `'100%'`             | Any CSS length; a number is pixels                                                                                       |
+| `title`                         | `string \| undefined`                                                 | `undefined`          | Root heading; visually falls back to `Menu`                                                                              |
+| `titleIcon`                     | `string`                                                              | Built-in bars SVG    | Header and toggle icon                                                                                                   |
+| `backText`                      | `string`                                                              | `'Back'`             | Back-button text                                                                                                         |
+| `backItemClass`                 | `string`                                                              | `'back-item'`        | Extra class on the Back button                                                                                           |
+| `backItemIcon`                  | `string`                                                              | Built-in chevron SVG | Back-button icon                                                                                                         |
+| `groupIcon`                     | `string`                                                              | Built-in chevron SVG | Group indicator                                                                                                          |
+| `overlapWidth`                  | `string \| number`                                                    | `55`                 | Visible overlap; a number is pixels and also influences swipe threshold                                                  |
+| `preventItemClick`              | `boolean`                                                             | `true`               | Legacy routing flag; `false` uses native anchor navigation instead of Angular Router interception                        |
+| `preventGroupItemClick`         | `boolean`                                                             | `true`               | Legacy propagation flag; `true` stops the group activation DOM event from bubbling. Outputs still emit                   |
+| `direction`                     | `'ltr' \| 'rtl'`                                                      | `'ltr'`              | Layout, swipe, and forward/back keyboard direction                                                                       |
+| `fullCollapse`                  | `boolean`                                                             | `false`              | Hide the navigation completely instead of leaving the overlap/toggle edge visible                                        |
+| `swipe`                         | `'both' \| 'left' \| 'right' \| 'touchscreen' \| 'desktop' \| 'none'` | `'both'`             | Enabled pointer kinds/directions; touchscreen and desktop are compatibility aliases                                      |
+| `ariaLabel`                     | `string`                                                              | `'Main navigation'`  | Accessible label for the `<nav>` landmark                                                                                |
+| `closeOnNavigation`             | `boolean`                                                             | `false`              | Collapse after leaf navigation                                                                                           |
+| `preserveActiveLevelOnCollapse` | `boolean`                                                             | `true`               | Keep the submenu stack across collapse/expand                                                                            |
+| `maxDepth`                      | `number`                                                              | `50`                 | Maximum submenu depth; also limits malformed/cyclic data                                                                 |
+| `animationDuration`             | `string \| number`                                                    | `280`                | CSS time or milliseconds when numeric                                                                                    |
+
+## Icons
+
+Icons are optional and dependency-free.
+
+### Safe inline SVG paths
+
+An icon string beginning with `<` must be a complete `<svg>` containing at least one safe `<path>`. The renderer does not use `innerHTML`: it parses a numeric four-value `viewBox` plus safe path and paint attributes, then creates Angular-owned SVG elements. Scripts, event handlers, external references, unsupported elements, invalid path data, and overlong paths are discarded. An invalid SVG renders no icon.
+
+```ts
+const icon = '<svg viewBox="0 0 24 24"><path d="M4 12h16M12 4v16" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+```
+
+The supported path attributes are `d`, `fill`, `stroke`, `stroke-width`, `fill-rule`, and `clip-rule`. Use simple path-only SVGs; convert shapes such as circles or polygons to paths first.
+
+### CSS icon classes
+
+Any non-markup string is applied as a CSS class list:
+
+```ts
+{ name: 'Settings', icon: 'fa-solid fa-gear', link: '/settings' }
+```
+
+Install and load the chosen icon library in your application. This package does not bundle one.
+
+## Styling
+
+Set custom properties directly on the component host. This works in an application component stylesheet and can be scoped per instance with a class.
+
+```html
+<ngx-multi-level-push-menu class="app-menu" />
+```
+
+```scss
+ngx-multi-level-push-menu.app-menu {
+  --ngx-push-menu-background: #0b3d2e;
+  --ngx-push-menu-surface: #115740;
+  --ngx-push-menu-hover: #176b4e;
+  --ngx-push-menu-active: #082d22;
+  --ngx-push-menu-color: #fff;
+  --ngx-push-menu-border: rgb(255 255 255 / 24%);
+  --ngx-push-menu-focus: #a7f3d0;
+  --ngx-push-menu-shadow: 0 0.75rem 2rem rgb(0 0 0 / 30%);
 }
 ```
 
-## Menu Structure
+| CSS custom property          | Default                            |
+| ---------------------------- | ---------------------------------- |
+| `--ngx-push-menu-background` | `#336ca6`                          |
+| `--ngx-push-menu-surface`    | `#2e6196`                          |
+| `--ngx-push-menu-hover`      | `#295685`                          |
+| `--ngx-push-menu-active`     | `#1f4164`                          |
+| `--ngx-push-menu-color`      | `#fff`                             |
+| `--ngx-push-menu-border`     | `rgb(255 255 255 / 18%)`           |
+| `--ngx-push-menu-focus`      | `#fff`                             |
+| `--ngx-push-menu-shadow`     | `0 0.5rem 1.5rem rgb(0 0 0 / 24%)` |
 
-The menu structure follows this format:
+Sizing and motion are configured through `menuWidth`, `menuHeight`, `overlapWidth`, and `animationDuration`; the component exposes them internally as `--ngx-push-menu-width`, `--ngx-push-menu-height`, `--ngx-push-menu-overlap`, and `--ngx-push-menu-duration`.
 
-```typescript
-{
-  title: 'Menu Title',                // Title displayed at the top
-  id: 'menuID',                       // Unique identifier
-  icon: '<svg>...</svg>',             // Icon (SVG content or CSS class)
-  items: [                            // Array of menu items
-    {
-      name: 'Home',                   // Display name
-      id: 'home',                     // Unique identifier (optional)
-      icon: '<svg>...</svg>',         // Icon (SVG content or CSS class)
-      link: 'home',                   // Router link (optional)
-      items: []                       // Child items (optional)
-    }
-  ]
-}
-```
+## Accessibility and interaction
 
-**Important**: Each submenu should be defined directly within an `items` array. Don't add extra wrapper objects around menu items.
+The component provides:
 
-## Features
+- A labeled navigation landmark and native interactive elements
+- Disabled semantics and safe external-link defaults
+- Up/Down looping within a level; Home/End to jump; direction-aware Left/Right for submenus; Escape to go back or collapse
+- Focus movement into opened levels and restoration to the parent group
+- Polite live announcements for level and collapsed-state changes
+- Inert, non-focusable inactive panels
+- Logical CSS properties for LTR/RTL layouts
+- `prefers-reduced-motion` and Windows forced-colors adaptations
+- Vertical-scroll-friendly pointer gestures using `touch-action: pan-y`
 
-- Multi-level menu support with endless nesting
-- Expand/Collapse navigation with left/right swipe gestures
-- Support for both overlay and cover sliding modes
-- Flexible sizing options
-- Left-to-right and Right-to-left sliding directions
-- Flexible icon support - use SVG content directly or CSS classes from any icon library
-- Keyboard navigation and accessibility features
-- Customizable styling
-- Cross-browser compatibility
-- Angular Versions Support (6+)
-- AoT Compilation Support
+Accessibility still depends on consumer data and theming. Give every menu a useful `ariaLabel`, use meaningful item labels, keep IDs unique, and verify color contrast and keyboard flows in the consuming application.
 
-## Common Issues & Solutions
+## SSR, hydration, and zoneless Angular
 
-### Menu not visible on init
+- The initial menu tree renders on the server.
+- Browser-only focus scheduling is guarded with `isPlatformBrowser` and the injected `DOCUMENT`.
+- The Router is optional, so rendering does not require router providers.
+- Pointer handling runs only in response to browser events.
+- The implementation uses signals, Angular events, and `OnPush`; it does not require Zone.js from the consuming application.
 
-If your menu is not visible initially, check:
+No special provider is needed for SSR, hydration, or zoneless change detection. Configure those features as usual in the Angular application.
 
-- Ensure `options.collapsed` is set to `false`
-- Verify CSS is properly loaded
-- Check console for errors
+## Advanced public directives
 
-### Submenu items not appearing
+The main component already handles items and swipes. `MenuItemDirective` (`[ramiz4MenuItem]`) and `SwipeDirective` (`[ramiz4Swipe]`) remain exported for custom templates. They emit typed `MenuItemClickEvent`, `KeyNavigationEvent`, and `SwipeEvent` values. Treat them as advanced building blocks; most applications only import `MultiLevelPushMenuComponent`.
 
-Ensure your menu structure is correct:
+## Troubleshooting
 
-```typescript
-// Correct structure
-{
-  name: 'Products',
-  items: [
-    { name: 'Item 1' },
-    { name: 'Item 2' }
-  ]
-}
+### The menu has no height
 
-// Incorrect structure
-{
-  name: 'Products',
-  items: {
-    item1: { name: 'Item 1' },
-    item2: { name: 'Item 2' }
-  }
-}
-```
+The default `menuHeight` is `100%`, so an ancestor must establish a height. Set a host height or pass an explicit value such as `100dvh`.
 
-### Mobile Support
+### The service controls every menu
 
-Configure the swipe behavior with the `swipe` option:
+Commands without a target are broadcasts. Give each menu a unique `menuID` and pass that ID to service methods.
 
-- `both`: Support touch and mouse (default)
-- `touchscreen`: Support only touch
-- `desktop`: Support only mouse
-- `none`: Disable swipe support
+### A submenu does not open
 
-### Font Awesome Version Compatibility
+Use an `items` array, make sure the item is not disabled, and avoid cyclic object/array references. Navigation is capped by `maxDepth`.
 
-This library supports two ways to provide icons:
+### An icon is blank
 
-1. **SVG content directly** (recommended):
+For inline icons, use one complete path-only SVG that meets the safe parser rules. Otherwise pass CSS classes and ensure that icon library is loaded globally.
 
-   - Better performance and accessibility
-   - No external dependencies
-   - Example: `icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">...</svg>'`
+### Router navigation is not intercepted
 
-2. **CSS classes from icon libraries**:
-   - For Font Awesome 4.x: `icon: 'fa fa-home'`
-   - For Font Awesome 5+: `icon: 'fas fa-home'`
-   - Other icon libraries with similar class-based approaches
+Confirm that the application provides Angular Router, the link is an internal same-context URL, `target` is absent or `_self`, and `preventItemClick` is not `false`.
 
-## Accessibility
-
-The component includes several accessibility enhancements:
-
-- ARIA attributes for screen readers
-- Keyboard navigation support
-- Focus management
-- Screen reader announcements for menu changes
-
-## Performance Considerations
-
-For large menus, consider:
-
-- Lazy loading submenus
-- Using `trackBy` with `*ngFor` directives
-- Implementing virtual scrolling for very large menus
-
-## Demo
-
-To view the demo:
+## Development
 
 ```bash
-git clone https://github.com/ramiz4/ngx-multi-level-push-menu.git
-cd ngx-multi-level-push-menu
-npm install
-npm start
+npm ci
+npm start                 # example app on http://localhost:4200
+npm run test:lib
+npm run lint
+npm run build:lib
+npm run build:app
+npm run validate          # format, lint, CI tests, library and example builds
 ```
 
-Then navigate to `http://localhost:4200`
+See [CONTRIBUTING.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/CONTRIBUTING.md) for the contributor workflow, [MAINTENANCE.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/MAINTENANCE.md) for releases, [MIGRATION.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/MIGRATION.md) for upgrading, and [CHANGELOG.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/CHANGELOG.md) for notable changes.
+
+## Support and security
+
+- Bugs and feature requests: [GitHub Issues](https://github.com/ramiz4/ngx-multi-level-push-menu/issues)
+- Usage help: [SUPPORT.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/SUPPORT.md)
+- Security reports: follow [SECURITY.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/SECURITY.md); do not open a public issue for a suspected vulnerability
+
+## License
+
+[MIT](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/LICENSE) © Ramiz Loki

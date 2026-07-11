@@ -9,31 +9,13 @@ export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
   public menu: MultiLevelPushMenuItem[] = [];
 
-  /**
-   * Menu sliding mode: overlap/cover
-   *
-   *  - `overlap` - menus are stacked on top of each other and visible at the same time
-   *  - `cover` - menus are stacked on top of each other and only one is visible at a time
-   *
-   *
-   * **Note:** `overlap` mode is not supported in mobile view
-   *
-   * and will be automatically set to 'cover' if the screen width is less than 768px
-   *
-   *
-   * **Issue:** `overlap` mode does not work as expected.
-   *
-   * Consider using `cover` mode for a more reliable experience.
-   *
-   *
-   * We are working on a fix for this issue.
-   * */
+  /** Sliding layout. Overlap automatically uses cover-style motion below 48rem. */
   public mode: 'cover' | 'overlap' = 'cover';
 
   /** Initialize menu in collapsed/expanded mode */
   public collapsed = false;
 
-  /** ID of <nav> element */
+  /** Optional ID of the <nav> element and service command target. */
   public menuID?: string;
 
   /** Wrapper CSS class */
@@ -51,8 +33,8 @@ export class MultiLevelPushMenuOptions {
   /** Menu title default icon - SVG content */
   public titleIcon = MENU_BARS_SVG;
 
-  /** Menu height (integer, '%', 'px', 'em') */
-  public menuHeight?: string;
+  /** Menu height as any valid CSS length. */
+  public menuHeight: string | number = '100%';
 
   /** Text for 'Back' menu item */
   public backText = 'Back';
@@ -61,38 +43,44 @@ export class MultiLevelPushMenuOptions {
   public backItemClass = 'back-item';
 
   /** Icon used for back menu item - SVG content */
-  public backItemIcon = ANGLE_RIGHT_SVG;
+  public backItemIcon = ANGLE_LEFT_SVG;
 
   /** Icon used for menu items containing sub-items - SVG content */
-  public groupIcon = ANGLE_LEFT_SVG;
+  public groupIcon = ANGLE_RIGHT_SVG;
 
-  /** Width in px of menu wrappers overlap */
-  public overlapWidth = '55';
+  /** Width of the visible menu overlap as a number of pixels or CSS length. */
+  public overlapWidth: string | number = 55;
 
-  /** Set to false if you do not need event callback functionality per item click */
+  /** Legacy flag: `false` bypasses Angular Router interception for leaf links. */
   public preventItemClick = true;
 
-  /** Set to false if you do not need event callback functionality per group item click */
+  /** When true, group activation stops the original DOM event from bubbling. */
   public preventGroupItemClick = true;
 
-  /**
-   * Direction of the menu:
-   *
-   *  - `ltr` - left to right
-   *  - `rtl` - right to left
-   *  - TODO: `auto` - auto-detect based on the browser's language setting
-   *
-   * **Issue:** `rtl` mode does not work as expected.
-   *
-   * We are working on a fix for this issue.
-   */
+  /** Visual and keyboard direction of the navigation. */
   public direction: 'ltr' | 'rtl' = 'ltr';
 
   /** Set to true to fully hide base level holder when collapsed */
   public fullCollapse = false;
 
-  /** Direction to enable swipe: 'both', 'left', 'right' */
-  public swipe: 'both' | 'left' | 'right' = 'both';
+  /** Swipe direction/device mode. `touchscreen`, `desktop` and `none` are legacy-compatible aliases. */
+  public swipe: 'both' | 'left' | 'right' | 'touchscreen' | 'desktop' | 'none' =
+    'both';
+
+  /** Accessible label for the navigation landmark. */
+  public ariaLabel = 'Main navigation';
+
+  /** Collapse the menu after a leaf item successfully starts navigation. */
+  public closeOnNavigation = false;
+
+  /** Keep the active submenu path when the menu is collapsed and expanded. */
+  public preserveActiveLevelOnCollapse = true;
+
+  /** Maximum supported submenu depth. Guards against cyclic or malformed data. */
+  public maxDepth = 50;
+
+  /** Animation duration as milliseconds or a valid CSS time. */
+  public animationDuration: string | number = 280;
 
   constructor(options?: Partial<MultiLevelPushMenuOptions>) {
     if (options) {

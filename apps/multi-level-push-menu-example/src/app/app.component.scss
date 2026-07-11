@@ -1,12 +1,29 @@
 :host {
   display: block;
-  height: 100%;
-  width: 100%;
+  min-height: 100%;
 }
 
-ramiz4-multi-level-push-menu {
+.demo-menu {
   display: block;
-  height: 100vh;
+  height: 100dvh;
   width: 100%;
-  position: relative;
+  --ngx-push-menu-background: #092c2c;
+  --ngx-push-menu-surface: #0d3835;
+  --ngx-push-menu-hover: #125148;
+  --ngx-push-menu-active: #18a47e;
+  --ngx-push-menu-color: #effff9;
+  --ngx-push-menu-border: rgb(191 255 230 / 14%);
+  --ngx-push-menu-focus: #86ffd3;
+  --ngx-push-menu-shadow: 1rem 0 3rem rgb(1 18 18 / 30%);
+}
+
+.demo-menu--midnight {
+  --ngx-push-menu-background: #15162e;
+  --ngx-push-menu-surface: #1d1f3d;
+  --ngx-push-menu-hover: #292c55;
+  --ngx-push-menu-active: #7267f0;
+  --ngx-push-menu-color: #f5f3ff;
+  --ngx-push-menu-border: rgb(220 216 255 / 14%);
+  --ngx-push-menu-focus: #beb8ff;
+  --ngx-push-menu-shadow: 1rem 0 3rem rgb(8 8 25 / 34%);
 }

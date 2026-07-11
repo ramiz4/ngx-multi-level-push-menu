@@ -1,28 +1,217 @@
-<div class="multilevelpushmenu-wrapper">
-  <!-- Screen reader accessibility enhancements -->
-  <div
-    id="menu-live-region"
-    class="sr-only"
-    aria-live="polite"
-    aria-atomic="true"
-  ></div>
+<div
+  class="ngx-push-menu"
+  [ngClass]="wrapperClasses"
+  [class.ngx-push-menu--collapsed]="isCollapsed()"
+  [class.ngx-push-menu--full-collapse]="options.fullCollapse"
+  [class.ngx-push-menu--cover]="options.mode === 'cover'"
+  [class.ngx-push-menu--overlap]="options.mode === 'overlap'"
+  [class.ngx-push-menu--ltr]="options.direction === 'ltr'"
+  [class.ngx-push-menu--rtl]="options.direction === 'rtl'"
+  [style.--ngx-push-menu-width]="menuWidth"
+  [style.--ngx-push-menu-height]="menuHeight"
+  [style.--ngx-push-menu-overlap]="overlapWidth"
+  [style.--ngx-push-menu-duration]="animationDuration"
+  [style.--ngx-push-menu-active-level]="activeLevelIndex"
+>
+  <span class="ngx-push-menu__sr-only" aria-live="polite" aria-atomic="true">
+    {{ announcement() }}
+  </span>
 
   <nav
-    #menuContainer
-    id="{{ options.menuID || 'multilevelpushmenu' }}"
+    class="ngx-push-menu__navigation"
+    [attr.id]="options.menuID || null"
+    [attr.dir]="options.direction"
+    [attr.aria-label]="navigationLabel"
+    [attr.aria-hidden]="isCollapsed() && options.fullCollapse ? 'true' : null"
+    [attr.inert]="isCollapsed() && options.fullCollapse ? '' : null"
     ramiz4Swipe
     [swipeEnabled]="options.swipe"
-    [overlapWidth]="toNumber(options.overlapWidth)"
-    [preventBodyScroll]="true"
+    [overlapWidth]="overlapWidthPixels"
     (swipe)="onSwipeDetected($event)"
     (swipeStart)="onSwipeStart()"
-    (swipeCancel)="onSwipeCancel()"
-    role="menu"
-    aria-label="Main navigation menu"
-    [attr.aria-orientation]="'vertical'"
-    [class.is-swiping]="isSwiping"
-  ></nav>
-  <div #contentContainer id="content">
+    (swipeCancel)="onSwipeEnd()"
+    (swipeEnd)="onSwipeEnd()"
+    [class.ngx-push-menu__navigation--swiping]="isSwiping()"
+  >
+    <section
+      *ngFor="
+        let level of levels();
+        let levelIndex = index;
+        trackBy: trackLevel
+      "
+      class="ngx-push-menu__level"
+      [style.--ngx-push-menu-level]="levelIndex"
+      [attr.data-level-index]="levelIndex"
+      [attr.data-active]="isLevelActive(levelIndex)"
+      [attr.aria-hidden]="isLevelActive(levelIndex) ? null : 'true'"
+      [attr.inert]="isLevelActive(levelIndex) ? null : ''"
+      [attr.aria-label]="level.title"
+    >
+      <header class="ngx-push-menu__header">
+        <ramiz4-menu-icon
+          *ngIf="level.icon"
+          class="ngx-push-menu__header-icon"
+          aria-hidden="true"
+          [icon]="level.icon"
+        ></ramiz4-menu-icon>
+        <h2 class="ngx-push-menu__title">{{ level.title }}</h2>
+        <button
+          type="button"
+          class="ngx-push-menu__toggle"
+          data-menu-control
+          data-menu-toggle
+          [attr.aria-label]="toggleLabel"
+          [attr.aria-expanded]="!isCollapsed()"
+          [attr.tabindex]="
+            isLevelActive(levelIndex) &&
+            !(isCollapsed() && options.fullCollapse)
+              ? 0
+              : -1
+          "
+          (click)="toggleMenu()"
+          (keydown)="onControlKeydown($event)"
+        >
+          <ramiz4-menu-icon
+            class="ngx-push-menu__toggle-icon"
+            aria-hidden="true"
+            [icon]="options.titleIcon"
+          ></ramiz4-menu-icon>
+        </button>
+      </header>
+
+      <button
+        *ngIf="levelIndex > 0"
+        type="button"
+        class="ngx-push-menu__back"
+        [ngClass]="options.backItemClass"
+        data-menu-control
+        data-menu-back
+        [attr.aria-hidden]="isCollapsed() ? 'true' : null"
+        [attr.inert]="isCollapsed() ? '' : null"
+        [attr.tabindex]="isLevelActive(levelIndex) && !isCollapsed() ? 0 : -1"
+        (click)="goBack()"
+        (keydown)="onControlKeydown($event)"
+      >
+        <ramiz4-menu-icon
+          class="ngx-push-menu__back-icon"
+          aria-hidden="true"
+          [icon]="options.backItemIcon"
+        ></ramiz4-menu-icon>
+        <span>{{ options.backText }}</span>
+      </button>
+
+      <ul
+        class="ngx-push-menu__items"
+        [attr.aria-hidden]="isCollapsed() ? 'true' : null"
+        [attr.inert]="isCollapsed() ? '' : null"
+      >
+        <li
+          *ngFor="
+            let item of level.items;
+            let itemIndex = index;
+            trackBy: trackItem
+          "
+          class="ngx-push-menu__item"
+        >
+          <button
+            *ngIf="hasChildren(item); else leafItem"
+            type="button"
+            class="ngx-push-menu__item-control"
+            data-menu-control
+            data-menu-item-control
+            [attr.data-menu-item-index]="itemIndex"
+            [disabled]="item.disabled"
+            [attr.aria-label]="itemAriaLabel(item)"
+            aria-haspopup="true"
+            aria-expanded="false"
+            [attr.tabindex]="
+              isLevelActive(levelIndex) && !isCollapsed() ? 0 : -1
+            "
+            (click)="openSubmenu(item, itemIndex, $event)"
+            (keydown)="onItemKeydown($event, item, itemIndex)"
+          >
+            <ramiz4-menu-icon
+              *ngIf="item.icon"
+              class="ngx-push-menu__item-icon"
+              aria-hidden="true"
+              [icon]="item.icon"
+            ></ramiz4-menu-icon>
+            <span class="ngx-push-menu__item-label">{{ itemLabel(item) }}</span>
+            <ramiz4-menu-icon
+              class="ngx-push-menu__group-icon"
+              aria-hidden="true"
+              [icon]="options.groupIcon"
+            ></ramiz4-menu-icon>
+          </button>
+
+          <ng-template #leafItem>
+            <a
+              *ngIf="hasLink(item); else actionItem"
+              class="ngx-push-menu__item-control"
+              data-menu-control
+              data-menu-item-control
+              [attr.data-menu-item-index]="itemIndex"
+              [href]="item.link || ''"
+              [attr.target]="item.target || null"
+              [attr.rel]="safeRel(item)"
+              [attr.aria-label]="itemAriaLabel(item)"
+              [attr.aria-disabled]="item.disabled ? 'true' : null"
+              [attr.tabindex]="
+                isLevelActive(levelIndex) && !isCollapsed() && !item.disabled
+                  ? 0
+                  : -1
+              "
+              (click)="activateItem(item, $event)"
+              (keydown)="onItemKeydown($event, item, itemIndex)"
+            >
+              <ramiz4-menu-icon
+                *ngIf="item.icon"
+                class="ngx-push-menu__item-icon"
+                aria-hidden="true"
+                [icon]="item.icon"
+              ></ramiz4-menu-icon>
+              <span class="ngx-push-menu__item-label">{{
+                itemLabel(item)
+              }}</span>
+            </a>
+
+            <ng-template #actionItem>
+              <button
+                type="button"
+                class="ngx-push-menu__item-control"
+                data-menu-control
+                data-menu-item-control
+                [attr.data-menu-item-index]="itemIndex"
+                [disabled]="item.disabled"
+                [attr.aria-label]="itemAriaLabel(item)"
+                [attr.tabindex]="
+                  isLevelActive(levelIndex) && !isCollapsed() ? 0 : -1
+                "
+                (click)="activateItem(item, $event)"
+                (keydown)="onItemKeydown($event, item, itemIndex)"
+              >
+                <ramiz4-menu-icon
+                  *ngIf="item.icon"
+                  class="ngx-push-menu__item-icon"
+                  aria-hidden="true"
+                  [icon]="item.icon"
+                ></ramiz4-menu-icon>
+                <span class="ngx-push-menu__item-label">{{
+                  itemLabel(item)
+                }}</span>
+              </button>
+            </ng-template>
+          </ng-template>
+        </li>
+
+        <li *ngIf="level.items.length === 0" class="ngx-push-menu__empty">
+          No menu items
+        </li>
+      </ul>
+    </section>
+  </nav>
+
+  <div class="ngx-push-menu__content" data-menu-content tabindex="-1">
     <ng-content></ng-content>
   </div>
 </div>

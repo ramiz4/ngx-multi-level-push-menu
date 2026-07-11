@@ -9,7 +9,7 @@ The current declarative `20.x` line declares these public compatibility bounds:
 - Angular Common/Core/Router: `>=20.0.0 <23.0.0`
 - RxJS: `>=7.8.0 <8.0.0`
 - Installed-package Node engine: `>=20.19`
-- Repository toolchain: Node `>=20.19 <25`, npm 10
+- Repository toolchain: Node `>=20.19 <25`, npm 11
 
 Angular 20, 21, and 22 are supported by `20.x`. Angular 19 consumers must stay on the latest `19.x` patch until upgrading Angular, but that legacy line is security-unsupported once `20.x` publishes. Keep peer ranges in the library package, the compatibility table in both READMEs, CI coverage, and release notes aligned. Do not widen a peer range based on compilation alone: verify installation, strict template compilation, interaction tests, and package consumption in the added Angular major.
 
@@ -51,11 +51,14 @@ npm run lint
 npm run test:ci
 npm run build:lib
 npm run build:app
+npm run validate:automation
 node tools/scripts/validate-package.mjs
 npm pack ./dist/libs/ngx-multi-level-push-menu --dry-run
 ```
 
 The package validator inspects the built artifact, not only the source workspace. The dry run is a final check that the npm tarball contains the intended README, declarations, bundles, metadata, and license without workspace-only files.
+
+On pull requests, CI also validates every commit subject and the pull-request title with Commitlint. This is part of the release contract because a squash merge normally turns the pull-request title into the default-branch commit that Semantic Release analyzes.
 
 The browser job runs separately on Node 22:
 
@@ -66,6 +69,8 @@ npx nx e2e multi-level-push-menu-example-e2e \
 ```
 
 Production dependency auditing also runs on Node 22 with `npm audit --omit=dev --audit-level=high`. A PR-only dependency-review gate rejects newly introduced vulnerabilities rated high or critical. Treat required-check failures as release blockers and review development-only advisories during every dependency update.
+
+CodeQL runs its extended JavaScript/TypeScript security query suite on every pull request and default-branch push, and weekly even without repository changes. It is part of the CI workflow that gates release authorization.
 
 For a convenient local aggregate, run:
 
@@ -96,7 +101,7 @@ Record exceptions explicitly in `CHANGELOG.md` and the compatibility table; neve
 - Root `README.md` is canonical.
 - `libs/ngx-multi-level-push-menu/README.md` mirrors the consumer-facing content and is shipped to npm.
 - `MIGRATION.md` explains user action required by changed behavior or types.
-- `CHANGELOG.md` records notable user-visible changes under `Unreleased` until a version is prepared.
+- `CHANGELOG.md` provides curated migration context; generated per-version notes live in GitHub Releases.
 - `SECURITY.md` and `SUPPORT.md` own private-reporting and public-support routes.
 
 Check README equivalence before release. Absolute repository links are preferred in mirrored/npm documentation because relative root links resolve differently from the packaged README.
@@ -105,41 +110,49 @@ Check README equivalence before release. Absolute repository links are preferred
 
 Use semantic versioning based on consumer impact:
 
-- Patch: compatible bug, security, performance, or documentation fix
+- Patch: compatible bug, security, or performance fix
 - Minor: backward-compatible capability or public API addition
 - Major: removal, incompatible type/behavior/style change, or intentionally narrowed compatibility
 
-Do not infer the next version solely from the Angular major. The package peer range is the source of truth. Deprecate compatibility APIs and document a replacement before removal whenever practical.
+Semantic Release derives this impact from Conventional Commits: `fix:` and `perf:` produce a patch, `feat:` produces a minor, and `!` or a `BREAKING CHANGE:` footer produces a major. Documentation, test, refactor, build, CI, and chore-only changes do not publish an identical package. Use the consumer impact, not the preferred version number, to choose the commit type.
+
+Do not infer the next version solely from the Angular major. The package peer range is the source of truth. Deprecate compatibility APIs and document a replacement before removal whenever practical. Repository manifests deliberately remain at `0.0.0-development`; only Semantic Release writes the calculated version into the built package.
 
 ## Release process
 
-Releases are intentionally prepared by a manual GitHub Actions workflow and published only from a version tag. Normal pushes to `master` do not bump or publish a version.
+Every successful CI run for a push to the repository's actual default branch hands the exact validated commit to the **Release** workflow. With branch protection requiring pull requests, this means a merge to `main` (or the current `master` default) is the only normal release entry point. Direct pushes must be disabled in repository rules.
 
-### 1. Prepare the release content
+Semantic Release then:
 
-- Ensure the default branch is green.
-- Move relevant `Unreleased` changelog entries into a dated version section.
-- Confirm migration guidance, compatibility tables, examples, package metadata, and both READMEs.
-- Choose an exact unused semantic version `X.Y.Z`.
-- Confirm npm and GitHub release credentials are available to the workflows; never place token values in the repository or logs.
+1. Reads the Conventional Commits since the last `vX.Y.Z` tag and calculates the next version.
+2. Stops successfully without publishing when no commit affects the package release.
+3. Rebuilds and validates the distributable, while `@semantic-release/npm` writes the calculated version only into `dist`.
+4. Creates and validates one immutable npm tarball.
+5. Publishes the public package through npm Trusted Publishing with automatically generated provenance.
+6. Creates the matching Git tag and GitHub Release, attaches the tarball, and posts release links to referenced issues and pull requests.
 
-### 2. Run “Prepare release”
+The workflow uses the scoped `GITHUB_TOKEN` for GitHub and an ephemeral OIDC identity for npm. Do not add `GH_PAT`, `NPM_TOKEN`, manual version commits, or hand-created release tags.
 
-In GitHub Actions, select the **Prepare release** workflow, choose `master`, enter the exact `X.Y.Z`, and run it.
+### One-time npm Trusted Publisher setup
 
-The workflow is responsible for:
+Configure this before merging the release automation:
 
-1. Validating the requested version and confirming its tag does not already exist
-2. Updating the root package version, library package version, and lockfile consistently
-3. Running the full validation/package checks
-4. Creating the release commit and an annotated `vX.Y.Z` tag
-5. Atomically pushing the commit and tag so a partial release is not published
+1. Open the settings for `@ramiz4/ngx-multi-level-push-menu` on npm.
+2. Add a GitHub Actions trusted publisher with organization/user `ramiz4`, repository `ngx-multi-level-push-menu`, workflow filename `release.yml`, no environment, and allowed action **npm publish**.
+3. Merge a release-worthy pull request and verify the first OIDC publication.
+4. Set publishing access to require 2FA and disallow tokens, revoke the old automation token, and delete the repository's obsolete `NPM_TOKEN` and `GH_PAT` secrets.
 
-Do not create a second manual version commit or lightweight tag around this process.
+The workflow intentionally uses a GitHub-hosted runner, npm `>=11.5.1`, Node `>=22.14`, `id-token: write`, and no shared package-manager cache. These are requirements of npm Trusted Publishing, not optional repository conventions.
 
-### 3. Verify tag-triggered publication
+### Required repository rules
 
-The `vX.Y.Z` tag starts the publish workflow. It rebuilds and validates the package, then publishes to npm with provenance. Verify:
+Protect the default branch with pull requests, required approvals, resolved conversations, and these required checks: both `Validate` jobs, all three `Consumer` jobs, `End-to-end (Chrome)`, `Dependency review`, and `CodeQL (JavaScript/TypeScript)`. Require a linear history or squash merges, block force pushes and deletions, and prevent bypass/direct pushes. Protect the `v*` tag namespace as well, while allowing only the Release workflow's GitHub Actions identity to create release tags. Keep pull-request titles in Conventional Commit form because a squash merge uses that title as release input.
+
+The workflows accept `main` and `master` during branch migration, but publication always compares against `github.event.repository.default_branch`. Rename the default branch separately if `main` is the desired canonical name, then update `nx.json`, documentation links, and branch rules in the same administrative migration.
+
+### Verify a publication
+
+After a release-worthy merge, verify:
 
 ```bash
 npm view @ramiz4/ngx-multi-level-push-menu version
@@ -147,12 +160,14 @@ npm view @ramiz4/ngx-multi-level-push-menu dist-tags --json
 npm pack @ramiz4/ngx-multi-level-push-menu@X.Y.Z --dry-run
 ```
 
-Confirm the npm version, provenance, README, license, peer dependencies, and tarball contents. Create or verify the matching GitHub release notes and link `MIGRATION.md` for any required user action.
+Confirm the npm version, provenance, README, license, peer dependencies, tarball contents, `vX.Y.Z` tag, and generated GitHub Release. Breaking pull requests must already link `MIGRATION.md` before merge.
 
-### 4. Handle failures safely
+### Handle failures safely
 
-- If preparation fails before the atomic push, fix the cause and rerun with the same still-unused version.
-- If the tag exists but npm publication failed, fix the workflow or credential issue and rerun the tag-triggered publish job; do not move the tag.
+- If CI fails, no release workflow receives publish authority. Fix the failure in a new pull request.
+- If release analysis or validation fails before publication, fix the cause and rerun the failed Release workflow or merge a corrective commit.
+- If npm publication succeeds but a later GitHub step fails, inspect npm and GitHub state before rerunning; Semantic Release is designed to resume from repository state.
+- Never move or recreate an existing release tag.
 - If an incorrect package was already published, do not overwrite that version. Follow npm policy and issue a corrected patch release.
 - Treat revoking credentials, changing dist-tags, deprecating, or unpublishing a version as explicit maintainer actions with a recorded reason.
 

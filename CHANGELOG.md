@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this project are documented here. The project follows [Semantic Versioning](https://semver.org/) and the structure of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Curated migration-relevant changes are documented here. The project follows [Semantic Versioning](https://semver.org/); Semantic Release generates the authoritative per-version notes in [GitHub Releases](https://github.com/ramiz4/ngx-multi-level-push-menu/releases) from Conventional Commits.
 
 ## Unreleased
 
@@ -26,6 +26,7 @@ All notable changes to this project are documented here. The project follows [Se
 - Preserved native browser behavior for external, fragment, target, and modified-click navigation
 - Made Router optional and limited Angular Router interception to eligible internal links
 - Made numeric sizing values consistently mean pixels; string values are CSS lengths
+- Replaced manual release commits, PAT pushes, and tag-triggered token publishing with Conventional Commits and Semantic Release after successful default-branch CI
 
 ### Fixed
 
@@ -40,6 +41,7 @@ All notable changes to this project are documented here. The project follows [Se
 ### Security
 
 - Removed arbitrary inline SVG rendering in favor of a strict, length-bounded SVG path parser that discards scripts, event handlers, external references, and unsupported markup
+- Replaced long-lived npm publication tokens with npm Trusted Publishing through short-lived GitHub OIDC credentials and automatic provenance
 
 ### Deprecated
 

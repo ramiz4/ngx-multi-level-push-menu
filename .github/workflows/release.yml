@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main, master]
+
+permissions: {}
+
+concurrency:
+  group: npm-release-${{ github.event.repository.id }}
+  cancel-in-progress: false
+
+env:
+  CI: true
+  NX_DAEMON: false
+  NX_ISOLATE_PLUGINS: false
+  NPM_VERSION: 11.18.0
+
+jobs:
+  release:
+    name: Semantic release
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == github.event.repository.default_branch &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+      issues: write
+      pull-requests: write
+    env:
+      CYPRESS_INSTALL_BINARY: '0'
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_BRANCH: ${{ github.event.repository.default_branch }}
+
+    steps:
+      - name: Checkout the validated commit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js for trusted publishing
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Use the pinned npm version
+        run: npm install --global npm@"$NPM_VERSION" --ignore-scripts
+
+      - name: Verify the release commit
+        env:
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          git fetch --no-tags origin "$RELEASE_BRANCH"
+          git merge-base --is-ancestor HEAD "origin/$RELEASE_BRANCH"
+
+      - name: Install dependencies without a shared release cache
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Build and validate the package
+        run: |
+          npm run build:lib
+          node tools/scripts/validate-package.mjs
+          mkdir -p release-artifacts
+
+      - name: Analyze, tag, publish, and create the GitHub release
+        run: npm run release

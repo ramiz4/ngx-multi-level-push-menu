@@ -33,6 +33,8 @@ export default {
     [
       '@semantic-release/github',
       {
+        failCommentCondition: false,
+        releasedLabels: false,
         assets: [
           {
             label: 'npm package tarball',

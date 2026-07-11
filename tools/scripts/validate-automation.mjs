@@ -52,6 +52,14 @@ assert(
   /\bpackage-manager-cache:\s*false\b/.test(releaseWorkflow),
   'Release builds must disable the shared package-manager cache.',
 );
+assert(
+  /\bGITHUB_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/.test(releaseWorkflow),
+  'Semantic Release must receive github.token as GITHUB_TOKEN for authenticated Git tag pushes.',
+);
+assert(
+  !/\bGH_TOKEN:/.test(releaseWorkflow),
+  'Do not pass github.token as GH_TOKEN: Semantic Release requires the x-access-token prefix selected by GITHUB_TOKEN.',
+);
 
 assert(
   releaseConfig.tagFormat === 'v${version}',
@@ -73,6 +81,22 @@ assert(
 assert(
   npmPlugin[1].tarballDir === 'release-artifacts',
   'Semantic Release must retain the exact npm tarball for validation and GitHub Releases.',
+);
+
+const githubPlugin = releaseConfig.plugins.find(
+  (entry) => Array.isArray(entry) && entry[0] === '@semantic-release/github',
+);
+assert(
+  githubPlugin !== undefined,
+  'Missing @semantic-release/github configuration.',
+);
+assert(
+  githubPlugin[1].failCommentCondition === false,
+  'Release failures must not create GitHub issues as a secondary failure path.',
+);
+assert(
+  githubPlugin[1].releasedLabels === false,
+  'Releases must not depend on repository-specific labels.',
 );
 
 const analyzerOptions = releaseConfig.plugins.find(

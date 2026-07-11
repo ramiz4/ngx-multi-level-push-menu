@@ -35,7 +35,7 @@ jobs:
       pull-requests: write
     env:
       CYPRESS_INSTALL_BINARY: '0'
-      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
       RELEASE_BRANCH: ${{ github.event.repository.default_branch }}
 
     steps:

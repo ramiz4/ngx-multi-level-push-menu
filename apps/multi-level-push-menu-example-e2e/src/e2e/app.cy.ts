@@ -41,6 +41,7 @@ describe('multi-level push menu playground', () => {
     getActiveMenuControl('Live dashboard').click();
 
     cy.location('pathname').should('eq', '/collections');
+    cy.getByTestId('route-collections').scrollIntoView();
     cy.getByTestId('route-collections').should('be.visible');
     cy.getByTestId('event-kind').should('have.text', 'item');
     cy.getByTestId('event-label').should(

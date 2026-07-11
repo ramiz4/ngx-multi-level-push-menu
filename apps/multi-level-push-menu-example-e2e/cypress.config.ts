@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  allowCypressEnv: false,
   e2e: {
     ...nxE2EPreset(projectRoot, {
       webServerCommands: {

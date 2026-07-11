@@ -7,16 +7,8 @@
   "implicitDependencies": ["multi-level-push-menu-example"],
   "targets": {
     "e2e": {
-      "executor": "@nx/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/multi-level-push-menu-example-e2e/cypress.config.ts",
-        "devServerTarget": "multi-level-push-menu-example:serve:development",
-        "testingType": "e2e"
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "multi-level-push-menu-example:serve:production"
-        }
+        "config-file": "./cypress.config.ts"
       }
     }
   }

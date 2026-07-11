@@ -58,6 +58,7 @@
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
+      "continuous": true,
       "defaultConfiguration": "development",
       "configurations": {
         "production": {

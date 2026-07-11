@@ -75,7 +75,7 @@
     },
     "serve": {
       "inputs": ["default", "^production", "styles"],
-      "cache": true
+      "cache": false
     }
   },
   "useInferencePlugins": true,
@@ -92,6 +92,16 @@
       "options": {
         "targetName": "test"
       }
+    },
+    {
+      "plugin": "@nx/cypress/plugin",
+      "options": {
+        "targetName": "e2e",
+        "ciTargetName": "e2e-ci",
+        "componentTestingTargetName": "component-test",
+        "openTargetName": "open-cypress"
+      }
     }
-  ]
+  ],
+  "analytics": false
 }

@@ -1,237 +1,378 @@
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync,
-} from '@angular/core/testing';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import {
-  provideRouter,
-  Routes,
-  withComponentInputBinding,
-} from '@angular/router';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MultiLevelPushMenuItem, MultiLevelPushMenuOptions } from './models';
 import { MultiLevelPushMenuComponent } from './multi-level-push-menu.component';
 import { MultiLevelPushMenuService } from './multi-level-push-menu.service';
 
-// Create Dummy components for testing
-@Component({ template: '' })
-class DummyComponent {}
-
-export const routes: Routes = [
-  { path: '', component: DummyComponent },
-  { path: 'dummy', component: DummyComponent },
-  { path: '**', component: DummyComponent },
-];
-
-// Sample menu data for testing
-const testMenuItems: MultiLevelPushMenuItem[] = [
-  {
-    name: 'Home',
-    icon: 'fa fa-home',
-    link: '/home',
-  },
-  {
-    name: 'Collections',
-    icon: 'fa fa-list',
-    items: [
-      {
-        name: 'Collection 1',
-        icon: 'fa fa-folder',
-        link: '/collections/1',
-      },
-      {
-        name: 'Collection 2',
-        icon: 'fa fa-folder',
-        link: '/collections/2',
-      },
-    ],
-  },
-];
-
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
-});
+@Component({
+  selector: 'ngx-test-legacy-selector-host',
+  standalone: true,
+  imports: [MultiLevelPushMenuComponent],
+  template: `<ramiz4-multi-level-push-menu [menu]="menu" />`,
+})
+class LegacySelectorHostComponent {
+  readonly menu: readonly MultiLevelPushMenuItem[] = [{ name: 'Legacy item' }];
+}
 
 describe('MultiLevelPushMenuComponent', () => {
-  let component: MultiLevelPushMenuComponent;
   let fixture: ComponentFixture<MultiLevelPushMenuComponent>;
-  let menuService: MultiLevelPushMenuService;
+  let component: MultiLevelPushMenuComponent;
+  let element: HTMLElement;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [MultiLevelPushMenuComponent],
-      providers: [
-        { provide: 'WINDOW', useValue: window },
-        provideRouter(routes, withComponentInputBinding()),
-        provideAnimations(),
-        MultiLevelPushMenuService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA], // Add schema to ignore unknown properties
+  const menu: MultiLevelPushMenuItem[] = [
+    {
+      id: 'alpha',
+      name: 'Alpha',
+      items: [{ name: 'Alpha child' }],
+    },
+    {
+      id: 'beta',
+      name: 'Beta',
+      items: [{ name: 'Beta child' }],
+    },
+    { title: 'Constructor-compatible title' },
+  ];
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MultiLevelPushMenuComponent, LegacySelectorHostComponent],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(MultiLevelPushMenuComponent);
     component = fixture.componentInstance;
-    menuService = TestBed.inject(MultiLevelPushMenuService);
-
-    // Spy on various methods and services
-    jest.spyOn(component['menuBuilderService'], 'createMenuStructure');
-    jest.spyOn(component['menuAnimationService'], 'animateCollapse');
-    jest.spyOn(component['menuAnimationService'], 'animateExpand');
-    jest.spyOn(menuService, 'menuItemClicked');
-    jest.spyOn(menuService, 'groupItemClicked');
-
-    // Supply test menu data
-    component.menu = testMenuItems;
-
+    element = fixture.nativeElement as HTMLElement;
+    component.options = new MultiLevelPushMenuOptions({
+      title: 'Test menu',
+      menu,
+    });
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('is standalone and needs no explicit provider setup', () => {
     expect(component).toBeTruthy();
+    expect(element.querySelector('nav')).not.toBeNull();
   });
 
-  it('should initialize with default options when no options are provided', () => {
-    expect(component.options).toBeDefined();
-    expect(component.options.collapsed).toBeFalsy();
-    // Checking for string or number is valid since we now support both
-    const menuWidth = component.options.menuWidth;
+  it('keeps the historical ramiz4 selector as a compatibility alias', () => {
+    const legacyFixture = TestBed.createComponent(LegacySelectorHostComponent);
+    legacyFixture.detectChanges();
+
     expect(
-      typeof menuWidth === 'string' ? menuWidth : String(menuWidth)
-    ).toContain('300');
+      legacyFixture.nativeElement.querySelector(
+        'ramiz4-multi-level-push-menu .ngx-push-menu',
+      ),
+    ).not.toBeNull();
   });
 
-  it('should create menu structure when initialized with menu items', () => {
-    expect(
-      component['menuBuilderService'].createMenuStructure
-    ).toHaveBeenCalled();
+  it('renders plain objects and falls back from name to title', () => {
+    expect(element.textContent).toContain('Alpha');
+    expect(element.textContent).toContain('Constructor-compatible title');
   });
 
-  it('should apply custom options when provided', () => {
-    const customOptions = new MultiLevelPushMenuOptions({
+  it('applies the initial collapsed state immediately', () => {
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
       collapsed: true,
-      menuWidth: 400,
-      mode: 'overlap', // Type assertion to ensure it's recognized as the literal type
-      overlapWidth: '50',
-    } as Partial<MultiLevelPushMenuOptions>);
-
-    // Apply to the component options - no type assertion needed this way
-    component.options = { ...component.options, ...customOptions };
+      fullCollapse: true,
+    });
     fixture.detectChanges();
 
-    expect(component.options.collapsed).toBe(true);
-    expect(component.options.menuWidth).toBe(400);
-    expect(component.options.mode).toBe('overlap');
-    expect(component.options.overlapWidth).toBe('50');
-  });
-
-  it('should toggle menu state when title icon is clicked', () => {
-    // Mock the event object
-    const mockEvent = {
-      preventDefault: jest.fn(),
-      stopPropagation: jest.fn(),
-    } as unknown as MouseEvent;
-
-    // Test expanding when collapsed
-    component.options = { ...component.options, collapsed: true };
-    fixture.detectChanges();
-
-    component.titleIconClick(mockEvent);
-    expect(component['menuAnimationService'].animateExpand).toHaveBeenCalled();
-    expect(component.options.collapsed).toBe(false);
-
-    // Test collapsing when expanded
-    component.titleIconClick(mockEvent);
+    const wrapper = element.querySelector('.ngx-push-menu');
+    const navigation = element.querySelector('nav');
+    expect(wrapper?.classList).toContain('ngx-push-menu--collapsed');
+    expect(navigation?.getAttribute('aria-hidden')).toBe('true');
+    expect(navigation?.hasAttribute('inert')).toBe(true);
     expect(
-      component['menuAnimationService'].animateCollapse
-    ).toHaveBeenCalled();
+      element.querySelector<HTMLElement>('.ngx-push-menu__item-control')
+        ?.tabIndex,
+    ).toBe(-1);
   });
 
-  it('should emit events when menu items are clicked', fakeAsync(() => {
-    // Create a mock menu item
-    const mockItem: MultiLevelPushMenuItem = {
-      name: 'Test Item',
-      link: '/test',
-    };
+  it('keeps only the visible toggle reachable when partially collapsed', () => {
+    component.collapseMenu();
+    fixture.detectChanges();
 
-    // Test the handleMenuItemClick method
-    component['handleMenuItemClick'](mockItem);
-    tick();
-
-    expect(menuService.menuItemClicked).toHaveBeenCalledWith(mockItem);
-  }));
-
-  it('should emit events when group items are clicked', fakeAsync(() => {
-    // Create a mock group item
-    const mockGroupItem: MultiLevelPushMenuItem = {
-      name: 'Test Group',
-      items: [{ name: 'Child 1', link: '/child1' }],
-    };
-    const mockParentLevelHolder = document.createElement('div');
-
-    // Mock the submenu creation method
-    jest
-      .spyOn(component['menuBuilderService'], 'createSubmenu')
-      .mockImplementation(() => {
-        // Do nothing but in a non-empty way
-        return;
-      });
-
-    // Test the group item click method
-    component['handleSubmenuClick'](
-      'test-key',
-      1,
-      mockGroupItem,
-      mockParentLevelHolder
-    );
-    tick(20);
-
-    expect(menuService.groupItemClicked).toHaveBeenCalledWith(mockGroupItem);
-  }));
-
-  // Test for proper cleanup
-  it('should unsubscribe from subscriptions on destroy', () => {
-    // Setup spies
-    const collapseUnsubSpy = jest.spyOn(
-      component['collapseSubscription'],
-      'unsubscribe'
-    );
-    const expandUnsubSpy = jest.spyOn(
-      component['expandSubscription'],
-      'unsubscribe'
-    );
-
-    component.ngOnDestroy();
-
-    expect(collapseUnsubSpy).toHaveBeenCalled();
-    expect(expandUnsubSpy).toHaveBeenCalled();
+    expect(
+      element.querySelector<HTMLElement>('.ngx-push-menu__toggle')?.tabIndex,
+    ).toBe(0);
+    expect(
+      Array.from(
+        element.querySelectorAll<HTMLElement>(
+          '.ngx-push-menu__item-control, .ngx-push-menu__back',
+        ),
+      ).every((control) => control.tabIndex === -1),
+    ).toBe(true);
+    expect(
+      element.querySelector('.ngx-push-menu__items')?.hasAttribute('inert'),
+    ).toBe(true);
   });
 
-  // Test accessibility features
-  it('should set up ARIA landmarks after view init', () => {
-    // Spy on accessibility service
-    const ariaSetupSpy = jest.spyOn(
-      component['accessibilityService'],
-      'setupAriaLandmarks'
+  it('keeps sibling branches isolated after repeated back navigation', () => {
+    clickControl('Alpha');
+    expect(activeLevelTitle()).toBe('Alpha');
+    clickBack();
+
+    clickControl('Beta');
+    expect(activeLevelTitle()).toBe('Beta');
+    expect(activeLevelText()).toContain('Beta child');
+    expect(activeLevelText()).not.toContain('Alpha child');
+    clickBack();
+
+    clickControl('Alpha');
+    expect(activeLevelTitle()).toBe('Alpha');
+    expect(activeLevelText()).toContain('Alpha child');
+    expect(activeLevelText()).not.toContain('Beta child');
+  });
+
+  it('removes old levels when menu data becomes empty', () => {
+    clickControl('Alpha');
+    expect(component.activeLevelIndex).toBe(1);
+
+    component.menu = [];
+    fixture.detectChanges();
+
+    expect(component.activeLevelIndex).toBe(0);
+    expect(element.querySelectorAll('.ngx-push-menu__level')).toHaveLength(1);
+    expect(activeLevelText()).toContain('No menu items');
+    expect(activeLevelText()).not.toContain('Alpha child');
+  });
+
+  it('emits typed leaf and group events once', () => {
+    const groupSpy = jest.spyOn(component.groupActivate, 'emit');
+    const itemSpy = jest.spyOn(component.itemActivate, 'emit');
+
+    clickControl('Alpha');
+    clickControl('Alpha child');
+
+    expect(groupSpy).toHaveBeenCalledTimes(1);
+    expect(groupSpy.mock.calls[0]?.[0]?.path.map((item) => item.name)).toEqual([
+      'Alpha',
+    ]);
+    expect(itemSpy).toHaveBeenCalledTimes(1);
+    expect(itemSpy.mock.calls[0]?.[0]?.path.map((item) => item.name)).toEqual([
+      'Alpha',
+      'Alpha child',
+    ]);
+  });
+
+  it('supports documented service commands and target IDs', () => {
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
+      menuID: 'primary-menu',
+      title: 'Test menu',
+    });
+    fixture.detectChanges();
+    const service = TestBed.inject(MultiLevelPushMenuService);
+
+    service.closeMenu('another-menu');
+    expect(component.collapsed).toBe(false);
+
+    service.closeMenu('primary-menu');
+    expect(component.collapsed).toBe(true);
+
+    service.openMenu('primary-menu');
+    expect(component.collapsed).toBe(false);
+
+    service.closeMenu('primary-menu');
+    service.navigateToLevel(0, 'primary-menu');
+    expect(component.collapsed).toBe(false);
+
+    service.navigateToLevel('beta', 'primary-menu');
+    fixture.detectChanges();
+    expect(activeLevelTitle()).toBe('Beta');
+    service.goBack('primary-menu');
+    fixture.detectChanges();
+    expect(activeLevelTitle()).toBe('Test menu');
+  });
+
+  it('uses vertical arrow keys without trapping Tab', () => {
+    const controls = Array.from(
+      element.querySelectorAll<HTMLElement>('.ngx-push-menu__item-control'),
+    );
+    controls[0]?.focus();
+    controls[0]?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
     );
 
-    component.ngAfterViewInit();
+    expect(document.activeElement).toBe(controls[1]);
 
-    expect(ariaSetupSpy).toHaveBeenCalled();
+    const tabEvent = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      bubbles: true,
+      cancelable: true,
+    });
+    controls[1]?.dispatchEvent(tabEvent);
+    expect(tabEvent.defaultPrevented).toBe(false);
   });
+
+  it('continues arrow navigation after focus reaches the header toggle', () => {
+    const firstItem = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__item-control',
+    );
+    const toggle = element.querySelector<HTMLElement>('.ngx-push-menu__toggle');
+    firstItem?.focus();
+    firstItem?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }),
+    );
+    expect(document.activeElement).toBe(toggle);
+
+    toggle?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+    );
+    expect(document.activeElement).toBe(firstItem);
+  });
+
+  it('keeps a separately controlled collapsed input authoritative', () => {
+    component.collapsed = true;
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
+      collapsed: false,
+      direction: 'rtl',
+    });
+    fixture.detectChanges();
+
+    expect(component.collapsed).toBe(true);
+  });
+
+  it('preserves the active path when only visual options change', () => {
+    clickControl('Alpha');
+
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
+      title: 'Updated title',
+      direction: 'rtl',
+    });
+    fixture.detectChanges();
+
+    expect(activeLevelTitle()).toBe('Alpha');
+    expect(element.querySelector('.ngx-push-menu')?.hasAttribute('dir')).toBe(
+      false,
+    );
+    expect(element.querySelector('nav')?.getAttribute('dir')).toBe('rtl');
+  });
+
+  it('preserves an internally collapsed state across visual option updates', () => {
+    component.collapseMenu();
+
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
+      direction: 'rtl',
+      mode: 'overlap',
+    });
+    fixture.detectChanges();
+
+    expect(component.collapsed).toBe(true);
+  });
+
+  it('renders disabled links as native disabled buttons', () => {
+    component.menu = [
+      { name: 'Disabled link', link: '/should-not-open', disabled: true },
+    ];
+    fixture.detectChanges();
+
+    const control = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__item-control',
+    );
+    expect(control?.tagName).toBe('BUTTON');
+    expect(control?.hasAttribute('disabled')).toBe(true);
+    expect(control?.hasAttribute('href')).toBe(false);
+  });
+
+  it('resets the level once when a controlled collapse does not preserve it', () => {
+    const levelChange = jest.spyOn(component.levelChange, 'emit');
+    clickControl('Alpha');
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
+      preserveActiveLevelOnCollapse: false,
+    });
+
+    component.collapsed = true;
+    fixture.detectChanges();
+
+    expect(component.activeLevelIndex).toBe(0);
+    expect(levelChange).toHaveBeenLastCalledWith(0);
+  });
+
+  it('only navigates to enabled groups within maxDepth', () => {
+    clickControl('Alpha');
+    component.navigateToLevel('Constructor-compatible title');
+    expect(activeLevelTitle()).toBe('Alpha');
+
+    component.menu = [
+      {
+        id: 'disabled',
+        name: 'Disabled',
+        disabled: true,
+        items: [{ name: 'Hidden child' }],
+      },
+      {
+        id: 'level-one',
+        name: 'Level one',
+        items: [
+          {
+            id: 'level-two',
+            name: 'Level two',
+            items: [{ name: 'Deep leaf' }],
+          },
+        ],
+      },
+    ];
+    component.options = new MultiLevelPushMenuOptions({ maxDepth: 1 });
+    fixture.detectChanges();
+
+    component.navigateToLevel('disabled');
+    component.navigateToLevel('level-two');
+    fixture.detectChanges();
+    expect(component.activeLevelIndex).toBe(0);
+
+    component.navigateToLevel('level-one');
+    fixture.detectChanges();
+    expect(activeLevelTitle()).toBe('Level one');
+  });
+
+  it('sanitizes markup icons through Angular', () => {
+    component.menu = [
+      {
+        name: 'Unsafe icon',
+        icon: '<img src="x" onerror="window.__unsafe = true">',
+      },
+    ];
+    fixture.detectChanges();
+
+    const icon = element.querySelector('.ngx-push-menu__item-icon');
+    expect(icon?.innerHTML).not.toContain('onerror');
+  });
+
+  function clickControl(label: string): void {
+    const control = Array.from(
+      element.querySelectorAll<HTMLElement>('.ngx-push-menu__item-control'),
+    ).find((candidate) => candidate.textContent?.trim() === label);
+    expect(control).toBeDefined();
+    control?.click();
+    fixture.detectChanges();
+  }
+
+  function clickBack(): void {
+    const back = element.querySelector<HTMLElement>('.ngx-push-menu__back');
+    expect(back).not.toBeNull();
+    back?.click();
+    fixture.detectChanges();
+  }
+
+  function activeLevelTitle(): string {
+    return (
+      element
+        .querySelector(
+          '.ngx-push-menu__level[data-active="true"] .ngx-push-menu__title',
+        )
+        ?.textContent?.trim() ?? ''
+    );
+  }
+
+  function activeLevelText(): string {
+    return (
+      element.querySelector('.ngx-push-menu__level[data-active="true"]')
+        ?.textContent ?? ''
+    );
+  }
 });

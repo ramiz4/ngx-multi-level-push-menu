@@ -4,10 +4,12 @@
   "projectType": "library",
   "sourceRoot": "libs/ngx-multi-level-push-menu/src",
   "prefix": "ngx-multi-level-push-menu",
+  "tags": ["lib", "ui", "navigation", "menu"],
   "targets": {
     "build": {
       "executor": "@nx/angular:package",
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
         "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json",
         "project": "libs/ngx-multi-level-push-menu/ng-package.json"
@@ -19,19 +21,12 @@
         "development": {
           "tsConfig": "libs/ngx-multi-level-push-menu/tsconfig.lib.json"
         }
-      },
-      "defaultConfiguration": "production"
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/ngx-multi-level-push-menu"],
-      "options": {
-        "jestConfig": "libs/ngx-multi-level-push-menu/jest.config.ts"
       }
     },
-    "lint": {
-      "executor": "@nx/eslint:lint"
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
     }
-  },
-  "tags": ["lib", "ui", "navigation", "menu"]
+  }
 }

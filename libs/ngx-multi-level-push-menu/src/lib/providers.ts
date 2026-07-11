@@ -1,16 +1,11 @@
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import { MultiLevelPushMenuService } from './multi-level-push-menu/multi-level-push-menu.service';
-import { DeviceDetectorService } from './multi-level-push-menu/services';
 
 /**
- * Provides the necessary services for the Multi-Level Push Menu component
- * to work in a standalone application.
+ * Compatibility provider for applications that already call this helper.
  *
- * @returns The providers needed for the Multi-Level Push Menu
+ * @deprecated No provider is required. MultiLevelPushMenuService is root-provided.
  */
 export function provideMultiLevelPushMenu(): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    MultiLevelPushMenuService,
-    DeviceDetectorService,
-  ]);
+  return makeEnvironmentProviders([MultiLevelPushMenuService]);
 }

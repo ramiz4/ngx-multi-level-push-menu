@@ -1,7 +1,178 @@
-<ramiz4-multi-level-push-menu [options]="options">
-  <h1>Welcome {{ title }}</h1>
-  <button class="my-btn" (click)="collapseMenu()">collapse menu</button>
-  <button class="my-btn" (click)="expandMenu()">expand menu</button>
+<ngx-multi-level-push-menu
+  class="demo-menu"
+  data-testid="demo-menu"
+  [class.demo-menu--midnight]="theme === 'midnight'"
+  [attr.data-collapsed]="collapsed"
+  [attr.data-direction]="options.direction"
+  [attr.data-mode]="options.mode"
+  [attr.data-theme]="theme"
+  [menu]="menuItems"
+  [options]="options"
+  [collapsed]="collapsed"
+  (collapsedChange)="setCollapsed($event)"
+  (itemActivate)="onItemActivate($event)"
+  (groupActivate)="onGroupActivate($event)"
+  (levelChange)="onLevelChange($event)"
+>
+  <main class="demo-shell">
+    <header class="demo-topbar">
+      <a class="demo-brand" href="/home" aria-label="Nexus demo home">
+        <span class="demo-brand__mark" aria-hidden="true">N</span>
+        <span>
+          <strong>Nexus UI</strong>
+          <small>Push menu playground</small>
+        </span>
+      </a>
 
-  <router-outlet></router-outlet>
-</ramiz4-multi-level-push-menu>
+      <div class="demo-topbar__actions" aria-label="Menu state controls">
+        <span class="demo-state-dot" [class.is-active]="!collapsed"></span>
+        <span data-testid="menu-state">
+          {{ collapsed ? 'Collapsed' : 'Expanded' }}
+        </span>
+        <button
+          type="button"
+          class="demo-icon-button"
+          data-testid="collapse-menu"
+          aria-label="Collapse menu"
+          [disabled]="collapsed"
+          (click)="setCollapsed(true)"
+        >
+          <span aria-hidden="true">&larr;</span>
+        </button>
+        <button
+          type="button"
+          class="demo-icon-button"
+          data-testid="expand-menu"
+          aria-label="Expand menu"
+          [disabled]="!collapsed"
+          (click)="setCollapsed(false)"
+        >
+          <span aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="demo-content">
+      <section class="demo-hero" aria-labelledby="demo-heading">
+        <div>
+          <p class="demo-eyebrow">Angular navigation, reimagined</p>
+          <h1 id="demo-heading">Deep navigation.<br />Delightfully simple.</h1>
+          <p class="demo-lead">
+            A provider-free, accessible push menu with typed events, responsive
+            motion and a tiny integration surface.
+          </p>
+          <div class="demo-pills" aria-label="Library highlights">
+            <span>Standalone</span>
+            <span>Typed outputs</span>
+            <span>RTL ready</span>
+            <span>Zero icon dependencies</span>
+          </div>
+        </div>
+
+        <div class="demo-hero__visual" aria-hidden="true">
+          <div class="demo-orbit demo-orbit--outer"></div>
+          <div class="demo-orbit demo-orbit--inner"></div>
+          <div class="demo-cube"><span>N</span></div>
+          <span class="demo-particle demo-particle--one"></span>
+          <span class="demo-particle demo-particle--two"></span>
+          <span class="demo-particle demo-particle--three"></span>
+        </div>
+      </section>
+
+      <section class="demo-playground" aria-labelledby="playground-heading">
+        <div class="demo-section-heading">
+          <div>
+            <p class="demo-eyebrow">Live configuration</p>
+            <h2 id="playground-heading">Make it yours</h2>
+          </div>
+          <p>Every control updates the component through public inputs.</p>
+        </div>
+
+        <div class="demo-toolbar">
+          <fieldset class="demo-control-group">
+            <legend>Transition</legend>
+            <div class="demo-segmented">
+              <button
+                type="button"
+                data-testid="mode-cover"
+                [class.is-selected]="options.mode === 'cover'"
+                [attr.aria-pressed]="options.mode === 'cover'"
+                (click)="setMode('cover')"
+              >
+                Cover
+              </button>
+              <button
+                type="button"
+                data-testid="mode-overlap"
+                [class.is-selected]="options.mode === 'overlap'"
+                [attr.aria-pressed]="options.mode === 'overlap'"
+                (click)="setMode('overlap')"
+              >
+                Overlap
+              </button>
+            </div>
+          </fieldset>
+
+          <div class="demo-control-group">
+            <span>Direction</span>
+            <button
+              type="button"
+              class="demo-setting-button"
+              data-testid="toggle-direction"
+              (click)="toggleDirection()"
+            >
+              {{ options.direction.toUpperCase() }}
+              <span aria-hidden="true">&#8646;</span>
+            </button>
+          </div>
+
+          <div class="demo-control-group">
+            <span>Theme</span>
+            <button
+              type="button"
+              class="demo-setting-button"
+              data-testid="toggle-theme"
+              (click)="toggleTheme()"
+            >
+              {{ theme === 'aurora' ? 'Aurora' : 'Midnight' }}
+              <span class="demo-theme-swatch" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="demo-event-card" aria-live="polite">
+          <div>
+            <span class="demo-event-card__icon" aria-hidden="true"
+              >&#8599;</span
+            >
+            <span>
+              <small>Latest typed output</small>
+              <strong data-testid="event-label">{{ lastEvent.label }}</strong>
+            </span>
+          </div>
+          <dl>
+            <div>
+              <dt>Event</dt>
+              <dd data-testid="event-kind">{{ lastEvent.kind }}</dd>
+            </div>
+            <div>
+              <dt>Level</dt>
+              <dd data-testid="event-depth">{{ activeLevel }}</dd>
+            </div>
+            <div>
+              <dt>Path</dt>
+              <dd data-testid="event-path">{{ lastEvent.path }}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <router-outlet></router-outlet>
+
+      <footer class="demo-footer">
+        <span>Built for Angular teams who care about the details.</span>
+        <span>Keyboard &bull; Touch &bull; Mouse</span>
+      </footer>
+    </div>
+  </main>
+</ngx-multi-level-push-menu>

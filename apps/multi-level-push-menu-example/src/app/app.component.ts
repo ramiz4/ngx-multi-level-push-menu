@@ -1,10 +1,44 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {
+  MenuActivationEvent,
   MultiLevelPushMenuComponent,
+  MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
-  MultiLevelPushMenuService,
 } from '@ramiz4/ngx-multi-level-push-menu';
+
+type DemoEventKind = 'ready' | 'group' | 'item' | 'state';
+type DemoTheme = 'aurora' | 'midnight';
+
+interface DemoMenuData {
+  readonly kind: 'route' | 'action' | 'group';
+  readonly description: string;
+}
+
+interface DemoEvent {
+  readonly kind: DemoEventKind;
+  readonly label: string;
+  readonly path: string;
+  readonly depth: number;
+}
+
+const icon = (path: string): string =>
+  `<svg viewBox="0 0 24 24"><path d="${path}"></path></svg>`;
+
+const outlineIcon = (path: string): string =>
+  `<svg viewBox="0 0 24 24"><path d="${path}" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg>`;
+
+const ICONS = {
+  brand: icon('M4 3h7v7H4zM13 3h7v7h-7zM4 12h7v9H4zM13 12h7v9h-7z'),
+  home: icon('M3 11l9-8 9 8v10h-6v-6H9v6H3z'),
+  products: icon('M3 6l9-4 9 4-9 4zM3 9l9 4 9-4v9l-9 4-9-4z'),
+  analytics: icon('M4 20V10h4v10zM10 20V4h4v16zM16 20v-7h4v7z'),
+  commerce: outlineIcon('M3 4h2l2 11h11l2-8H7M9 20h1M17 20h1'),
+  resources: icon('M4 4h7v16H4zM13 4h7v16h-7zM7 8h1M16 8h1'),
+  guide: outlineIcon('M5 3h14v18H5zM8 7h8M8 11h8M8 15h5'),
+  about: icon('M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0z'),
+  spark: icon('M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z'),
+} as const;
 
 @Component({
   selector: 'ramiz4-root',
@@ -13,229 +47,245 @@ import {
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
-  title = 'multi-level-push-menu-example';
+export class AppComponent {
+  readonly menuItems: readonly MultiLevelPushMenuItem<DemoMenuData>[] = [
+    {
+      id: 'home',
+      name: 'Overview',
+      icon: ICONS.home,
+      link: '/home',
+      data: {
+        kind: 'route',
+        description: 'Return to the playground overview',
+      },
+    },
+    {
+      id: 'products',
+      name: 'Products',
+      icon: ICONS.products,
+      ariaLabel: 'Open Products menu',
+      data: {
+        kind: 'group',
+        description: 'Explore product areas',
+      },
+      items: [
+        {
+          id: 'analytics',
+          name: 'Analytics',
+          icon: ICONS.analytics,
+          ariaLabel: 'Open Analytics menu',
+          data: {
+            kind: 'group',
+            description: 'Open analytics destinations',
+          },
+          items: [
+            {
+              id: 'live-dashboard',
+              name: 'Live dashboard',
+              link: '/collections',
+              data: {
+                kind: 'route',
+                description: 'Navigate to the live dashboard example',
+              },
+            },
+            {
+              id: 'scheduled-reports',
+              name: 'Scheduled reports',
+              link: '/collections',
+              data: {
+                kind: 'route',
+                description: 'Navigate to reporting examples',
+              },
+            },
+          ],
+        },
+        {
+          id: 'commerce',
+          name: 'Commerce',
+          icon: ICONS.commerce,
+          ariaLabel: 'Open Commerce menu',
+          data: {
+            kind: 'group',
+            description: 'Open commerce destinations',
+          },
+          items: [
+            {
+              id: 'orders',
+              name: 'Orders',
+              link: '/collections',
+              data: {
+                kind: 'route',
+                description: 'Navigate to the orders example',
+              },
+            },
+            {
+              id: 'catalog',
+              name: 'Catalog',
+              link: '/collections',
+              data: {
+                kind: 'route',
+                description: 'Navigate to the catalog example',
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'resources',
+      name: 'Resources',
+      icon: ICONS.resources,
+      ariaLabel: 'Open Resources menu',
+      data: {
+        kind: 'group',
+        description: 'Browse guides and API resources',
+      },
+      items: [
+        {
+          id: 'guides',
+          name: 'Guides',
+          icon: ICONS.guide,
+          link: '/credits',
+          data: {
+            kind: 'route',
+            description: 'Navigate to implementation guides',
+          },
+        },
+        {
+          id: 'release-notes',
+          name: 'Release notes',
+          icon: ICONS.spark,
+          data: {
+            kind: 'action',
+            description: 'Handle an action without a router link',
+          },
+        },
+      ],
+    },
+    {
+      id: 'about',
+      name: 'About the library',
+      icon: ICONS.about,
+      link: '/about-us',
+      data: {
+        kind: 'route',
+        description: 'Learn why this component is different',
+      },
+    },
+    {
+      id: 'coming-soon',
+      name: 'Coming soon',
+      disabled: true,
+      data: {
+        kind: 'action',
+        description: 'Disabled items remain accessible and inert',
+      },
+    },
+  ];
 
-  options = new MultiLevelPushMenuOptions();
+  options = new MultiLevelPushMenuOptions({
+    title: 'Nexus',
+    titleIcon: ICONS.brand,
+    menuID: 'nexus-demo-menu',
+    ariaLabel: 'Nexus product navigation',
+    menuWidth: 320,
+    menuHeight: '100dvh',
+    overlapWidth: 52,
+    mode: 'cover',
+    direction: 'ltr',
+    backText: 'Back',
+    closeOnNavigation: false,
+    preserveActiveLevelOnCollapse: true,
+    animationDuration: 240,
+  });
 
-  constructor(private multiLevelPushMenuService: MultiLevelPushMenuService) {}
+  collapsed = false;
+  theme: DemoTheme = 'aurora';
+  activeLevel = 0;
+  lastEvent: DemoEvent = {
+    kind: 'ready',
+    label: 'Playground ready',
+    path: 'Nexus',
+    depth: 0,
+  };
 
-  ngOnInit() {
-    this.options.title = 'Company Name'; // Set menu title
-
-    // Create menu items array
-    this.options.menu = [
-      { name: 'Home', id: 'home', icon: 'fa fa-home', link: 'home' },
-      {
-        name: 'About Us',
-        id: 'about-us',
-        icon: 'fa fa-user',
-        link: 'about-us',
-      },
-      {
-        name: 'Devices',
-        id: 'devices',
-        icon: 'fa fa-laptop',
-        link: '#',
-        items: [
-          {
-            name: 'Mobile Phones',
-            icon: 'fa fa-phone',
-            link: '#',
-            items: [
-              {
-                name: 'Super Smart Phone',
-                link: 'xxx',
-              },
-              {
-                name: 'Thin Magic Mobile',
-                link: 'xxx',
-              },
-              {
-                name: 'Performance Crusher',
-                link: 'xxx',
-              },
-              {
-                name: 'Futuristic Experience',
-                link: 'xxx',
-              },
-            ],
-          },
-          {
-            name: 'Televisions',
-            icon: 'fa fa-desktop',
-            link: '#',
-            items: [
-              {
-                name: 'Flat Super Screen',
-                link: '#',
-              },
-              {
-                name: 'Gigantic LED',
-                link: '#',
-              },
-              {
-                name: 'Power Eater',
-                link: '#',
-              },
-              {
-                name: '3D Experience',
-                link: '#',
-              },
-              {
-                name: 'Classic Comfort',
-                link: '#',
-              },
-            ],
-          },
-          {
-            name: 'Cameras',
-            icon: 'fa fa-camera-retro',
-            link: '#',
-            items: [
-              {
-                name: 'Smart Shot',
-                link: '#',
-              },
-              {
-                name: 'Power Shooter',
-                link: '#',
-              },
-              {
-                name: 'Easy Photo Maker',
-                link: '#',
-              },
-              {
-                name: 'Super Pixel',
-                link: '#',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        name: 'Magazines',
-        icon: 'fa fa-book',
-        link: '#',
-        items: [
-          {
-            name: 'National Geographics',
-            link: '#',
-          },
-          {
-            name: 'Scientific American',
-            link: '#',
-          },
-          {
-            name: 'The Spectator',
-            link: '#',
-          },
-          {
-            name: 'Rambler',
-            link: '#',
-          },
-          {
-            name: 'Physics World',
-            link: '#',
-          },
-          {
-            name: 'The New Scientist',
-            link: '#',
-          },
-        ],
-      },
-      {
-        name: 'Store',
-        icon: 'fa fa-shopping-cart',
-        link: '#',
-        items: [
-          {
-            name: 'Clothes',
-            icon: 'fa fa-tags',
-            link: '#',
-            items: [
-              {
-                name: "Women's Clothing",
-                icon: 'fa fa-female',
-                link: '#',
-                items: [
-                  {
-                    name: 'Tops',
-                    link: '#',
-                  },
-                  {
-                    name: 'Dresses',
-                    link: '#',
-                  },
-                  {
-                    name: 'Trousers',
-                    link: '#',
-                  },
-                  {
-                    name: 'Shoes',
-                    link: '#',
-                  },
-                  {
-                    name: 'Sale',
-                    link: '#',
-                  },
-                ],
-              },
-              {
-                name: "Men's Clothing",
-                icon: 'fa fa-male',
-                link: '#',
-                items: [
-                  {
-                    name: 'Shirts',
-                    link: '#',
-                  },
-                  {
-                    name: 'Trousers',
-                    link: '#',
-                  },
-                  {
-                    name: 'Shoes',
-                    link: '#',
-                  },
-                  {
-                    name: 'Sale',
-                    link: '#',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            name: 'Jewelry',
-            link: '#',
-          },
-          {
-            name: 'Music',
-            link: '#',
-          },
-          {
-            name: 'Grocery',
-            link: '#',
-          },
-        ],
-      },
-      {
-        name: 'Collections',
-        link: 'collections',
-      },
-      {
-        name: 'Credits',
-        link: 'credits',
-      },
-    ];
+  setMode(mode: MultiLevelPushMenuOptions['mode']): void {
+    this.updateOptions({ mode });
+    this.recordState(`${mode} mode enabled`);
   }
 
-  collapseMenu(): void {
-    this.multiLevelPushMenuService.collapse();
+  toggleDirection(): void {
+    const direction = this.options.direction === 'ltr' ? 'rtl' : 'ltr';
+    this.updateOptions({ direction });
+    this.recordState(`${direction.toUpperCase()} direction enabled`);
   }
 
-  expandMenu(): void {
-    this.multiLevelPushMenuService.expand();
+  toggleTheme(): void {
+    this.theme = this.theme === 'aurora' ? 'midnight' : 'aurora';
+    this.recordState(`${this.theme} theme enabled`);
+  }
+
+  setCollapsed(collapsed: boolean): void {
+    this.collapsed = collapsed;
+    this.recordState(`Menu ${collapsed ? 'collapsed' : 'expanded'}`);
+  }
+
+  onLevelChange(level: number): void {
+    this.activeLevel = level;
+  }
+
+  onItemActivate(event: MenuActivationEvent): void {
+    this.recordActivation('item', event);
+  }
+
+  onGroupActivate(event: MenuActivationEvent): void {
+    this.recordActivation('group', event);
+  }
+
+  private updateOptions(patch: Partial<MultiLevelPushMenuOptions>): void {
+    this.options = new MultiLevelPushMenuOptions({
+      ...this.options,
+      ...patch,
+    });
+  }
+
+  private recordActivation(
+    kind: Extract<DemoEventKind, 'item' | 'group'>,
+    event: MenuActivationEvent,
+  ): void {
+    const data = event.item.data;
+    if (!this.isDemoMenuData(data)) return;
+
+    const typedEvent = event as MenuActivationEvent<DemoMenuData>;
+    this.lastEvent = {
+      kind,
+      label: `${typedEvent.item.name}: ${data.description}`,
+      path: typedEvent.path
+        .map((item) => item.name)
+        .filter(Boolean)
+        .join(' / '),
+      depth: typedEvent.level,
+    };
+  }
+
+  private recordState(label: string): void {
+    this.lastEvent = {
+      kind: 'state',
+      label,
+      path: `Nexus / level ${this.activeLevel}`,
+      depth: this.activeLevel,
+    };
+  }
+
+  private isDemoMenuData(value: unknown): value is DemoMenuData {
+    if (!value || typeof value !== 'object') return false;
+
+    const candidate = value as Partial<DemoMenuData>;
+    return (
+      (candidate.kind === 'route' ||
+        candidate.kind === 'action' ||
+        candidate.kind === 'group') &&
+      typeof candidate.description === 'string'
+    );
   }
 }

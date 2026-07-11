@@ -2,280 +2,238 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
+  HostBinding,
   HostListener,
+  inject,
   Input,
-  OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   Renderer2,
-  SimpleChanges,
 } from '@angular/core';
 import { SwipeEvent } from '../interfaces';
-import { DeviceDetectorService } from '../services';
 
 export enum SwipeDirection {
   Left = 'left',
   Right = 'right',
 }
 
-/**
- * Enhanced directive to handle swipe gestures on mobile and desktop devices
- * with improved touch detection and velocity tracking
- */
+export type SwipeMode =
+  | 'both'
+  | 'left'
+  | 'right'
+  | 'touchscreen'
+  | 'desktop'
+  | 'none';
+
+/** Pointer-event based horizontal swipe detection that preserves page scroll. */
 @Directive({
   selector: '[ramiz4Swipe]',
   exportAs: 'swipe',
   standalone: true,
 })
-export class SwipeDirective implements OnInit, OnChanges, OnDestroy {
-  @Input() swipeEnabled: 'both' | 'left' | 'right' = 'both';
+export class SwipeDirective implements OnDestroy {
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly removeCapturedClickListener: () => void;
+
+  @Input() swipeEnabled: SwipeMode = 'both';
   @Input() swipeThreshold: number | null = null;
   @Input() overlapWidth = 60;
+
+  /** @deprecated Body scroll is no longer mutated; `touch-action: pan-y` is used. */
   @Input() preventBodyScroll = true;
 
-  @Output() swipe = new EventEmitter<SwipeEvent>();
-  @Output() swipeStart = new EventEmitter<{ x: number; y: number }>();
-  @Output() swipeCancel = new EventEmitter<void>();
+  @Output() readonly swipe = new EventEmitter<SwipeEvent>();
+  @Output() readonly swipeStart = new EventEmitter<{ x: number; y: number }>();
+  @Output() readonly swipeCancel = new EventEmitter<void>();
+  @Output() readonly swipeEnd = new EventEmitter<void>();
 
-  private isTracking = false;
+  @HostBinding('style.touch-action')
+  get touchAction(): 'auto' | 'pan-y' {
+    return this.swipeEnabled === 'none' || this.swipeEnabled === 'desktop'
+      ? 'auto'
+      : 'pan-y';
+  }
+
+  private pointerId: number | null = null;
+  private pointerType = '';
   private startX = 0;
   private startY = 0;
+  private currentX = 0;
+  private currentY = 0;
   private startTime = 0;
-  private threshold = 30; // Default threshold - will be updated based on device and input
-  private originalBodyOverflow: string | null = null;
+  private suppressNextClick = false;
+  private suppressionTimer: ReturnType<typeof globalThis.setTimeout> | null =
+    null;
+  private captureTarget: HTMLElement | null = null;
 
-  private mouseMoveHandler: ((e: MouseEvent) => void) | null = null;
-  private mouseUpHandler: ((e: MouseEvent) => void) | null = null;
-
-  constructor(
-    private elementRef: ElementRef,
-    private renderer: Renderer2,
-    private deviceDetectorService: DeviceDetectorService
-  ) {}
-
-  ngOnInit(): void {
-    this.updateThreshold();
+  constructor() {
+    this.removeCapturedClickListener = this.renderer.listen(
+      this.elementRef.nativeElement,
+      'click',
+      (event: MouseEvent) => this.onCapturedClick(event),
+      { capture: true },
+    );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['overlapWidth'] || changes['swipeThreshold']) {
-      this.updateThreshold();
-    }
-  }
-
-  private updateThreshold(): void {
-    // Set threshold based on input or device
-    this.threshold =
-      this.swipeThreshold ||
-      this.deviceDetectorService.getSwipeThreshold(this.overlapWidth);
-  }
-
-  /**
-   * Handle touch start event
-   */
-  @HostListener('touchstart', ['$event'])
-  onTouchStart(event: TouchEvent): void {
-    if (
-      !this.deviceDetectorService.isSwipeEnabled(
-        'touchscreen',
-        this.swipeEnabled
-      )
-    )
-      return;
-
-    if (event.touches.length === 1) {
-      const touch = event.touches[0];
-      this.startTracking(touch.clientX, touch.clientY);
-    }
-  }
-
-  /**
-   * Handle touch move event with improved tracking
-   */
-  @HostListener('touchmove', ['$event'])
-  onTouchMove(event: TouchEvent): void {
-    if (!this.isTracking) return;
-
-    const touch = event.touches[0];
-    const currentX = touch.clientX;
-    const currentY = touch.clientY;
-
-    // Calculate horizontal and vertical distance
-    const diffX = currentX - this.startX;
-    const diffY = currentY - this.startY;
-
-    // Update threshold from current overlapWidth to ensure it's current
-    this.updateThreshold();
-
-    // Determine if this is primarily a horizontal or vertical swipe
-    // For menu purposes, we only care about horizontal swipes
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
-      // This is a horizontal swipe that exceeds threshold
-      const duration = Date.now() - this.startTime;
-      let velocity = 0; // Default velocity to 0
-      if (duration > 0) {
-        velocity = Math.abs(diffX) / duration; // pixels per millisecond
-      }
-
-      this.emitSwipeEvent(diffX, velocity);
-      this.resetTracking();
-      // Prevent default to avoid page scrolling
-      event.preventDefault();
-    } else if (Math.abs(diffY) > Math.abs(diffX) * 2) {
-      // This is a vertical swipe - cancel the tracking as it's not relevant for our menu
-      this.swipeCancel.emit();
-      this.resetTracking();
-    }
-  }
-
-  /**
-   * Handle touch end event
-   */
-  @HostListener('touchend')
-  onTouchEnd(): void {
-    this.resetTracking();
-  }
-
-  /**
-   * Handle touch cancel event
-   */
-  @HostListener('touchcancel')
-  onTouchCancel(): void {
-    this.swipeCancel.emit();
-    this.resetTracking();
-  }
-
-  /**
-   * Handle mouse down event for desktop devices
-   */
-  @HostListener('mousedown', ['$event'])
-  onMouseDown(event: MouseEvent): void {
-    if (
-      !this.deviceDetectorService.isSwipeEnabled('desktop', this.swipeEnabled)
-    )
-      return;
-
-    this.startTracking(event.clientX, event.clientY);
-
-    // Setup document-level listeners for mouse move and up
-    this.setupMouseEventHandlers();
-  }
-
-  /**
-   * Set up tracking on start of a touch/drag
-   */
-  private startTracking(x: number, y: number): void {
-    this.isTracking = true;
-    this.startX = x;
-    this.startY = y;
-    this.startTime = Date.now();
-    this.swipeStart.emit({ x, y });
-
-    // Prevent body scrolling if enabled
-    if (this.preventBodyScroll) {
-      this.originalBodyOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-    }
-  }
-
-  /**
-   * Reset tracking flags and data
-   */
-  private resetTracking(): void {
-    this.isTracking = false;
-    this.startX = 0;
-    this.startY = 0;
-    this.startTime = 0;
-
-    // Restore body scrolling
-    if (this.preventBodyScroll && this.originalBodyOverflow !== null) {
-      document.body.style.overflow = this.originalBodyOverflow;
-      this.originalBodyOverflow = null;
-    }
-
-    // Clean up mouse event handlers if they exist
-    this.cleanupMouseEventHandlers();
-  }
-
-  /**
-   * Emit a swipe event based on the distance moved
-   */
-  private emitSwipeEvent(diffX: number, velocity: number): void {
-    const direction = diffX > 0 ? SwipeDirection.Right : SwipeDirection.Left;
-    const distance = Math.abs(diffX);
-
-    this.swipe.emit({
-      direction,
-      distance,
-      velocity,
-    });
-  }
-
-  /**
-   * Set up document-level mouse event handlers for desktop swipe
-   */
-  private setupMouseEventHandlers(): void {
-    // Clean up existing handlers if any
-    this.cleanupMouseEventHandlers();
-
-    // Create new handlers
-    this.mouseMoveHandler = (e: MouseEvent) => {
-      if (!this.isTracking) return;
-
-      const diffX = e.clientX - this.startX;
-      const diffY = e.clientY - this.startY;
-
-      // Use the same threshold as for touch events
-      if (
-        Math.abs(diffX) > Math.abs(diffY) &&
-        Math.abs(diffX) > this.threshold
-      ) {
-        const duration = Date.now() - this.startTime;
-        const velocity = Math.abs(diffX) / duration;
-
-        this.emitSwipeEvent(diffX, velocity);
-        this.resetTracking();
-      } else if (Math.abs(diffY) > Math.abs(diffX) * 2) {
-        // Vertical movement - cancel swipe
-        this.swipeCancel.emit();
-        this.resetTracking();
-      }
-    };
-
-    this.mouseUpHandler = () => {
-      this.resetTracking();
-    };
-
-    // Attach handlers to document
-    document.addEventListener('mousemove', this.mouseMoveHandler);
-    document.addEventListener('mouseup', this.mouseUpHandler);
-  }
-
-  /**
-   * Clean up document-level mouse event handlers
-   */
-  private cleanupMouseEventHandlers(): void {
-    if (this.mouseMoveHandler) {
-      document.removeEventListener('mousemove', this.mouseMoveHandler);
-      this.mouseMoveHandler = null;
-    }
-
-    if (this.mouseUpHandler) {
-      document.removeEventListener('mouseup', this.mouseUpHandler);
-      this.mouseUpHandler = null;
-    }
-  }
-
-  /**
-   * Ensure all event handlers are removed when directive is destroyed
-   */
   ngOnDestroy(): void {
-    // Restore body overflow if it was changed
-    if (this.preventBodyScroll && this.originalBodyOverflow !== null) {
-      document.body.style.overflow = this.originalBodyOverflow;
+    this.removeCapturedClickListener();
+    this.clearClickSuppression();
+  }
+
+  @HostListener('pointerdown', ['$event'])
+  onPointerDown(event: PointerEvent): void {
+    if (
+      this.pointerId !== null ||
+      !event.isPrimary ||
+      (event.pointerType === 'mouse' && event.button !== 0) ||
+      !this.isPointerTypeEnabled(event.pointerType)
+    ) {
+      return;
     }
 
-    this.cleanupMouseEventHandlers();
+    this.clearClickSuppression();
+    this.pointerId = event.pointerId;
+    this.pointerType = event.pointerType;
+    this.startX = this.currentX = event.clientX;
+    this.startY = this.currentY = event.clientY;
+    this.startTime = performance.now();
+    this.swipeStart.emit({ x: event.clientX, y: event.clientY });
+  }
+
+  @HostListener('pointermove', ['$event'])
+  onPointerMove(event: PointerEvent): void {
+    if (event.pointerId !== this.pointerId) return;
+
+    this.currentX = event.clientX;
+    this.currentY = event.clientY;
+    const diffX = this.currentX - this.startX;
+    const diffY = this.currentY - this.startY;
+
+    if (Math.abs(diffY) > Math.abs(diffX) * 1.25) {
+      this.cancelTracking(event.pointerId);
+      return;
+    }
+
+    if (
+      !this.captureTarget &&
+      Math.abs(diffX) >= Math.min(this.effectiveThreshold(), 24) &&
+      Math.abs(diffX) > Math.abs(diffY) * 1.25
+    ) {
+      const target = event.target as HTMLElement | null;
+      if (target?.setPointerCapture) {
+        target.setPointerCapture(event.pointerId);
+        this.captureTarget = target;
+      }
+    }
+  }
+
+  @HostListener('pointerup', ['$event'])
+  onPointerUp(event: PointerEvent): void {
+    if (event.pointerId !== this.pointerId) return;
+
+    this.currentX = event.clientX;
+    this.currentY = event.clientY;
+    const diffX = this.currentX - this.startX;
+    const diffY = this.currentY - this.startY;
+    const duration = Math.max(performance.now() - this.startTime, 1);
+    const threshold = this.effectiveThreshold();
+    const direction = diffX > 0 ? SwipeDirection.Right : SwipeDirection.Left;
+
+    const isHorizontalSwipe =
+      Math.abs(diffX) >= threshold && Math.abs(diffX) > Math.abs(diffY);
+
+    if (isHorizontalSwipe || this.captureTarget) this.armClickSuppression();
+
+    if (isHorizontalSwipe && this.isDirectionEnabled(direction)) {
+      this.swipe.emit({
+        direction,
+        distance: Math.abs(diffX),
+        velocity: Math.abs(diffX) / duration,
+      });
+    } else {
+      this.swipeCancel.emit();
+    }
+
+    this.finishTracking(event.pointerId);
+  }
+
+  @HostListener('pointercancel', ['$event'])
+  onPointerCancel(event: PointerEvent): void {
+    if (event.pointerId === this.pointerId) {
+      this.cancelTracking(event.pointerId);
+    }
+  }
+
+  @HostListener('lostpointercapture', ['$event'])
+  onLostPointerCapture(event: PointerEvent): void {
+    if (event.pointerId === this.pointerId) {
+      this.cancelTracking(event.pointerId);
+    }
+  }
+
+  private onCapturedClick(event: MouseEvent): void {
+    if (!this.suppressNextClick) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.clearClickSuppression();
+  }
+
+  private isPointerTypeEnabled(pointerType: string): boolean {
+    if (this.swipeEnabled === 'none') return false;
+    if (this.swipeEnabled === 'touchscreen') return pointerType !== 'mouse';
+    if (this.swipeEnabled === 'desktop') return pointerType === 'mouse';
+    return true;
+  }
+
+  private isDirectionEnabled(direction: SwipeDirection): boolean {
+    return (
+      (this.swipeEnabled !== 'left' && this.swipeEnabled !== 'right') ||
+      this.swipeEnabled === direction
+    );
+  }
+
+  private cancelTracking(pointerId: number): void {
+    if (this.captureTarget) this.armClickSuppression();
+    this.swipeCancel.emit();
+    this.finishTracking(pointerId);
+  }
+
+  private effectiveThreshold(): number {
+    if (this.swipeThreshold !== null && Number.isFinite(this.swipeThreshold)) {
+      return Math.max(this.swipeThreshold, 1);
+    }
+    const overlap = Number.isFinite(this.overlapWidth)
+      ? Math.max(this.overlapWidth, 0)
+      : 60;
+    return Math.max(overlap * 0.3, 24);
+  }
+
+  private finishTracking(pointerId: number): void {
+    const captureTarget = this.captureTarget;
+    this.pointerId = null;
+    this.pointerType = '';
+    this.captureTarget = null;
+    if (captureTarget?.hasPointerCapture?.(pointerId)) {
+      captureTarget.releasePointerCapture(pointerId);
+    }
+    this.swipeEnd.emit();
+  }
+
+  private armClickSuppression(): void {
+    this.clearClickSuppression();
+    this.suppressNextClick = true;
+    this.suppressionTimer = globalThis.setTimeout(
+      () => this.clearClickSuppression(),
+      250,
+    );
+  }
+
+  private clearClickSuppression(): void {
+    this.suppressNextClick = false;
+    if (this.suppressionTimer !== null) {
+      globalThis.clearTimeout(this.suppressionTimer);
+      this.suppressionTimer = null;
+    }
   }
 }

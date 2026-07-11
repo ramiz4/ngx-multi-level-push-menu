@@ -1,12 +1,14 @@
 {
   "name": "@ramiz4/ngx-multi-level-push-menu",
   "version": "19.3.3",
-  "description": "Angular multi-level push menu component",
+  "description": "Accessible, responsive and SSR-safe multi-level push navigation for Angular",
+  "type": "module",
   "homepage": "https://github.com/ramiz4/ngx-multi-level-push-menu#readme",
   "author": "Ramiz Loki <me@ramizloki.com> (https://ramizloki.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ramiz4/ngx-multi-level-push-menu"
+    "url": "git+https://github.com/ramiz4/ngx-multi-level-push-menu.git",
+    "directory": "libs/ngx-multi-level-push-menu"
   },
   "bugs": {
     "url": "https://github.com/ramiz4/ngx-multi-level-push-menu/issues"
@@ -16,12 +18,10 @@
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
-    "@angular/common": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/router": "^19.0.0",
-    "font-awesome": "^4.7.0",
-    "rxjs": "^7.8.0",
-    "zone.js": "~0.15.0"
+    "@angular/common": ">=20.0.0 <23.0.0",
+    "@angular/core": ">=20.0.0 <23.0.0",
+    "@angular/router": ">=20.0.0 <23.0.0",
+    "rxjs": ">=7.8.0 <8.0.0"
   },
   "keywords": [
     "angular",
@@ -30,6 +30,9 @@
     "multi-level",
     "navigation"
   ],
+  "engines": {
+    "node": ">=20.19"
+  },
   "publishConfig": {
     "access": "public"
   },

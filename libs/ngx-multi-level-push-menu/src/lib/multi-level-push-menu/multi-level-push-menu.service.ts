@@ -2,17 +2,40 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { MultiLevelPushMenuItem } from './models';
 
-@Injectable()
+/** @internal */
+export type MultiLevelPushMenuCommand =
+  | {
+      readonly type: 'collapse';
+      readonly level?: number;
+      readonly targetId?: string;
+    }
+  | { readonly type: 'expand'; readonly targetId?: string }
+  | { readonly type: 'toggle'; readonly targetId?: string }
+  | {
+      readonly type: 'navigate';
+      readonly levelOrId: number | string;
+      readonly targetId?: string;
+    }
+  | { readonly type: 'back'; readonly targetId?: string };
+
+@Injectable({ providedIn: 'root' })
 export class MultiLevelPushMenuService {
-  private collapseSubject = new Subject<number | undefined>();
-  private expandSubject = new Subject<void>();
-  private menuItemClickSubject = new Subject<MultiLevelPushMenuItem>();
-  private groupItemClickSubject = new Subject<MultiLevelPushMenuItem>();
+  private readonly commandSubject = new Subject<MultiLevelPushMenuCommand>();
+  private readonly collapseSubject = new Subject<number | undefined>();
+  private readonly expandSubject = new Subject<void>();
+  private readonly menuItemClickSubject = new Subject<MultiLevelPushMenuItem>();
+  private readonly groupItemClickSubject =
+    new Subject<MultiLevelPushMenuItem>();
+
+  /** @internal Command stream used only by menu instances. */
+  readonly commands$: Observable<MultiLevelPushMenuCommand> =
+    this.commandSubject.asObservable();
 
   /**
    * Trigger menu collapse
    */
-  collapse(level?: number) {
+  collapse(level?: number, targetId?: string): void {
+    this.commandSubject.next({ type: 'collapse', level, targetId });
     this.collapseSubject.next(level);
   }
 
@@ -26,8 +49,34 @@ export class MultiLevelPushMenuService {
   /**
    * Trigger menu expand
    */
-  expand() {
+  expand(targetId?: string): void {
+    this.commandSubject.next({ type: 'expand', targetId });
     this.expandSubject.next();
+  }
+
+  /** Toggle one menu, or all menus when no target ID is supplied. */
+  toggleMenu(targetId?: string): void {
+    this.commandSubject.next({ type: 'toggle', targetId });
+  }
+
+  /** Alias retained for the documented API. */
+  openMenu(targetId?: string): void {
+    this.expand(targetId);
+  }
+
+  /** Alias retained for the documented API. */
+  closeMenu(targetId?: string): void {
+    this.collapse(undefined, targetId);
+  }
+
+  /** Navigate to an already open depth or to a group item by ID/name/title. */
+  navigateToLevel(levelOrId: number | string, targetId?: string): void {
+    this.commandSubject.next({ type: 'navigate', levelOrId, targetId });
+  }
+
+  /** Navigate one level back. */
+  goBack(targetId?: string): void {
+    this.commandSubject.next({ type: 'back', targetId });
   }
 
   /**
@@ -40,7 +89,7 @@ export class MultiLevelPushMenuService {
   /**
    * Emit menu item click event
    */
-  menuItemClicked(item: MultiLevelPushMenuItem) {
+  menuItemClicked(item: MultiLevelPushMenuItem): void {
     this.menuItemClickSubject.next(item);
   }
 
@@ -54,7 +103,7 @@ export class MultiLevelPushMenuService {
   /**
    * Emit group item click event
    */
-  groupItemClicked(item: MultiLevelPushMenuItem) {
+  groupItemClicked(item: MultiLevelPushMenuItem): void {
     this.groupItemClickSubject.next(item);
   }
 

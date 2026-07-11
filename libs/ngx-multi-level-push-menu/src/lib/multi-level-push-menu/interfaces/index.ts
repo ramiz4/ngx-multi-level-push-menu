@@ -4,6 +4,6 @@
  */
 
 export * from './key-navigation-event.interface';
+export * from './menu-activation-event.interface';
 export * from './menu-item-click-event.interface';
-export * from './menu-level-data.interface';
 export * from './swipe-event.interface';

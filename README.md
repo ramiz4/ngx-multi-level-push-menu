@@ -1,6 +1,7 @@
 # ngx-multi-level-push-menu
 
 [![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu)
+[![CI](https://github.com/ramiz4/ngx-multi-level-push-menu/actions/workflows/ci.yml/badge.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/LICENSE)
 
 Accessible, responsive, SSR-safe multi-level push navigation for Angular. The library is standalone-first, has no icon or animation dependency, and still supports existing NgModule applications.
@@ -26,7 +27,7 @@ Accessible, responsive, SSR-safe multi-level push navigation for Angular. The li
 | `19.x` (legacy)                   | Angular 19                          | See the release metadata | See the release metadata            |
 | `<=18.x` (archived)               | See the exact npm release metadata  | See the release metadata | See the release metadata            |
 
-Older library major numbers did not consistently match Angular major numbers. Do not infer compatibility from the package version; inspect the chosen release's `peerDependencies`. For the current line, use the [Node.js version supported by your Angular major](https://angular.dev/reference/versions). The repository development toolchain uses Node `>=20.19 <25` and npm 10.
+Older library major numbers did not consistently match Angular major numbers. Do not infer compatibility from the package version; inspect the chosen release's `peerDependencies`. For the current line, use the [Node.js version supported by your Angular major](https://angular.dev/reference/versions). The repository development toolchain uses Node `>=20.19 <25` and npm 11.
 
 Angular 19 applications must remain on `@ramiz4/ngx-multi-level-push-menu@^19` until the application is upgraded to Angular 20 or newer. That legacy line no longer receives supported security fixes after `20.x` publishes, so plan the Angular upgrade; do not force-install the `20.x` library over an incompatible peer range.
 

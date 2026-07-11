@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const workspaceRoot = resolve(import.meta.dirname, '../..');
@@ -7,6 +7,9 @@ const distributionRoot = resolve(
   workspaceRoot,
   'dist/libs/ngx-multi-level-push-menu',
 );
+const releaseArtifactsRoot = resolve(workspaceRoot, 'release-artifacts');
+const developmentVersion = '0.0.0-development';
+const stableSemver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const assert = (condition, message) => {
@@ -26,23 +29,47 @@ assert(
 );
 
 const builtPackage = readJson(builtPackagePath);
-const versions = {
+const repositoryVersions = {
   root: rootPackage.version,
   lockfile: packageLock.version,
   'lockfile root': packageLock.packages?.['']?.version,
   source: sourcePackage.version,
-  distribution: builtPackage.version,
 };
-const uniqueVersions = new Set(Object.values(versions));
+const uniqueRepositoryVersions = new Set(Object.values(repositoryVersions));
+
+const releaseVersionArgumentIndex = process.argv.indexOf('--release-version');
+const releaseVersion =
+  releaseVersionArgumentIndex === -1
+    ? undefined
+    : process.argv[releaseVersionArgumentIndex + 1];
 
 assert(
-  uniqueVersions.size === 1,
-  `Package versions are inconsistent: ${JSON.stringify(versions)}.`,
+  uniqueRepositoryVersions.size === 1,
+  `Repository package versions are inconsistent: ${JSON.stringify(repositoryVersions)}.`,
 );
 assert(
-  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(sourcePackage.version),
-  `Package version must be stable semver: ${sourcePackage.version}.`,
+  sourcePackage.version === developmentVersion,
+  `Repository packages must keep the semantic-release placeholder version ${developmentVersion}.`,
 );
+if (releaseVersionArgumentIndex === -1) {
+  assert(
+    builtPackage.version === developmentVersion,
+    `Development build must use ${developmentVersion}, received ${builtPackage.version}.`,
+  );
+} else {
+  assert(
+    releaseVersion !== undefined,
+    'The --release-version option requires a value.',
+  );
+  assert(
+    stableSemver.test(releaseVersion),
+    `Release version must be stable semver: ${releaseVersion}.`,
+  );
+  assert(
+    builtPackage.version === releaseVersion,
+    `Built package version ${builtPackage.version} does not match release ${releaseVersion}.`,
+  );
+}
 assert(
   builtPackage.name === sourcePackage.name,
   `Built package name ${builtPackage.name} does not match ${sourcePackage.name}.`,
@@ -124,13 +151,25 @@ assert(
   'Do not publish declaration maps that reference unavailable workspace sources.',
 );
 
-const tagArgumentIndex = process.argv.indexOf('--tag');
-if (tagArgumentIndex !== -1) {
-  const tag = process.argv[tagArgumentIndex + 1];
-  assert(tag !== undefined, 'The --tag option requires a value.');
+if (releaseVersion !== undefined) {
   assert(
-    tag === `v${sourcePackage.version}`,
-    `Release tag ${tag} does not match package version v${sourcePackage.version}.`,
+    existsSync(releaseArtifactsRoot),
+    'Semantic Release must create the release-artifacts directory.',
+  );
+  const tarballs = readdirSync(releaseArtifactsRoot).filter((name) =>
+    name.endsWith('.tgz'),
+  );
+  assert(
+    tarballs.length === 1,
+    `Expected exactly one release tarball, found: ${JSON.stringify(tarballs)}.`,
+  );
+  assert(
+    tarballs[0].endsWith(`-${releaseVersion}.tgz`),
+    `Release tarball ${tarballs[0]} does not match version ${releaseVersion}.`,
+  );
+  assert(
+    statSync(resolve(releaseArtifactsRoot, tarballs[0])).size > 0,
+    `Release tarball ${tarballs[0]} is empty.`,
   );
 }
 

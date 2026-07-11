@@ -19,7 +19,7 @@ Never include credentials, private URLs, or sensitive application data. Follow [
 
 ## Development setup
 
-The workspace requires Node.js `>=20.19 <25` and npm 10 (the pinned package manager is recorded in `package.json`).
+The workspace requires Node.js `>=20.19 <25` and npm 11 (the exact package manager is recorded in `package.json`).
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/ngx-multi-level-push-menu.git
@@ -59,7 +59,8 @@ Create a focused branch from the current default branch:
 
 ```bash
 git fetch upstream
-git switch -c fix/short-description upstream/master
+git remote set-head upstream --auto
+git switch -c fix/short-description upstream/HEAD
 ```
 
 Keep changes small enough to review. Add a regression test for a bug and tests for each observable behavior of a feature. Avoid unrelated formatting or dependency updates.
@@ -106,7 +107,7 @@ The repository-root `README.md` is canonical. Keep `libs/ngx-multi-level-push-me
 
 ## Commits and pull requests
 
-Use a Conventional Commit-style subject where possible:
+Every commit subject and the pull-request title must use Conventional Commit syntax:
 
 ```text
 feat: add controlled collapsed state
@@ -118,6 +119,8 @@ chore: update development tooling
 ```
 
 Use `!` or a `BREAKING CHANGE:` footer only for an intentional breaking change with migration notes.
+
+For squash merges, the pull-request title becomes the release commit. `fix:` and `perf:` trigger a patch, `feat:` triggers a minor, and `!` or a `BREAKING CHANGE:` footer triggers a major. Changes limited to documentation, tests, refactoring, builds, CI, or chores do not publish a new package. Never edit package versions or create release tags manually; repository manifests stay at `0.0.0-development` and Semantic Release versions the built package after successful default-branch CI.
 
 A pull request should include:
 

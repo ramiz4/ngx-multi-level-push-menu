@@ -1,4 +1,4 @@
-const releaseBranch = process.env.RELEASE_BRANCH || 'master';
+const releaseBranch = process.env.RELEASE_BRANCH || 'main';
 
 export default {
   branches: [releaseBranch],

@@ -33,6 +33,10 @@ for (const { content, name } of workflows) {
 }
 
 const allWorkflowContent = workflows.map(({ content }) => content).join('\n');
+assert(
+  !/\bmaster\b/.test(allWorkflowContent),
+  'GitHub workflows must target the canonical main branch only.',
+);
 for (const forbiddenCredential of ['secrets.NPM_TOKEN', 'secrets.GH_PAT']) {
   assert(
     !allWorkflowContent.includes(forbiddenCredential),
@@ -64,6 +68,18 @@ assert(
 assert(
   releaseConfig.tagFormat === 'v${version}',
   'Semantic Release tags must use v${version}.',
+);
+assert(
+  releaseConfig.branches.length === 1 && releaseConfig.branches[0] === 'main',
+  'Semantic Release must default to the canonical main branch.',
+);
+
+const nxConfig = JSON.parse(
+  readFileSync(resolve(workspaceRoot, 'nx.json'), 'utf8'),
+);
+assert(
+  nxConfig.defaultBase === 'main',
+  'Nx affected commands must compare against the canonical main branch.',
 );
 for (const pluginEntry of releaseConfig.plugins) {
   const pluginName = Array.isArray(pluginEntry) ? pluginEntry[0] : pluginEntry;

@@ -76,6 +76,22 @@ describe('multi-level push menu playground', () => {
     getMenu().should('have.attr', 'data-collapsed', 'false');
   };
 
+  const activateRail = (targetLevel: number) => {
+    getMenu()
+      .find(`[data-menu-rail][data-target-level="${targetLevel}"]`)
+      .should('be.visible')
+      .then(($rail) => {
+        const rail = $rail[0];
+        const rect = rail.getBoundingClientRect();
+        const hit = rail.ownerDocument.elementFromPoint(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        );
+        expect(hit === rail || rail.contains(hit)).to.equal(true);
+        rail.click();
+      });
+  };
+
   const assertFullWidthContent = (expectedOffset: number) => {
     getMenu().should(($menu) => {
       const menuRect = $menu[0]?.getBoundingClientRect();
@@ -404,12 +420,12 @@ describe('multi-level push menu playground', () => {
       });
     assertOverlapGeometry(['Back to Products', 'Back to Nexus']);
 
-    getMenu().find('[data-menu-rail][data-target-level="1"]').click();
+    activateRail(1);
     getActiveLevel().should('have.attr', 'aria-label', 'Products');
     assertOverlapGeometry(['Back to Nexus']);
 
     getActiveMenuControl('Open Analytics menu').click();
-    getMenu().find('[data-menu-rail][data-target-level="0"]').click();
+    activateRail(0);
     getActiveLevel().should('have.attr', 'aria-label', 'Nexus');
     getMenu().find('[data-menu-rail]').should('not.exist');
 

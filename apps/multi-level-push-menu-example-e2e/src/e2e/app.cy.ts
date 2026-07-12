@@ -413,6 +413,20 @@ describe('multi-level push menu playground', () => {
         window.innerWidth,
       );
     });
+    getMenu()
+      .find<HTMLElement>('.ngx-push-menu__content')
+      .should(($content) => {
+        const content = $content[0];
+        expect(content.scrollWidth).to.be.at.most(content.clientWidth + 1);
+      });
+
+    expandFromHandle();
+    getMenu()
+      .find<HTMLElement>('.ngx-push-menu__content')
+      .should(($content) => {
+        const content = $content[0];
+        expect(content.scrollWidth).to.be.at.most(content.clientWidth + 1);
+      });
   });
 
   it('keeps expanded content full-width and reserves the collapsed icon rail', () => {

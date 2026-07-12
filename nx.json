@@ -79,7 +79,7 @@
     }
   },
   "useInferencePlugins": true,
-  "defaultBase": "master",
+  "defaultBase": "main",
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",

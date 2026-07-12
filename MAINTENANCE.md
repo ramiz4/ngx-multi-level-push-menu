@@ -120,7 +120,7 @@ Do not infer the next version solely from the Angular major. The package peer ra
 
 ## Release process
 
-Every successful CI run for a push to the repository's actual default branch hands the exact validated commit to the **Release** workflow. With branch protection requiring pull requests, this means a merge to `main` (or the current `master` default) is the only normal release entry point. Direct pushes must be disabled in repository rules.
+Every successful CI run for a push to the repository's `main` default branch hands the exact validated commit to the **Release** workflow. With branch protection requiring pull requests, a merge to `main` is the only normal release entry point. Direct pushes must be disabled in repository rules.
 
 Semantic Release then:
 
@@ -148,7 +148,7 @@ The workflow intentionally uses a GitHub-hosted runner, npm `>=11.5.1`, Node `>=
 
 Protect the default branch with pull requests, required approvals, resolved conversations, and these required checks: both `Validate` jobs, all three `Consumer` jobs, `End-to-end (Chrome)`, `Dependency review`, and `CodeQL (JavaScript/TypeScript)`. Require a linear history or squash merges, block force pushes and deletions, and prevent bypass/direct pushes. Protect the `v*` tag namespace as well, while allowing only the Release workflow's GitHub Actions identity to create release tags. Keep pull-request titles in Conventional Commit form because a squash merge uses that title as release input.
 
-The workflows accept `main` and `master` during branch migration, but publication always compares against `github.event.repository.default_branch`. Rename the default branch separately if `main` is the desired canonical name, then update `nx.json`, documentation links, and branch rules in the same administrative migration.
+The workflows target `main`, and publication additionally compares against `github.event.repository.default_branch` before receiving write or OIDC permissions. Keep `nx.json`, documentation links, and repository rules aligned with that branch.
 
 ### Verify a publication
 

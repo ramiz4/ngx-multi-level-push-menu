@@ -4,7 +4,7 @@
 
 [![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu)
 [![CI](https://github.com/ramiz4/ngx-multi-level-push-menu/actions/workflows/ci.yml/badge.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/LICENSE)
 
 Accessible, responsive, SSR-safe multi-level push navigation for Angular. The library is standalone-first, has no icon or animation dependency, and still supports existing NgModule applications.
 
@@ -396,14 +396,14 @@ npm run build:app
 npm run validate          # format, lint, CI tests, library and example builds
 ```
 
-See [CONTRIBUTING.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/CONTRIBUTING.md) for the contributor workflow, [MAINTENANCE.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/MAINTENANCE.md) for releases, [MIGRATION.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/MIGRATION.md) for upgrading, and [CHANGELOG.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/CHANGELOG.md) for notable changes.
+See [CONTRIBUTING.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/CONTRIBUTING.md) for the contributor workflow, [MAINTENANCE.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/MAINTENANCE.md) for releases, [MIGRATION.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/MIGRATION.md) for upgrading, and [CHANGELOG.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/CHANGELOG.md) for notable changes.
 
 ## Support and security
 
 - Bugs and feature requests: [GitHub Issues](https://github.com/ramiz4/ngx-multi-level-push-menu/issues)
-- Usage help: [SUPPORT.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/SUPPORT.md)
-- Security reports: follow [SECURITY.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/SECURITY.md); do not open a public issue for a suspected vulnerability
+- Usage help: [SUPPORT.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/SUPPORT.md)
+- Security reports: follow [SECURITY.md](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/SECURITY.md); do not open a public issue for a suspected vulnerability
 
 ## License
 
-[MIT](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/master/LICENSE) © Ramiz Loki
+[MIT](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/LICENSE) © Ramiz Loki

@@ -33,7 +33,19 @@ describe('multi-level push menu playground', () => {
 
   const expandFromHandle = () => {
     assertCollapsedHandleSettled();
-    getMenu().find('[data-menu-collapsed-toggle]').should('be.visible').click();
+    getMenu()
+      .find('[data-menu-collapsed-toggle]')
+      .should('be.visible')
+      .then(($handle) => {
+        const handle = $handle[0];
+        const rect = handle.getBoundingClientRect();
+        const hit = handle.ownerDocument.elementFromPoint(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        );
+        expect(hit === handle || handle.contains(hit)).to.equal(true);
+        handle.click();
+      });
     getMenu().should('have.attr', 'data-collapsed', 'false');
   };
 

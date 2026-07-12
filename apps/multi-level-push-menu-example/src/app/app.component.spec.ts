@@ -82,6 +82,22 @@ describe('AppComponent', () => {
     expect(component.lastEvent.label).toBe('Menu collapsed');
   });
 
+  it('expands the controlled menu through its collapsed handle', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    element.querySelector<HTMLElement>('[data-menu-backdrop]')?.click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.collapsed).toBe(true);
+
+    element.querySelector<HTMLElement>('[data-menu-collapsed-toggle]')?.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.collapsed).toBe(false);
+    expect(element.querySelector('[data-menu-collapsed-toggle]')).toBeNull();
+  });
+
   it('does not replace activation details while syncing an automatic close', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const component = fixture.componentInstance;

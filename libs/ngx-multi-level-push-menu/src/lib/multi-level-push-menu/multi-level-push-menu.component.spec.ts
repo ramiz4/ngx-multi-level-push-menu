@@ -105,6 +105,13 @@ describe('MultiLevelPushMenuComponent', () => {
       element.querySelector('.ngx-push-menu__items')?.hasAttribute('inert'),
     ).toBe(false);
     expect(element.querySelector('nav')?.hasAttribute('inert')).toBe(false);
+    expect(
+      Array.from(
+        element.querySelectorAll<HTMLElement>('.ngx-push-menu__item-control'),
+      ).every((control) =>
+        Boolean(control.querySelector('.ngx-push-menu__item-icon')),
+      ),
+    ).toBe(true);
   });
 
   it('closes from the backdrop outside the navigation', () => {
@@ -296,6 +303,11 @@ describe('MultiLevelPushMenuComponent', () => {
     );
     expect(collapsedToggle?.tabIndex).toBe(0);
     expect(collapsedToggle?.closest('nav')).not.toBeNull();
+    const collapsedBack = element.querySelector<HTMLButtonElement>(
+      '.ngx-push-menu__level[data-active="true"] [data-menu-back]',
+    );
+    expect(collapsedBack?.getAttribute('aria-hidden')).toBeNull();
+    expect(collapsedBack?.tabIndex).toBe(0);
     await nextAnimationFrame();
     expect(element.ownerDocument.activeElement).toBe(collapsedToggle);
 

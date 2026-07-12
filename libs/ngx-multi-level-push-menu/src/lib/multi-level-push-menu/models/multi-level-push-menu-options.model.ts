@@ -1,6 +1,7 @@
 import {
   ANGLE_LEFT_SVG,
   ANGLE_RIGHT_SVG,
+  DEFAULT_ITEM_SVG,
   MENU_BARS_SVG,
 } from '../utilities/svg-icons';
 import { MultiLevelPushMenuItem } from './multi-level-push-menu-item.model';
@@ -47,6 +48,9 @@ export class MultiLevelPushMenuOptions {
 
   /** Icon used for menu items containing sub-items - SVG content */
   public groupIcon = ANGLE_RIGHT_SVG;
+
+  /** Fallback icon used when a menu item does not provide an icon. */
+  public defaultItemIcon = DEFAULT_ITEM_SVG;
 
   /** Width of each ancestor rail as a number of pixels or CSS length. */
   public overlapWidth: string | number = 55;

@@ -26,3 +26,8 @@ export const ANGLE_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox=
 export const ANGLE_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="1em" height="1em" fill="currentColor">
   <path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/>
 </svg>`;
+
+/** Generic item icon used when a menu item does not provide one. */
+export const DEFAULT_ITEM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor">
+  <path d="M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
+</svg>`;

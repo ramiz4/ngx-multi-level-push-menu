@@ -70,7 +70,11 @@ a:focus-visible {
 }
 
 .demo-shell {
+  container-type: inline-size;
+  max-width: 100%;
   min-height: 100%;
+  min-width: 0;
+  overflow-x: clip;
   background:
     radial-gradient(
       circle at 78% 10%,
@@ -88,6 +92,8 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   min-height: 4.5rem;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.75rem clamp(1rem, 4vw, 3rem);
   border-bottom: 1px solid rgb(11 58 50 / 9%);
   background: rgb(251 253 252 / 83%);
@@ -96,8 +102,10 @@ a:focus-visible {
 
 .demo-brand {
   display: inline-flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
   color: inherit;
   text-decoration: none;
 }
@@ -122,7 +130,10 @@ a:focus-visible {
 }
 
 .demo-brand strong {
+  overflow: hidden;
   letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .demo-brand small {
@@ -133,6 +144,7 @@ a:focus-visible {
 
 .demo-topbar__actions {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 0.55rem;
   color: #55736d;
@@ -176,8 +188,15 @@ a:focus-visible {
 
 .demo-content {
   width: min(72rem, 100%);
+  max-width: 100%;
+  min-width: 0;
   margin-inline: auto;
   padding: 0 clamp(1rem, 4vw, 3rem) 2rem;
+}
+
+.demo-content > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .demo-hero {
@@ -1060,7 +1079,7 @@ a:focus-visible {
   }
 
   .demo-hero h1 {
-    font-size: clamp(2.6rem, 14vw, 4rem);
+    font-size: clamp(2.35rem, 13cqi, 4rem);
   }
 
   .demo-hero__visual {

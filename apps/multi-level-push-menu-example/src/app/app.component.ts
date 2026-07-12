@@ -356,7 +356,7 @@ export class AppComponent {
       mode: 'cover',
       direction: 'ltr',
       backText: 'Back',
-      closeOnNavigation: false,
+      closeOnNavigation: true,
       preserveActiveLevelOnCollapse: true,
       animationDuration: 240,
     });

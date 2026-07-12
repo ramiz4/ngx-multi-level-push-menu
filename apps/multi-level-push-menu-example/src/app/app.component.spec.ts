@@ -109,7 +109,7 @@ describe('AppComponent', () => {
 
     expect(component.options.mode).toBe('cover');
     expect(component.options.direction).toBe('ltr');
-    expect(component.options.closeOnNavigation).toBe(false);
+    expect(component.options.closeOnNavigation).toBe(true);
     expect(component.theme).toBe('aurora');
     expect(component.collapsed).toBe(false);
     expect(component.lastEvent.label).toBe('Playground reset');

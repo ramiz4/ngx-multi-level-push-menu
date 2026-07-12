@@ -6,6 +6,30 @@ import {
 } from '../support/app.po';
 
 describe('multi-level push menu playground', () => {
+  const closeFromOutside = () => {
+    getMenu().find('[data-menu-backdrop]').click();
+    getMenu().should('have.attr', 'data-collapsed', 'true');
+  };
+
+  const expandFromHandle = () => {
+    getMenu().find('[data-menu-collapsed-toggle]').click();
+    getMenu().should('have.attr', 'data-collapsed', 'false');
+  };
+
+  const assertFullWidthContent = (expectedOffset: number) => {
+    getMenu().should(($menu) => {
+      const menuRect = $menu[0]?.getBoundingClientRect();
+      const contentRect = $menu[0]
+        ?.querySelector<HTMLElement>('.ngx-push-menu__content')
+        ?.getBoundingClientRect();
+      expect(menuRect).not.to.equal(undefined);
+      expect(contentRect).not.to.equal(undefined);
+      if (!menuRect || !contentRect) return;
+      expect(contentRect.width).to.be.closeTo(menuRect.width, 1);
+      expect(contentRect.left).to.be.closeTo(menuRect.left + expectedOffset, 1);
+    });
+  };
+
   const assertOverlapGeometry = (
     railLabels: readonly string[],
     direction: 'ltr' | 'rtl' = 'ltr',
@@ -32,17 +56,19 @@ describe('multi-level push menu playground', () => {
       const navigationRect = navigation.getBoundingClientRect();
       const activeRect = activeLevel.getBoundingClientRect();
       const contentRect = content.getBoundingClientRect();
+      const menuRect = $menu[0].getBoundingClientRect();
       expect(navigationRect.width).to.be.closeTo(
         280 + railLabels.length * 40,
         1,
       );
       expect(activeRect.width).to.be.closeTo(280, 1);
+      expect(contentRect.width).to.be.closeTo(menuRect.width, 1);
+      expect(contentRect.left).to.be.closeTo(menuRect.left, 1);
+      expect(contentRect.right).to.be.closeTo(menuRect.right, 1);
       if (direction === 'ltr') {
         expect(activeRect.left).to.be.closeTo(navigationRect.left, 1);
-        expect(contentRect.left).to.be.closeTo(navigationRect.right, 1);
       } else {
         expect(activeRect.right).to.be.closeTo(navigationRect.right, 1);
-        expect(contentRect.right).to.be.closeTo(navigationRect.left, 1);
       }
       expect(
         rails.map((rail) => rail.getAttribute('aria-label')),
@@ -106,12 +132,13 @@ describe('multi-level push menu playground', () => {
       'have.text',
       'Products / Analytics / Live dashboard',
     );
+    getMenu().should('have.attr', 'data-collapsed', 'true');
   });
 
   it('keeps collapse and expand state controlled by the application', () => {
     getMenu().should('have.attr', 'data-collapsed', 'false');
 
-    cy.getByTestId('collapse-menu').click();
+    closeFromOutside();
     getMenu().should('have.attr', 'data-collapsed', 'true');
     getActiveLevel().find('.ngx-push-menu__items').should('have.attr', 'inert');
     getActiveLevel()
@@ -136,7 +163,9 @@ describe('multi-level push menu playground', () => {
     getActiveMenuControl('Open Analytics menu').focus().type('{leftarrow}');
     getActiveLevel().should('have.attr', 'aria-label', 'Nexus');
 
+    closeFromOutside();
     cy.getByTestId('toggle-direction').click();
+    expandFromHandle();
     getMenu().should('have.attr', 'data-direction', 'rtl');
     getMenu().find('nav').should('have.attr', 'dir', 'rtl');
     getMenu().find('.demo-shell').should('have.css', 'direction', 'ltr');
@@ -149,6 +178,7 @@ describe('multi-level push menu playground', () => {
   });
 
   it('switches cover, overlap and theme through public inputs', () => {
+    closeFromOutside();
     cy.getByTestId('mode-overlap').click();
     getMenu().should('have.attr', 'data-mode', 'overlap');
     cy.getByTestId('mode-overlap').should('have.attr', 'aria-pressed', 'true');
@@ -164,6 +194,7 @@ describe('multi-level push menu playground', () => {
   });
 
   it('provides copy-ready, complete quick-start examples', () => {
+    closeFromOutside();
     cy.window().then((window) => {
       const writeText = cy.stub().resolves();
       Object.defineProperty(window.navigator, 'clipboard', {
@@ -187,6 +218,7 @@ describe('multi-level push menu playground', () => {
   });
 
   it('demonstrates targeted service control and configuration reset', () => {
+    closeFromOutside();
     cy.getByTestId('mode-overlap').click();
     cy.getByTestId('toggle-direction').click();
     cy.getByTestId('toggle-close-on-navigation').click();
@@ -194,6 +226,7 @@ describe('multi-level push menu playground', () => {
     cy.getByTestId('service-analytics').click();
     getActiveLevel().should('have.attr', 'aria-label', 'Analytics');
 
+    closeFromOutside();
     cy.getByTestId('reset-playground').click();
     getMenu()
       .should('have.attr', 'data-mode', 'cover')
@@ -202,7 +235,7 @@ describe('multi-level push menu playground', () => {
     cy.getByTestId('toggle-close-on-navigation').should(
       'have.attr',
       'aria-pressed',
-      'false',
+      'true',
     );
   });
 
@@ -210,11 +243,20 @@ describe('multi-level push menu playground', () => {
     cy.viewport(375, 812);
     cy.visit('/');
 
-    getActiveLevel().find('[data-menu-toggle]').click();
-    getMenu().should('have.attr', 'data-collapsed', 'true');
-    getMenu()
-      .find('.ngx-push-menu__content')
-      .should('have.css', 'left', '40px');
+    assertFullWidthContent(280);
+    closeFromOutside();
+    assertFullWidthContent(0);
+    getMenu().should(($menu) => {
+      const menuRect = $menu[0].getBoundingClientRect();
+      const handleRect = $menu[0]
+        .querySelector<HTMLElement>('[data-menu-collapsed-toggle]')
+        ?.getBoundingClientRect();
+      expect(handleRect).not.to.equal(undefined);
+      if (!handleRect) return;
+      expect(handleRect.width).to.be.closeTo(56, 1);
+      expect(handleRect.left).to.be.at.least(menuRect.left);
+      expect(handleRect.right).to.be.at.most(menuRect.right);
+    });
     cy.get('h1').should('be.visible');
     cy.getByTestId('snippet-install').click();
     cy.get('[role="tabpanel"]').scrollIntoView();
@@ -224,6 +266,25 @@ describe('multi-level push menu playground', () => {
         window.innerWidth,
       );
     });
+  });
+
+  it('keeps content full-width in cover and overlap for LTR and RTL', () => {
+    cy.viewport(375, 812);
+
+    assertFullWidthContent(280);
+    closeFromOutside();
+    assertFullWidthContent(0);
+
+    cy.getByTestId('toggle-direction').click();
+    expandFromHandle();
+    assertFullWidthContent(-280);
+    closeFromOutside();
+    assertFullWidthContent(0);
+
+    cy.getByTestId('mode-overlap').click();
+    expandFromHandle();
+    assertFullWidthContent(0);
+    closeFromOutside();
   });
 
   it('stacks clickable overlap rails and paints deep mobile levels immediately', () => {
@@ -243,7 +304,9 @@ describe('multi-level push menu playground', () => {
     getBackButton().click();
 
     cy.viewport(1280, 800);
+    closeFromOutside();
     cy.getByTestId('mode-overlap').click();
+    expandFromHandle();
     cy.viewport(375, 812);
     getActiveMenuControl('Open Products menu').click();
     getActiveLevel()
@@ -292,7 +355,9 @@ describe('multi-level push menu playground', () => {
     getMenu().find('[data-menu-rail]').should('not.exist');
 
     cy.viewport(1280, 800);
+    closeFromOutside();
     cy.getByTestId('toggle-direction').click();
+    expandFromHandle();
     cy.viewport(375, 812);
     getActiveMenuControl('Open Products menu').click();
     getActiveMenuControl('Open Analytics menu').click();

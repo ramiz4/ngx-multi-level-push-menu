@@ -71,7 +71,7 @@ export class MultiLevelPushMenuOptions {
   public ariaLabel = 'Main navigation';
 
   /** Collapse the menu after a leaf item successfully starts navigation. */
-  public closeOnNavigation = false;
+  public closeOnNavigation = true;
 
   /** Keep the active submenu path when the menu is collapsed and expanded. */
   public preserveActiveLevelOnCollapse = true;

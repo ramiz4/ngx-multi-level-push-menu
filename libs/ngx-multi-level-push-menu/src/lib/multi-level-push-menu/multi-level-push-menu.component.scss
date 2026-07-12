@@ -43,8 +43,11 @@
   background: var(--ngx-push-menu-background, #336ca6);
   box-shadow: var(--ngx-push-menu-shadow, 0 0.5rem 1.5rem rgb(0 0 0 / 24%));
   transform: translate3d(0, 0, 0);
-  transition: transform var(--ngx-push-menu-duration, 500ms)
-    var(--ngx-push-menu-motion-easing);
+  transition:
+    inline-size var(--ngx-push-menu-duration, 500ms)
+      var(--ngx-push-menu-motion-easing),
+    transform var(--ngx-push-menu-duration, 500ms)
+      var(--ngx-push-menu-motion-easing);
   backface-visibility: hidden;
   contain: layout paint style;
   will-change: transform;
@@ -63,7 +66,13 @@
   --ngx-push-menu-motion-edge: 100%;
 }
 
-.ngx-push-menu--ltr.ngx-push-menu--collapsed .ngx-push-menu__navigation {
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__navigation {
+  inline-size: var(--ngx-push-menu-collapsed-handle-width);
+}
+
+.ngx-push-menu--ltr.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
+  .ngx-push-menu__navigation {
   transform: translate3d(
     calc(0px - var(--ngx-push-menu-effective-width)),
     0,
@@ -71,8 +80,14 @@
   );
 }
 
-.ngx-push-menu--rtl.ngx-push-menu--collapsed .ngx-push-menu__navigation {
+.ngx-push-menu--rtl.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
+  .ngx-push-menu__navigation {
   transform: translate3d(var(--ngx-push-menu-effective-width), 0, 0);
+}
+
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__level {
+  inline-size: var(--ngx-push-menu-collapsed-handle-width);
 }
 
 .ngx-push-menu__level {
@@ -168,24 +183,6 @@
   line-height: 1;
 }
 
-.ngx-push-menu__collapsed-toggle {
-  appearance: none;
-  position: absolute;
-  z-index: 200;
-  top: 0;
-  display: grid;
-  place-items: center;
-  inline-size: var(--ngx-push-menu-collapsed-handle-width);
-  min-inline-size: var(--ngx-push-menu-collapsed-handle-width);
-  block-size: 3.5rem;
-  padding: 0.75rem;
-  color: inherit;
-  background: var(--ngx-push-menu-active, #1f4164);
-  border: 0;
-  border-radius: 0;
-  cursor: pointer;
-}
-
 .ngx-push-menu__header {
   display: flex;
   align-items: center;
@@ -211,7 +208,6 @@
 }
 
 .ngx-push-menu__toggle,
-.ngx-push-menu__collapsed-toggle,
 .ngx-push-menu__back,
 .ngx-push-menu__item-control {
   appearance: none;
@@ -259,9 +255,33 @@
 }
 
 .ngx-push-menu--collapsed .ngx-push-menu__back,
-.ngx-push-menu--collapsed .ngx-push-menu__items {
+.ngx-push-menu--collapsed.ngx-push-menu--full-collapse .ngx-push-menu__items {
   visibility: hidden;
   pointer-events: none;
+}
+
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__header {
+  gap: 0;
+  padding: 0;
+}
+
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__header-icon,
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__title,
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__item-label,
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__group-icon {
+  display: none;
+}
+
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__item-control {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0.75rem;
 }
 
 .ngx-push-menu__item {
@@ -335,7 +355,6 @@
 }
 
 .ngx-push-menu__toggle:focus-visible,
-.ngx-push-menu__collapsed-toggle:focus-visible,
 .ngx-push-menu__back:focus-visible,
 .ngx-push-menu__item-control:focus-visible,
 .ngx-push-menu__rail:focus-visible {
@@ -361,6 +380,20 @@
   backface-visibility: hidden;
   will-change: transform;
   -webkit-overflow-scrolling: touch;
+}
+
+.ngx-push-menu--ltr.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__content {
+  right: auto;
+  left: var(--ngx-push-menu-collapsed-handle-width);
+  inline-size: calc(100% - var(--ngx-push-menu-collapsed-handle-width));
+}
+
+.ngx-push-menu--rtl.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__content {
+  right: var(--ngx-push-menu-collapsed-handle-width);
+  left: auto;
+  inline-size: calc(100% - var(--ngx-push-menu-collapsed-handle-width));
 }
 
 .ngx-push-menu--cover.ngx-push-menu--ltr:not(.ngx-push-menu--collapsed)
@@ -485,7 +518,6 @@
   .ngx-push-menu__navigation,
   .ngx-push-menu__level,
   .ngx-push-menu__rail,
-  .ngx-push-menu__collapsed-toggle,
   .ngx-push-menu__header,
   .ngx-push-menu__back,
   .ngx-push-menu__item-control {

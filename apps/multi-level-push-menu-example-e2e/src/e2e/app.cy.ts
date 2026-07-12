@@ -10,7 +10,7 @@ describe('multi-level push menu playground', () => {
     getMenu().should(($menu) => {
       const menuRect = $menu[0].getBoundingClientRect();
       const handle = $menu[0].querySelector<HTMLElement>(
-        '[data-menu-collapsed-toggle]',
+        '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
       );
       expect(handle).not.to.equal(null);
       if (!handle) return;
@@ -61,7 +61,7 @@ describe('multi-level push menu playground', () => {
   const expandFromHandle = () => {
     assertCollapsedHandleSettled();
     getMenu()
-      .find('[data-menu-collapsed-toggle]')
+      .find('.ngx-push-menu__level[data-active="true"] [data-menu-toggle]')
       .should('be.visible')
       .then(($handle) => {
         const handle = $handle[0];
@@ -105,6 +105,30 @@ describe('multi-level push menu playground', () => {
       if (!menuRect || !contentRect) return;
       expect(contentRect.width).to.be.closeTo(menuRect.width, 1);
       expect(contentRect.left).to.be.closeTo(menuRect.left + expectedOffset, 1);
+    });
+  };
+
+  const assertCollapsedContent = (direction: 'ltr' | 'rtl' = 'ltr') => {
+    getMenu().should(($menu) => {
+      const menuRect = $menu[0].getBoundingClientRect();
+      const contentRect = $menu[0]
+        .querySelector<HTMLElement>('.ngx-push-menu__content')
+        ?.getBoundingClientRect();
+      const navigationRect = $menu[0]
+        .querySelector<HTMLElement>('.ngx-push-menu__navigation')
+        ?.getBoundingClientRect();
+      expect(contentRect).not.to.equal(undefined);
+      expect(navigationRect).not.to.equal(undefined);
+      if (!contentRect || !navigationRect) return;
+
+      expect(navigationRect.height).to.be.closeTo(menuRect.height, 1);
+      expect(navigationRect.width).to.be.closeTo(56, 1);
+      expect(contentRect.width).to.be.closeTo(menuRect.width - 56, 1);
+      if (direction === 'ltr') {
+        expect(contentRect.left).to.be.closeTo(menuRect.left + 56, 1);
+      } else {
+        expect(contentRect.right).to.be.closeTo(menuRect.right - 56, 1);
+      }
     });
   };
 
@@ -248,10 +272,17 @@ describe('multi-level push menu playground', () => {
 
     closeFromOutside();
     getMenu().should('have.attr', 'data-collapsed', 'true');
-    getActiveLevel().find('.ngx-push-menu__items').should('have.attr', 'inert');
+    getActiveLevel()
+      .find('.ngx-push-menu__items')
+      .should('not.have.attr', 'inert');
     getActiveLevel()
       .find('.ngx-push-menu__item-control')
-      .should('have.attr', 'tabindex', '-1');
+      .first()
+      .should('have.attr', 'tabindex', '0');
+    getActiveLevel().find('.ngx-push-menu__item-icon').should('be.visible');
+    getActiveLevel()
+      .find('.ngx-push-menu__item-label')
+      .should('not.be.visible');
     cy.getByTestId('menu-state').should('contain.text', 'Collapsed');
 
     cy.getByTestId('expand-menu').click();
@@ -352,11 +383,13 @@ describe('multi-level push menu playground', () => {
 
     assertFullWidthContent(280);
     closeFromOutside();
-    assertFullWidthContent(0);
+    assertCollapsedContent();
     getMenu().should(($menu) => {
       const menuRect = $menu[0].getBoundingClientRect();
       const handleRect = $menu[0]
-        .querySelector<HTMLElement>('[data-menu-collapsed-toggle]')
+        .querySelector<HTMLElement>(
+          '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
+        )
         ?.getBoundingClientRect();
       expect(handleRect).not.to.equal(undefined);
       if (!handleRect) return;
@@ -375,18 +408,18 @@ describe('multi-level push menu playground', () => {
     });
   });
 
-  it('keeps content full-width in cover and overlap for LTR and RTL', () => {
+  it('keeps expanded content full-width and reserves the collapsed icon rail', () => {
     cy.viewport(375, 812);
 
     assertFullWidthContent(280);
     closeFromOutside();
-    assertFullWidthContent(0);
+    assertCollapsedContent();
 
     toggleDirection('rtl');
     expandFromHandle();
     assertFullWidthContent(-280);
     closeFromOutside();
-    assertFullWidthContent(0);
+    assertCollapsedContent('rtl');
 
     cy.getByTestId('mode-overlap').click();
     expandFromHandle();

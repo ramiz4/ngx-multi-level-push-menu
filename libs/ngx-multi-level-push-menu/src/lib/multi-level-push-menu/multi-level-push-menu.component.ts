@@ -303,7 +303,10 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
   /** @internal */
   protected isLevelAccessible(index: number): boolean {
-    return this.isLevelActive(index) && !this.isCollapsed();
+    return (
+      this.isLevelActive(index) &&
+      (!this.isCollapsed() || !this._options.fullCollapse)
+    );
   }
 
   /** @internal */
@@ -324,12 +327,9 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
   /** @internal */
   protected activeToggleTabIndex(levelIndex: number): number {
-    return this.isLevelActive(levelIndex) && !this.isCollapsed() ? 0 : -1;
-  }
-
-  /** @internal */
-  protected collapsedToggleTabIndex(): number {
-    return this.isCollapsed() && !this._options.fullCollapse ? 0 : -1;
+    return this.isLevelActive(levelIndex) && !this._options.fullCollapse
+      ? 0
+      : -1;
   }
 
   /** @internal */
@@ -816,7 +816,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
     if (shouldRestoreFocus) {
       if (this._options.fullCollapse) this.scheduleContentFocus();
-      else this.scheduleFocus('[data-menu-collapsed-toggle]', false);
+      else this.scheduleFocus('[data-menu-toggle]');
     }
   }
 
@@ -990,7 +990,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   private scheduleActiveLevelFocus(): void {
     if (this.isCollapsed()) {
       if (this._options.fullCollapse) this.scheduleContentFocus();
-      else this.scheduleFocus('[data-menu-collapsed-toggle]', false);
+      else this.scheduleFocus('[data-menu-toggle]');
       return;
     }
 

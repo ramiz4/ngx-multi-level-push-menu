@@ -105,7 +105,7 @@ describe('AppComponent', () => {
     expect(fixture.componentInstance.collapsed).toBe(true);
 
     const collapsedHandle = element.querySelector<HTMLElement>(
-      '[data-menu-collapsed-toggle]',
+      '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
     );
     expect(collapsedHandle).not.toBeNull();
 
@@ -113,7 +113,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.componentInstance.collapsed).toBe(false);
-    expect(element.querySelector('[data-menu-collapsed-toggle]')).toBeNull();
+    expect(collapsedHandle?.getAttribute('aria-expanded')).toBe('true');
   });
 
   it('does not replace activation details while syncing an automatic close', () => {

@@ -278,7 +278,7 @@ While expanded, the area outside the visible drawer acts as a close target and d
 | `closeOnNavigation`             | `boolean`                                                             | `true`               | Collapse after leaf navigation                                                                            |
 | `preserveActiveLevelOnCollapse` | `boolean`                                                             | `true`               | Keep the submenu stack across collapse/expand                                                             |
 | `maxDepth`                      | `number`                                                              | `50`                 | Maximum submenu depth; also limits malformed/cyclic data                                                  |
-| `animationDuration`             | `string \| number`                                                    | `280`                | CSS time or milliseconds when numeric                                                                     |
+| `animationDuration`             | `string \| number`                                                    | `500`                | CSS time or milliseconds when numeric                                                                     |
 
 ## Icons
 

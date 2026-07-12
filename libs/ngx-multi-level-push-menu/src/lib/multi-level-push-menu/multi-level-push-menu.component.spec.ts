@@ -141,7 +141,7 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(activeLevelText()).not.toContain('Beta child');
   });
 
-  it('renders cover offsets directly instead of relying on CSS arithmetic', () => {
+  it('keeps covered ancestors stationary while descendants exit toward the drawer edge', () => {
     clickControl('Alpha');
 
     const rootLevel = element.querySelector<HTMLElement>(
@@ -152,7 +152,7 @@ describe('MultiLevelPushMenuComponent', () => {
     );
     expect(
       rootLevel?.style.getPropertyValue('--ngx-push-menu-cover-offset'),
-    ).toBe('-100%');
+    ).toBe('0%');
     expect(
       activeLevel?.style.getPropertyValue('--ngx-push-menu-cover-offset'),
     ).toBe('0%');
@@ -164,7 +164,7 @@ describe('MultiLevelPushMenuComponent', () => {
     fixture.detectChanges();
     expect(
       rootLevel?.style.getPropertyValue('--ngx-push-menu-cover-offset'),
-    ).toBe('100%');
+    ).toBe('0%');
   });
 
   it('renders accessible overlap rails from the parent outward', () => {
@@ -236,7 +236,17 @@ describe('MultiLevelPushMenuComponent', () => {
     rails[1]?.click();
     fixture.detectChanges();
     expect(activeLevelTitle()).toBe('Nexus');
+    const exitingLevel = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__level[data-exiting="true"]',
+    );
+    expect(exitingLevel?.getAttribute('aria-label')).toBe('Analytics');
+    expect(exitingLevel?.getAttribute('aria-hidden')).toBe('true');
+    expect(element.querySelectorAll('[data-menu-rail]')).toHaveLength(2);
+
+    exitingLevel?.dispatchEvent(new Event('animationend', { bubbles: true }));
+    fixture.detectChanges();
     expect(element.querySelectorAll('[data-menu-rail]')).toHaveLength(0);
+    expect(element.querySelector('[data-exiting="true"]')).toBeNull();
     expect(levelChangeSpy).toHaveBeenLastCalledWith(0);
   });
 

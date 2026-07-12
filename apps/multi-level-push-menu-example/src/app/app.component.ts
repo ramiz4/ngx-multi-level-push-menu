@@ -362,7 +362,7 @@ export class AppComponent {
       backText: 'Back',
       closeOnNavigation: true,
       preserveActiveLevelOnCollapse: true,
-      animationDuration: 240,
+      animationDuration: 500,
     });
   }
 

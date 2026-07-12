@@ -76,6 +76,15 @@ describe('multi-level push menu playground', () => {
     getMenu().should('have.attr', 'data-collapsed', 'false');
   };
 
+  const toggleDirection = (expected: 'ltr' | 'rtl') => {
+    cy.getByTestId('toggle-direction')
+      .should('be.visible')
+      .then(($toggle) => {
+        $toggle[0].click();
+      });
+    getMenu().should('have.attr', 'data-direction', expected);
+  };
+
   const activateRail = (targetLevel: number) => {
     getMenu()
       .find(`[data-menu-rail][data-target-level="${targetLevel}"]`)
@@ -233,7 +242,7 @@ describe('multi-level push menu playground', () => {
     getActiveLevel().should('have.attr', 'aria-label', 'Nexus');
 
     closeFromOutside();
-    cy.getByTestId('toggle-direction').click();
+    toggleDirection('rtl');
     expandFromHandle();
     getMenu().should('have.attr', 'data-direction', 'rtl');
     getMenu().find('nav').should('have.attr', 'dir', 'rtl');
@@ -289,7 +298,7 @@ describe('multi-level push menu playground', () => {
   it('demonstrates targeted service control and configuration reset', () => {
     closeFromOutside();
     cy.getByTestId('mode-overlap').click();
-    cy.getByTestId('toggle-direction').click();
+    toggleDirection('rtl');
     cy.getByTestId('toggle-close-on-navigation').click();
 
     cy.getByTestId('service-analytics').click();
@@ -344,7 +353,7 @@ describe('multi-level push menu playground', () => {
     closeFromOutside();
     assertFullWidthContent(0);
 
-    cy.getByTestId('toggle-direction').click();
+    toggleDirection('rtl');
     expandFromHandle();
     assertFullWidthContent(-280);
     closeFromOutside();
@@ -455,7 +464,7 @@ describe('multi-level push menu playground', () => {
 
     cy.viewport(1280, 800);
     closeFromOutside();
-    cy.getByTestId('toggle-direction').click();
+    toggleDirection('rtl');
     expandFromHandle();
     cy.viewport(375, 812);
     getActiveMenuControl('Open Products menu').click();

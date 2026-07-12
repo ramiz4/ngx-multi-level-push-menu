@@ -88,6 +88,14 @@ jobs:
       - name: Build example application
         run: npm run build:app
 
+      - name: Validate GitHub Pages artifact
+        if: matrix.node-version == '22.x'
+        env:
+          BASE_HREF: /ngx-multi-level-push-menu/
+        run: |
+          npm run build:app -- --configuration=production --base-href "$BASE_HREF"
+          npm run prepare:pages
+
       - name: Validate distributable package
         run: |
           node tools/scripts/validate-package.mjs

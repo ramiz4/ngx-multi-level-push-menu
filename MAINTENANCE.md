@@ -144,6 +144,18 @@ Configure this before merging the release automation:
 
 The workflow intentionally uses a GitHub-hosted runner, npm `>=11.5.1`, Node `>=22.14`, `id-token: write`, and no shared package-manager cache. These are requirements of npm Trusted Publishing, not optional repository conventions.
 
+### Demo deployment
+
+The **Demo** workflow runs independently from the npm release after the same successful `main` CI. It checks out the exact validated commit, derives the site base path from GitHub Pages, builds the production example, validates the artifact, and deploys it to the protected `github-pages` environment. A copied `404.html` lets Angular Router restore deep links on GitHub Pages.
+
+One-time repository setup:
+
+1. In **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**.
+2. In **Settings → Environments → github-pages**, allow deployments from `main`. Do not add a required reviewer if deployment must remain automatic.
+3. Merge a pull request and verify both `https://ramiz4.github.io/ngx-multi-level-push-menu/` and one routed deep link.
+
+Do not deploy CI artifacts produced by pull requests. The privileged workflow intentionally rebuilds the trusted `main` commit without a shared package-manager cache. The Pages workflow uses `actions/configure-pages` for the base path so the same build also remains valid if a custom domain is introduced later.
+
 ### Required repository rules
 
 Protect the default branch with pull requests, required approvals, resolved conversations, and these required checks: both `Validate` jobs, all three `Consumer` jobs, `End-to-end (Chrome)`, `Dependency review`, and `CodeQL (JavaScript/TypeScript)`. Require a linear history or squash merges, block force pushes and deletions, and prevent bypass/direct pushes. Protect the `v*` tag namespace as well, while allowing only the Release workflow's GitHub Actions identity to create release tags. Keep pull-request titles in Conventional Commit form because a squash merge uses that title as release input.

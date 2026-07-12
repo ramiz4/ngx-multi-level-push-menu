@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import {
   MenuActivationEvent,
   MultiLevelPushMenuComponent,
   MultiLevelPushMenuItem,
   MultiLevelPushMenuOptions,
+  MultiLevelPushMenuService,
 } from '@ramiz4/ngx-multi-level-push-menu';
+import { DEMO_SNIPPETS, DemoSnippet, DemoSnippetId } from './demo-snippets';
 
 type DemoEventKind = 'ready' | 'group' | 'item' | 'state';
 type DemoTheme = 'aurora' | 'midnight';
@@ -42,12 +51,30 @@ const ICONS = {
 
 @Component({
   selector: 'ramiz4-root',
-  imports: [RouterOutlet, MultiLevelPushMenuComponent],
+  imports: [RouterLink, RouterOutlet, MultiLevelPushMenuComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
+  private readonly document = inject(DOCUMENT);
+  private readonly menuService = inject(MultiLevelPushMenuService);
+
+  readonly repositoryUrl =
+    'https://github.com/ramiz4/ngx-multi-level-push-menu';
+  readonly packageUrl =
+    'https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu';
+  readonly snippets = DEMO_SNIPPETS;
+  readonly installSnippet = DEMO_SNIPPETS[0];
+  readonly activeSnippetId = signal<DemoSnippetId>('component');
+  readonly copiedSnippetId = signal<DemoSnippetId | null>(null);
+  readonly copyStatus = signal('');
+  readonly activeSnippet = computed(
+    () =>
+      this.snippets.find((snippet) => snippet.id === this.activeSnippetId()) ??
+      this.snippets[0],
+  );
+
   readonly menuItems: readonly MultiLevelPushMenuItem<DemoMenuData>[] = [
     {
       id: 'home',
@@ -183,21 +210,7 @@ export class AppComponent {
     },
   ];
 
-  options = new MultiLevelPushMenuOptions({
-    title: 'Nexus',
-    titleIcon: ICONS.brand,
-    menuID: 'nexus-demo-menu',
-    ariaLabel: 'Nexus product navigation',
-    menuWidth: 320,
-    menuHeight: '100dvh',
-    overlapWidth: 52,
-    mode: 'cover',
-    direction: 'ltr',
-    backText: 'Back',
-    closeOnNavigation: false,
-    preserveActiveLevelOnCollapse: true,
-    animationDuration: 240,
-  });
+  options = this.createDefaultOptions();
 
   collapsed = false;
   theme: DemoTheme = 'aurora';
@@ -242,11 +255,129 @@ export class AppComponent {
     this.recordActivation('group', event);
   }
 
+  setMenuWidth(event: Event): void {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement)) return;
+
+    this.updateOptions({ menuWidth: input.valueAsNumber });
+    this.recordState(`Menu width set to ${input.valueAsNumber}px`);
+  }
+
+  toggleCloseOnNavigation(): void {
+    const closeOnNavigation = !this.options.closeOnNavigation;
+    this.updateOptions({ closeOnNavigation });
+    this.recordState(
+      `Close on navigation ${closeOnNavigation ? 'enabled' : 'disabled'}`,
+    );
+  }
+
+  togglePreserveLevel(): void {
+    const preserveActiveLevelOnCollapse =
+      !this.options.preserveActiveLevelOnCollapse;
+    this.updateOptions({ preserveActiveLevelOnCollapse });
+    this.recordState(
+      `Preserve active level ${preserveActiveLevelOnCollapse ? 'enabled' : 'disabled'}`,
+    );
+  }
+
+  resetPlayground(): void {
+    this.options = this.createDefaultOptions();
+    this.theme = 'aurora';
+    this.collapsed = false;
+    this.recordState('Playground reset');
+  }
+
+  runServiceCommand(command: 'open' | 'analytics' | 'back' | 'close'): void {
+    const targetId = this.options.menuID;
+
+    switch (command) {
+      case 'open':
+        this.menuService.openMenu(targetId);
+        break;
+      case 'analytics':
+        this.menuService.openMenu(targetId);
+        this.menuService.navigateToLevel('analytics', targetId);
+        break;
+      case 'back':
+        this.menuService.goBack(targetId);
+        break;
+      case 'close':
+        this.menuService.closeMenu(targetId);
+        break;
+    }
+
+    this.recordState(`Service command: ${command}`);
+  }
+
+  selectSnippet(id: DemoSnippetId): void {
+    this.activeSnippetId.set(id);
+    this.copiedSnippetId.set(null);
+  }
+
+  async copySnippet(snippet: DemoSnippet): Promise<void> {
+    let copied = false;
+
+    try {
+      const clipboard = this.document.defaultView?.navigator.clipboard;
+      if (clipboard) {
+        await clipboard.writeText(snippet.code);
+        copied = true;
+      }
+    } catch {
+      // The DOM fallback below also supports browsers that deny Clipboard API.
+    }
+
+    if (!copied) copied = this.copyWithDomFallback(snippet.code);
+
+    this.copiedSnippetId.set(copied ? snippet.id : null);
+    this.copyStatus.set(
+      copied
+        ? `${snippet.title} copied to the clipboard.`
+        : 'Copy was blocked. Select the code and copy it manually.',
+    );
+  }
+
   private updateOptions(patch: Partial<MultiLevelPushMenuOptions>): void {
     this.options = new MultiLevelPushMenuOptions({
       ...this.options,
       ...patch,
     });
+  }
+
+  private createDefaultOptions(): MultiLevelPushMenuOptions {
+    return new MultiLevelPushMenuOptions({
+      title: 'Nexus',
+      titleIcon: ICONS.brand,
+      menuID: 'nexus-demo-menu',
+      ariaLabel: 'Nexus product navigation',
+      menuWidth: 320,
+      menuHeight: '100dvh',
+      overlapWidth: 52,
+      mode: 'cover',
+      direction: 'ltr',
+      backText: 'Back',
+      closeOnNavigation: false,
+      preserveActiveLevelOnCollapse: true,
+      animationDuration: 240,
+    });
+  }
+
+  private copyWithDomFallback(text: string): boolean {
+    const textarea = this.document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    this.document.body.append(textarea);
+    textarea.select();
+
+    try {
+      return this.document.execCommand('copy');
+    } catch {
+      return false;
+    } finally {
+      textarea.remove();
+    }
   }
 
   private recordActivation(

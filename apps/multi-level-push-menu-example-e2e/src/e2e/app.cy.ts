@@ -164,12 +164,14 @@ describe('multi-level push menu playground', () => {
         1,
       );
       expect(activeRect.width).to.be.closeTo(280, 1);
-      expect(contentRect.width).to.be.closeTo(menuRect.width, 1);
-      expect(contentRect.left).to.be.closeTo(menuRect.left, 1);
-      expect(contentRect.right).to.be.closeTo(menuRect.right, 1);
+      expect(contentRect.width).to.be.closeTo(menuRect.width - 56, 1);
       if (direction === 'ltr') {
+        expect(contentRect.left).to.be.closeTo(menuRect.left + 56, 1);
+        expect(contentRect.right).to.be.closeTo(menuRect.right, 1);
         expect(activeRect.left).to.be.closeTo(navigationRect.left, 1);
       } else {
+        expect(contentRect.left).to.be.closeTo(menuRect.left, 1);
+        expect(contentRect.right).to.be.closeTo(menuRect.right - 56, 1);
         expect(activeRect.right).to.be.closeTo(navigationRect.right, 1);
       }
       expect(
@@ -444,7 +446,7 @@ describe('multi-level push menu playground', () => {
 
     cy.getByTestId('mode-overlap').click();
     expandFromHandle();
-    assertFullWidthContent(0);
+    assertOverlapGeometry([], 'rtl');
     closeFromOutside();
   });
 

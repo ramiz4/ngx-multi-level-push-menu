@@ -11,15 +11,13 @@ describe('AppComponent', () => {
     }).compileComponents();
   });
 
-  it('renders the provider-free standalone playground', () => {
+  it('renders the persistent menu shell and routed-content outlet', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('h1')?.textContent).toContain(
-      'Deep navigation',
-    );
     expect(element.querySelector('[data-testid="demo-menu"]')).not.toBeNull();
+    expect(element.querySelector('router-outlet')).not.toBeNull();
     expect(
       element.querySelector('[aria-label="Open Products menu"]'),
     ).not.toBeNull();
@@ -106,24 +104,12 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.collapsed).toBe(true);
 
-    element
-      .querySelector<HTMLElement>('[data-testid="toggle-direction"]')
-      ?.click();
-    fixture.detectChanges();
-    const rtlHandle = element.querySelector<HTMLElement>(
+    const collapsedHandle = element.querySelector<HTMLElement>(
       '[data-menu-collapsed-toggle]',
     );
-    expect(rtlHandle?.style.right).toBe('0px');
+    expect(collapsedHandle).not.toBeNull();
 
-    element.querySelector<HTMLElement>('[data-testid="mode-overlap"]')?.click();
-    fixture.detectChanges();
-    const overlapHandle = element.querySelector<HTMLElement>(
-      '[data-menu-collapsed-toggle]',
-    );
-    expect(fixture.componentInstance.options.direction).toBe('rtl');
-    expect(overlapHandle?.style.right).toBe('0px');
-
-    overlapHandle?.click();
+    collapsedHandle?.click();
     fixture.detectChanges();
 
     expect(fixture.componentInstance.collapsed).toBe(false);
@@ -164,11 +150,9 @@ describe('AppComponent', () => {
     fixture.detectChanges();
 
     expect(component.activeSnippet().id).toBe('template');
-    expect(
-      (fixture.nativeElement as HTMLElement).querySelector(
-        '[role="tabpanel"] code',
-      )?.textContent,
-    ).toContain('<ngx-multi-level-push-menu');
+    expect(component.activeSnippet().code).toContain(
+      '<ngx-multi-level-push-menu',
+    );
   });
 
   it('resets all live configuration through one public-options update', () => {

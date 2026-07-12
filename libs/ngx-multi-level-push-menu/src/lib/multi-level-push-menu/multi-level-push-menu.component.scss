@@ -52,24 +52,31 @@
 
 .ngx-push-menu--ltr.ngx-push-menu--collapsed .ngx-push-menu__navigation {
   transform: translateX(
-    calc(-100% + var(--ngx-push-menu-collapsed-handle-width))
+    calc(
+      0px - var(--ngx-push-menu-effective-width) +
+        var(--ngx-push-menu-collapsed-handle-width)
+    )
   );
 }
 
 .ngx-push-menu--rtl.ngx-push-menu--collapsed .ngx-push-menu__navigation {
   transform: translateX(
-    calc(100% - var(--ngx-push-menu-collapsed-handle-width))
+    calc(
+      var(--ngx-push-menu-effective-width) - var(
+          --ngx-push-menu-collapsed-handle-width
+        )
+    )
   );
 }
 
 .ngx-push-menu--ltr.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
   .ngx-push-menu__navigation {
-  transform: translateX(-100%);
+  transform: translateX(calc(0px - var(--ngx-push-menu-effective-width)));
 }
 
 .ngx-push-menu--rtl.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
   .ngx-push-menu__navigation {
-  transform: translateX(100%);
+  transform: translateX(var(--ngx-push-menu-effective-width));
 }
 
 .ngx-push-menu__level {

@@ -17,7 +17,9 @@ describe('ReleaseNotesComponent', () => {
     expect(
       element.querySelector('[data-testid="route-release-notes"]'),
     ).not.toBeNull();
-    expect(element.textContent).toContain('20.2.0');
-    expect(element.textContent).toContain('Complete collapsed icon rails');
+    expect(element.textContent).toContain('20.2.1');
+    expect(element.textContent).toContain(
+      'Polished collapsed and overlap rails',
+    );
   });
 });

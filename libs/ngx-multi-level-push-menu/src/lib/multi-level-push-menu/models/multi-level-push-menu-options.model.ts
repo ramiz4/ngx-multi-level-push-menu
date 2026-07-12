@@ -80,7 +80,7 @@ export class MultiLevelPushMenuOptions {
   public maxDepth = 50;
 
   /** Animation duration as milliseconds or a valid CSS time. */
-  public animationDuration: string | number = 280;
+  public animationDuration: string | number = 500;
 
   constructor(options?: Partial<MultiLevelPushMenuOptions>) {
     if (options) {

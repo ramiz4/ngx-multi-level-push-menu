@@ -356,6 +356,36 @@ describe('multi-level push menu playground', () => {
     closeFromOutside();
   });
 
+  it('keeps entering and exiting panels mounted for the complete motion', () => {
+    cy.viewport(375, 812);
+
+    getActiveMenuControl('Open Products menu').click();
+    getActiveLevel()
+      .should('have.attr', 'aria-label', 'Products')
+      .and('have.attr', 'data-entering', 'true')
+      .then(($level) => {
+        const style = getComputedStyle($level[0]);
+        expect(style.animationName).to.contain('ngx-push-menu-enter');
+        expect(style.animationDuration).to.equal('0.5s');
+      });
+    getActiveLevel().should('not.have.attr', 'data-entering');
+
+    getBackButton().click();
+    getActiveLevel().should('have.attr', 'aria-label', 'Nexus');
+    getMenu()
+      .find('.ngx-push-menu__level[data-exiting="true"]')
+      .should('have.attr', 'aria-label', 'Products')
+      .and('have.attr', 'aria-hidden', 'true')
+      .then(($level) => {
+        const style = getComputedStyle($level[0]);
+        expect(style.animationName).to.contain('ngx-push-menu-exit');
+        expect(style.animationDuration).to.equal('0.5s');
+      });
+    getMenu()
+      .find('.ngx-push-menu__level[data-exiting="true"]')
+      .should('not.exist');
+  });
+
   it('stacks clickable overlap rails and paints deep mobile levels immediately', () => {
     cy.viewport(375, 812);
 

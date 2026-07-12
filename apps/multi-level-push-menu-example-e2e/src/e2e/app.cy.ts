@@ -108,4 +108,62 @@ describe('multi-level push menu playground', () => {
       .find('.ngx-push-menu__navigation')
       .should('have.css', 'background-color', 'rgb(21, 22, 46)');
   });
+
+  it('provides copy-ready, complete quick-start examples', () => {
+    cy.window().then((window) => {
+      const writeText = cy.stub().resolves();
+      Object.defineProperty(window.navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText },
+      });
+      cy.wrap(writeText).as('writeText');
+    });
+
+    cy.getByTestId('snippet-template').click();
+    cy.get('[role="tabpanel"] code').should(
+      'contain.text',
+      '<ngx-multi-level-push-menu',
+    );
+    cy.getByTestId('copy-snippet').click();
+    cy.getByTestId('copy-snippet').should('have.text', 'Copied');
+    cy.get('@writeText').should(
+      'have.been.calledWithMatch',
+      '<ngx-multi-level-push-menu',
+    );
+  });
+
+  it('demonstrates targeted service control and configuration reset', () => {
+    cy.getByTestId('mode-overlap').click();
+    cy.getByTestId('toggle-direction').click();
+    cy.getByTestId('toggle-close-on-navigation').click();
+
+    cy.getByTestId('service-analytics').click();
+    getActiveLevel().should('have.attr', 'aria-label', 'Analytics');
+
+    cy.getByTestId('reset-playground').click();
+    getMenu()
+      .should('have.attr', 'data-mode', 'cover')
+      .and('have.attr', 'data-direction', 'ltr')
+      .and('have.attr', 'data-theme', 'aurora');
+    cy.getByTestId('toggle-close-on-navigation').should(
+      'have.attr',
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('keeps the complete demo usable without horizontal overflow on mobile', () => {
+    cy.viewport(375, 812);
+    cy.visit('/');
+
+    cy.get('h1').should('be.visible');
+    cy.getByTestId('snippet-install').click();
+    cy.get('[role="tabpanel"]').scrollIntoView();
+    cy.get('[role="tabpanel"]').should('be.visible');
+    cy.window().then((window) => {
+      expect(window.document.documentElement.scrollWidth).to.be.at.most(
+        window.innerWidth,
+      );
+    });
+  });
 });

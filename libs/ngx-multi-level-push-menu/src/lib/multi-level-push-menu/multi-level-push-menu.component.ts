@@ -1,4 +1,9 @@
-import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
+import {
+  CommonModule,
+  DOCUMENT,
+  isPlatformBrowser,
+  Location,
+} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -44,6 +49,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly menuService = inject(MultiLevelPushMenuService);
   private readonly router = inject(Router, { optional: true });
+  private readonly location = inject(Location, { optional: true });
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private _options = new MultiLevelPushMenuOptions();
@@ -338,6 +344,14 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       .catch(() => {
         // Navigation errors remain owned by the application's Router error handler.
       });
+  }
+
+  /** @internal */
+  protected itemHref(item: MultiLevelPushMenuItem): string {
+    const link = item.link?.trim() || '';
+    if (!link || !this.location || this.isNativeOnlyLink(link)) return link;
+
+    return this.location.prepareExternalUrl(link);
   }
 
   goBack(focusParent = true): void {
@@ -699,7 +713,11 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
     }
 
     const link = item.link?.trim() || '';
-    return !/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(link);
+    return !this.isNativeOnlyLink(link);
+  }
+
+  private isNativeOnlyLink(link: string): boolean {
+    return /^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(link);
   }
 
   private itemKey(item: MultiLevelPushMenuItem, index: number): string {

@@ -16,6 +16,7 @@
     "start": "nx serve",
     "build": "nx run-many --target=build --all",
     "build:app": "nx build multi-level-push-menu-example",
+    "prepare:pages": "node tools/scripts/prepare-pages.mjs",
     "build:lib": "nx build ngx-multi-level-push-menu",
     "build:libs": "nx run-many --target=build --projects=tag:lib",
     "build:apps": "nx run-many --target=build --projects=tag:app",

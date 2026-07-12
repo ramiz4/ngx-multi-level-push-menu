@@ -81,4 +81,37 @@ describe('AppComponent', () => {
     expect(menu?.getAttribute('data-collapsed')).toBe('true');
     expect(component.lastEvent.label).toBe('Menu collapsed');
   });
+
+  it('switches between complete quick-start snippets', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const component = fixture.componentInstance;
+
+    component.selectSnippet('template');
+    fixture.detectChanges();
+
+    expect(component.activeSnippet().id).toBe('template');
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector(
+        '[role="tabpanel"] code',
+      )?.textContent,
+    ).toContain('<ngx-multi-level-push-menu');
+  });
+
+  it('resets all live configuration through one public-options update', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const component = fixture.componentInstance;
+    component.setMode('overlap');
+    component.toggleDirection();
+    component.toggleTheme();
+    component.toggleCloseOnNavigation();
+
+    component.resetPlayground();
+
+    expect(component.options.mode).toBe('cover');
+    expect(component.options.direction).toBe('ltr');
+    expect(component.options.closeOnNavigation).toBe(false);
+    expect(component.theme).toBe('aurora');
+    expect(component.collapsed).toBe(false);
+    expect(component.lastEvent.label).toBe('Playground reset');
+  });
 });

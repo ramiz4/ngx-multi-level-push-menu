@@ -14,18 +14,32 @@
   (groupActivate)="onGroupActivate($event)"
   (levelChange)="onLevelChange($event)"
 >
-  <main class="demo-shell">
+  <a class="demo-skip-link" href="#demo-main">Skip to demo content</a>
+
+  <main id="demo-main" class="demo-shell">
     <header class="demo-topbar">
-      <a class="demo-brand" href="/home" aria-label="Nexus demo home">
-        <span class="demo-brand__mark" aria-hidden="true">N</span>
+      <a
+        class="demo-brand"
+        routerLink="/"
+        aria-label="ngx-multi-level-push-menu demo home"
+      >
+        <span class="demo-brand__mark" aria-hidden="true">ngx</span>
         <span>
-          <strong>Nexus UI</strong>
-          <small>Push menu playground</small>
+          <strong>ngx push menu</strong>
+          <small>Interactive Angular demo</small>
         </span>
       </a>
 
-      <div class="demo-topbar__actions" aria-label="Menu state controls">
-        <span class="demo-state-dot" [class.is-active]="!collapsed"></span>
+      <div
+        class="demo-topbar__actions"
+        role="group"
+        aria-label="Menu state controls"
+      >
+        <span
+          class="demo-state-dot"
+          aria-hidden="true"
+          [class.is-active]="!collapsed"
+        ></span>
         <span data-testid="menu-state">
           {{ collapsed ? 'Collapsed' : 'Expanded' }}
         </span>
@@ -55,15 +69,42 @@
     <div class="demo-content">
       <section class="demo-hero" aria-labelledby="demo-heading">
         <div>
-          <p class="demo-eyebrow">Angular navigation, reimagined</p>
-          <h1 id="demo-heading">Deep navigation.<br />Delightfully simple.</h1>
+          <p class="demo-eyebrow">Live Angular 20–22 playground</p>
+          <h1 id="demo-heading">
+            Deep navigation.<br />Shallow learning curve.
+          </h1>
           <p class="demo-lead">
-            A provider-free, accessible push menu with typed events, responsive
-            motion and a tiny integration surface.
+            Accessible, typed multi-level navigation with a standalone-first
+            API, no required providers and no design-system lock-in.
           </p>
+
+          <div class="demo-hero__actions">
+            <button
+              type="button"
+              class="demo-button demo-button--primary"
+              data-testid="copy-install"
+              (click)="copySnippet(installSnippet)"
+            >
+              {{
+                copiedSnippetId() === 'install'
+                  ? 'Install command copied'
+                  : 'Copy npm install'
+              }}
+            </button>
+            <a
+              class="demo-button demo-button--secondary"
+              [href]="repositoryUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View source <span aria-hidden="true">&#8599;</span>
+            </a>
+          </div>
+
           <div class="demo-pills" aria-label="Library highlights">
             <span>Standalone</span>
             <span>Typed outputs</span>
+            <span>SSR-safe</span>
             <span>RTL ready</span>
             <span>Zero icon dependencies</span>
           </div>
@@ -79,13 +120,88 @@
         </div>
       </section>
 
+      <section
+        id="quick-start"
+        class="demo-quick-start"
+        aria-labelledby="quick-start-heading"
+      >
+        <div class="demo-section-heading">
+          <div>
+            <p class="demo-eyebrow">Copy, understand, ship</p>
+            <h2 id="quick-start-heading">Four steps to production</h2>
+          </div>
+          <p>
+            Every example below is complete, typed and ready to adapt in a
+            standalone Angular application.
+          </p>
+        </div>
+
+        <div
+          class="demo-snippet-tabs"
+          role="tablist"
+          aria-label="Quick start code examples"
+        >
+          @for (snippet of snippets; track snippet.id) {
+            <button
+              type="button"
+              role="tab"
+              [id]="'snippet-tab-' + snippet.id"
+              [attr.aria-controls]="'snippet-panel-' + snippet.id"
+              [attr.aria-selected]="activeSnippetId() === snippet.id"
+              [attr.tabindex]="activeSnippetId() === snippet.id ? 0 : -1"
+              [class.is-selected]="activeSnippetId() === snippet.id"
+              [attr.data-testid]="'snippet-' + snippet.id"
+              (click)="selectSnippet(snippet.id)"
+            >
+              <span>{{ snippet.step }}</span>
+              {{ snippet.title }}
+            </button>
+          }
+        </div>
+
+        @let snippet = activeSnippet();
+        <article
+          class="demo-snippet"
+          role="tabpanel"
+          [id]="'snippet-panel-' + snippet.id"
+          [attr.aria-labelledby]="'snippet-tab-' + snippet.id"
+        >
+          <header class="demo-snippet__header">
+            <div>
+              <span>{{ snippet.fileName }}</span>
+              <p>{{ snippet.description }}</p>
+            </div>
+            <button
+              type="button"
+              class="demo-copy-button"
+              data-testid="copy-snippet"
+              [attr.aria-label]="'Copy ' + snippet.title + ' code'"
+              (click)="copySnippet(snippet)"
+            >
+              {{ copiedSnippetId() === snippet.id ? 'Copied' : 'Copy' }}
+            </button>
+          </header>
+          <pre tabindex="0"><code
+            [attr.data-language]="snippet.language"
+            [textContent]="snippet.code"
+          ></code></pre>
+        </article>
+
+        <p class="demo-visually-hidden" role="status" aria-live="polite">
+          {{ copyStatus() }}
+        </p>
+      </section>
+
       <section class="demo-playground" aria-labelledby="playground-heading">
         <div class="demo-section-heading">
           <div>
-            <p class="demo-eyebrow">Live configuration</p>
+            <p class="demo-eyebrow">Live public API</p>
             <h2 id="playground-heading">Make it yours</h2>
           </div>
-          <p>Every control updates the component through public inputs.</p>
+          <p>
+            Use the menu on this page while every control updates its public
+            inputs in real time.
+          </p>
         </div>
 
         <div class="demo-toolbar">
@@ -140,6 +256,81 @@
           </div>
         </div>
 
+        <div class="demo-behaviors">
+          <label class="demo-width-control">
+            <span>
+              Menu width
+              <output>{{ options.menuWidth }}px</output>
+            </span>
+            <input
+              type="range"
+              min="280"
+              max="380"
+              step="20"
+              [value]="options.menuWidth"
+              (input)="setMenuWidth($event)"
+            />
+          </label>
+
+          <button
+            type="button"
+            class="demo-behavior-toggle"
+            data-testid="toggle-close-on-navigation"
+            [attr.aria-pressed]="options.closeOnNavigation"
+            (click)="toggleCloseOnNavigation()"
+          >
+            <span>Close after route</span>
+            <strong>{{ options.closeOnNavigation ? 'On' : 'Off' }}</strong>
+          </button>
+
+          <button
+            type="button"
+            class="demo-behavior-toggle"
+            data-testid="toggle-preserve-level"
+            [attr.aria-pressed]="options.preserveActiveLevelOnCollapse"
+            (click)="togglePreserveLevel()"
+          >
+            <span>Preserve active level</span>
+            <strong>
+              {{ options.preserveActiveLevelOnCollapse ? 'On' : 'Off' }}
+            </strong>
+          </button>
+
+          <button
+            type="button"
+            class="demo-reset-button"
+            data-testid="reset-playground"
+            (click)="resetPlayground()"
+          >
+            Reset
+          </button>
+        </div>
+
+        <div class="demo-command-bar">
+          <div>
+            <small>Targeted service commands</small>
+            <strong>Control <code>#nexus-demo-menu</code></strong>
+          </div>
+          <div role="group" aria-label="Multi-level push menu service commands">
+            <button type="button" (click)="runServiceCommand('open')">
+              Open
+            </button>
+            <button
+              type="button"
+              data-testid="service-analytics"
+              (click)="runServiceCommand('analytics')"
+            >
+              Go to Analytics
+            </button>
+            <button type="button" (click)="runServiceCommand('back')">
+              Back
+            </button>
+            <button type="button" (click)="runServiceCommand('close')">
+              Close
+            </button>
+          </div>
+        </div>
+
         <div class="demo-event-card" aria-live="polite">
           <div>
             <span class="demo-event-card__icon" aria-hidden="true"
@@ -171,7 +362,20 @@
 
       <footer class="demo-footer">
         <span>Built for Angular teams who care about the details.</span>
-        <span>Keyboard &bull; Touch &bull; Mouse</span>
+        <nav aria-label="Project links">
+          <a
+            [href]="repositoryUrl + '#readme'"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Documentation</a
+          >
+          <a [href]="packageUrl" target="_blank" rel="noopener noreferrer"
+            >npm</a
+          >
+          <a [href]="repositoryUrl" target="_blank" rel="noopener noreferrer"
+            >GitHub</a
+          >
+        </nav>
       </footer>
     </div>
   </main>

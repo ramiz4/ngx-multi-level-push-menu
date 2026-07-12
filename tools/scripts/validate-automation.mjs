@@ -48,6 +48,7 @@ const releaseWorkflow = readFileSync(
   resolve(workflowRoot, 'release.yml'),
   'utf8',
 );
+const pagesWorkflow = readFileSync(resolve(workflowRoot, 'pages.yml'), 'utf8');
 assert(
   /\bid-token:\s*write\b/.test(releaseWorkflow),
   'The release job must grant id-token: write for npm OIDC.',
@@ -63,6 +64,49 @@ assert(
 assert(
   !/\bGH_TOKEN:/.test(releaseWorkflow),
   'Do not pass github.token as GH_TOKEN: Semantic Release requires the x-access-token prefix selected by GITHUB_TOKEN.',
+);
+
+for (const [workflowName, workflow] of [
+  ['Release', releaseWorkflow],
+  ['Demo', pagesWorkflow],
+]) {
+  for (const guard of [
+    "github.event.workflow_run.conclusion == 'success'",
+    "github.event.workflow_run.event == 'push'",
+    'github.event.workflow_run.head_branch == github.event.repository.default_branch',
+    'github.event.workflow_run.head_repository.full_name == github.repository',
+  ]) {
+    assert(
+      workflow.includes(guard),
+      `${workflowName} must guard its privileged workflow_run job with ${guard}.`,
+    );
+  }
+  assert(
+    workflow.includes('ref: ${{ github.event.workflow_run.head_sha }}'),
+    `${workflowName} must check out the exact commit validated by CI.`,
+  );
+}
+
+assert(
+  /\bpages:\s*write\b/.test(pagesWorkflow) &&
+    /\bid-token:\s*write\b/.test(pagesWorkflow),
+  'The Pages deploy job must grant only the deployment permissions it needs.',
+);
+assert(
+  /\bpackage-manager-cache:\s*false\b/.test(pagesWorkflow) &&
+    !/^\s*cache:\s*npm\s*$/m.test(pagesWorkflow),
+  'Pages builds must not consume a shared package-manager cache.',
+);
+assert(
+  pagesWorkflow.includes('BASE_HREF: ${{ steps.pages.outputs.base_path }}/') &&
+    pagesWorkflow.includes('npm run prepare:pages'),
+  'Pages must use the configured site base path and validate its static artifact.',
+);
+assert(
+  /environment:\s*\n\s*name:\s*github-pages\s*\n\s*url:\s*\$\{\{\s*steps\.deployment\.outputs\.page_url\s*\}\}/.test(
+    pagesWorkflow,
+  ),
+  'Pages deployments must report their URL through the github-pages environment.',
 );
 
 assert(

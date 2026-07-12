@@ -151,7 +151,7 @@
               data-menu-control
               data-menu-item-control
               [attr.data-menu-item-index]="itemIndex"
-              [href]="item.link || ''"
+              [href]="itemHref(item)"
               [attr.target]="item.target || null"
               [attr.rel]="safeRel(item)"
               [attr.aria-label]="itemAriaLabel(item)"

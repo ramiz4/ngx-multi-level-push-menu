@@ -2,9 +2,12 @@
 
 [![npm version](https://badge.fury.io/js/@ramiz4%2Fngx-multi-level-push-menu.svg)](https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu)
 [![CI](https://github.com/ramiz4/ngx-multi-level-push-menu/actions/workflows/ci.yml/badge.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/live_demo-open-18a47e)](https://ramiz4.github.io/ngx-multi-level-push-menu/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/ramiz4/ngx-multi-level-push-menu/blob/main/LICENSE)
 
 Accessible, responsive, SSR-safe multi-level push navigation for Angular. The library is standalone-first, has no icon or animation dependency, and still supports existing NgModule applications.
+
+[Open the interactive demo](https://ramiz4.github.io/ngx-multi-level-push-menu/) to try every public input, targeted service commands, typed output events, RTL, theming, and copy-ready setup examples.
 
 ## Why use it?
 
@@ -164,6 +167,7 @@ The visible-label fallback order is `name`, `title`, `id`, then `Untitled item`.
 ### Routing behavior
 
 - Same-context internal links use the optional Angular `Router` when one is available.
+- Rendered internal anchor URLs include the application's base href, so open-in-new-tab and modified clicks also work from subpath deployments.
 - External, protocol-relative, fragment, modified-click, and non-`_self` links keep native anchor behavior.
 - `target="_blank"` is protected with `rel="noopener noreferrer"` unless `rel` is supplied.
 - Set `closeOnNavigation` to collapse after native navigation starts or Angular Router navigation succeeds.

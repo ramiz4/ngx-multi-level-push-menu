@@ -278,6 +278,26 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(control?.hasAttribute('href')).toBe(false);
   });
 
+  it('prepares internal anchor hrefs with the application base path', () => {
+    const componentWithLocation = component as unknown as {
+      location: { prepareExternalUrl: (url: string) => string };
+    };
+    componentWithLocation.location = {
+      prepareExternalUrl: (url) => `/repository${url}`,
+    };
+    component.menu = [
+      { name: 'Internal', link: '/products' },
+      { name: 'External', link: 'https://example.com/products' },
+      { name: 'Fragment', link: '#details' },
+    ];
+    fixture.detectChanges();
+
+    const links = Array.from(element.querySelectorAll('a'));
+    expect(links[0]?.getAttribute('href')).toBe('/repository/products');
+    expect(links[1]?.getAttribute('href')).toBe('https://example.com/products');
+    expect(links[2]?.getAttribute('href')).toBe('#details');
+  });
+
   it('resets the level once when a controlled collapse does not preserve it', () => {
     const levelChange = jest.spyOn(component.levelChange, 'emit');
     clickControl('Alpha');

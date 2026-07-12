@@ -91,19 +91,11 @@
 }
 
 .ngx-push-menu--cover.ngx-push-menu--ltr .ngx-push-menu__level {
-  transform: translateX(
-    calc(
-      (var(--ngx-push-menu-level) - var(--ngx-push-menu-active-level)) * 100%
-    )
-  );
+  transform: translateX(var(--ngx-push-menu-cover-offset));
 }
 
 .ngx-push-menu--cover.ngx-push-menu--rtl .ngx-push-menu__level {
-  transform: translateX(
-    calc(
-      (var(--ngx-push-menu-active-level) - var(--ngx-push-menu-level)) * 100%
-    )
-  );
+  transform: translateX(var(--ngx-push-menu-cover-offset));
 }
 
 .ngx-push-menu--overlap.ngx-push-menu--ltr .ngx-push-menu__level {
@@ -116,18 +108,6 @@
   transform: translateX(
     calc(var(--ngx-push-menu-level) * var(--ngx-push-menu-overlap) * -1)
   );
-}
-
-@starting-style {
-  .ngx-push-menu--ltr
-    .ngx-push-menu__level[data-active='true']:not([data-level-index='0']) {
-    transform: translateX(100%);
-  }
-
-  .ngx-push-menu--rtl
-    .ngx-push-menu__level[data-active='true']:not([data-level-index='0']) {
-    transform: translateX(-100%);
-  }
 }
 
 .ngx-push-menu__level[aria-hidden='true'] {
@@ -341,21 +321,25 @@
     --ngx-push-menu-content-offset: 0px;
   }
 
+  .ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse) {
+    --ngx-push-menu-content-offset: var(--ngx-push-menu-overlap);
+  }
+
   .ngx-push-menu--overlap.ngx-push-menu--ltr .ngx-push-menu__level {
-    transform: translateX(
-      calc(
-        (var(--ngx-push-menu-level) - var(--ngx-push-menu-active-level)) * 100%
-      )
-    );
+    transform: translateX(var(--ngx-push-menu-cover-offset));
   }
 
   .ngx-push-menu--overlap.ngx-push-menu--rtl .ngx-push-menu__level {
-    transform: translateX(
-      calc(
-        (var(--ngx-push-menu-active-level) - var(--ngx-push-menu-level)) * 100%
-      )
-    );
+    transform: translateX(var(--ngx-push-menu-cover-offset));
   }
+}
+
+.ngx-push-menu.ngx-push-menu--ltr .ngx-push-menu__level[data-entering='true'] {
+  transform: translateX(100%);
+}
+
+.ngx-push-menu.ngx-push-menu--rtl .ngx-push-menu__level[data-entering='true'] {
+  transform: translateX(-100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

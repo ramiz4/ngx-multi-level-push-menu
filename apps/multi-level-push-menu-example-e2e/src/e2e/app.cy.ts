@@ -158,6 +158,9 @@ describe('multi-level push menu playground', () => {
 
     getActiveLevel().find('[data-menu-toggle]').click();
     getMenu().should('have.attr', 'data-collapsed', 'true');
+    getMenu()
+      .find('.ngx-push-menu__content')
+      .should('have.css', 'left', '52px');
     cy.get('h1').should('be.visible');
     cy.getByTestId('snippet-install').click();
     cy.get('[role="tabpanel"]').scrollIntoView();

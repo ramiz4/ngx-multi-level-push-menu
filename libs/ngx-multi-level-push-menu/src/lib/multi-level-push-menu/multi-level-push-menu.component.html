@@ -246,6 +246,7 @@
       [attr.aria-label]="toggleLabel"
       aria-expanded="false"
       [attr.tabindex]="collapsedToggleTabIndex()"
+      (pointerdown)="$event.stopPropagation()"
       (click)="expandMenu()"
     >
       <ramiz4-menu-icon

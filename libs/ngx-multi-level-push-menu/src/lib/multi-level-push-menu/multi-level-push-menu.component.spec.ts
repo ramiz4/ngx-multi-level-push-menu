@@ -287,6 +287,13 @@ describe('MultiLevelPushMenuComponent', () => {
       'Expand Main navigation',
     );
     expect(collapsedToggle?.tabIndex).toBe(0);
+    const navigation = element.querySelector('nav');
+    const pointerDownSpy = jest.fn();
+    navigation?.addEventListener('pointerdown', pointerDownSpy);
+    collapsedToggle?.dispatchEvent(
+      new Event('pointerdown', { bubbles: true, cancelable: true }),
+    );
+    expect(pointerDownSpy).not.toHaveBeenCalled();
     await nextAnimationFrame();
     expect(element.ownerDocument.activeElement).toBe(collapsedToggle);
 

@@ -171,4 +171,20 @@ describe('multi-level push menu playground', () => {
       );
     });
   });
+
+  it('keeps overlap visually distinct from cover on mobile', () => {
+    cy.getByTestId('mode-overlap').click();
+    cy.viewport(375, 812);
+
+    getActiveMenuControl('Open Products menu').click();
+    getMenu()
+      .find('.ngx-push-menu__level[data-level-index="0"]')
+      .should('have.css', 'transform', 'matrix(1, 0, 0, 1, 0, 0)');
+    getActiveLevel().should(
+      'have.css',
+      'transform',
+      'matrix(1, 0, 0, 1, 52, 0)',
+    );
+    getActiveMenuControl('Open Analytics menu').should('be.visible');
+  });
 });

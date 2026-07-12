@@ -183,6 +183,11 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   /** @internal */
+  protected get activeOverlapOffset(): string {
+    return this.repeatedCssLength(this.overlapWidth, this.activeLevelIndex);
+  }
+
+  /** @internal */
   protected get overlapWidthPixels(): number {
     const value =
       typeof this._options.overlapWidth === 'number'
@@ -267,6 +272,15 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   protected coverLevelOffset(index: number): string {
     const direction = this._options.direction === 'rtl' ? -1 : 1;
     return `${(index - this.activeLevelIndex) * direction * 100}%`;
+  }
+
+  /** @internal */
+  protected overlapLevelOffset(index: number): string {
+    return this.repeatedCssLength(
+      this.overlapWidth,
+      index,
+      this._options.direction === 'rtl',
+    );
   }
 
   /** @internal */
@@ -749,6 +763,21 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       return Number.isFinite(value) ? `${Math.max(value, 0)}px` : fallback;
     }
     return value?.trim() || fallback;
+  }
+
+  private repeatedCssLength(
+    value: string,
+    count: number,
+    negative = false,
+  ): string {
+    const repetitions = Math.max(Math.trunc(count), 0);
+    if (repetitions === 0) return '0px';
+
+    const operator = negative ? ' - ' : ' + ';
+    return `calc(0px${operator}${Array.from(
+      { length: repetitions },
+      () => value,
+    ).join(operator)})`;
   }
 
   private normalizedMaxDepth(): number {

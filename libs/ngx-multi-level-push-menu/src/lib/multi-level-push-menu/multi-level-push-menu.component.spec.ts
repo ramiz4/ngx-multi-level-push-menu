@@ -150,6 +150,43 @@ describe('MultiLevelPushMenuComponent', () => {
     ).toBe('100%');
   });
 
+  it('renders distinct overlap offsets in both writing directions', () => {
+    fixture.componentRef.setInput(
+      'options',
+      new MultiLevelPushMenuOptions({
+        menu,
+        mode: 'overlap',
+        overlapWidth: '3rem',
+      }),
+    );
+    fixture.detectChanges();
+    clickControl('Alpha');
+
+    const activeLevel = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__level[data-level-index="1"]',
+    );
+    expect(
+      activeLevel?.style.getPropertyValue('--ngx-push-menu-overlap-offset'),
+    ).toBe('calc(0px + 3rem)');
+
+    fixture.componentRef.setInput(
+      'options',
+      new MultiLevelPushMenuOptions({
+        menu,
+        mode: 'overlap',
+        overlapWidth: '3rem',
+        direction: 'rtl',
+      }),
+    );
+    fixture.detectChanges();
+    const rtlActiveLevel = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__level[data-level-index="1"]',
+    );
+    expect(
+      rtlActiveLevel?.style.getPropertyValue('--ngx-push-menu-overlap-offset'),
+    ).toBe('calc(0px - 3rem)');
+  });
+
   it('removes old levels when menu data becomes empty', () => {
     clickControl('Alpha');
     expect(component.activeLevelIndex).toBe(1);

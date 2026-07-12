@@ -289,6 +289,7 @@ describe('MultiLevelPushMenuComponent', () => {
     );
     expect(collapsedToggle?.tabIndex).toBe(0);
     expect(collapsedToggle?.closest('nav')).toBeNull();
+    expect(collapsedToggle?.style.left).toBe('0px');
     await nextAnimationFrame();
     expect(element.ownerDocument.activeElement).toBe(collapsedToggle);
 

@@ -247,6 +247,8 @@
     [attr.aria-label]="toggleLabel"
     aria-expanded="false"
     [attr.tabindex]="collapsedToggleTabIndex()"
+    [style.left]="options.direction === 'ltr' ? '0' : 'auto'"
+    [style.right]="options.direction === 'rtl' ? '0' : 'auto'"
     (click)="expandMenu()"
   >
     <ramiz4-menu-icon

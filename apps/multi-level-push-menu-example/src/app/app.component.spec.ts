@@ -91,7 +91,16 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.collapsed).toBe(true);
 
-    element.querySelector<HTMLElement>('[data-menu-collapsed-toggle]')?.click();
+    element
+      .querySelector<HTMLElement>('[data-testid="toggle-direction"]')
+      ?.click();
+    fixture.detectChanges();
+    const rtlHandle = element.querySelector<HTMLElement>(
+      '[data-menu-collapsed-toggle]',
+    );
+    expect(rtlHandle?.style.right).toBe('0px');
+
+    rtlHandle?.click();
     fixture.detectChanges();
 
     expect(fixture.componentInstance.collapsed).toBe(false);

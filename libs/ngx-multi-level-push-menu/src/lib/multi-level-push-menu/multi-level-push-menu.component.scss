@@ -176,14 +176,6 @@
   cursor: pointer;
 }
 
-.ngx-push-menu--ltr > .ngx-push-menu__collapsed-toggle {
-  left: 0;
-}
-
-.ngx-push-menu--rtl > .ngx-push-menu__collapsed-toggle {
-  right: 0;
-}
-
 .ngx-push-menu__header {
   display: flex;
   align-items: center;

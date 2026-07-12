@@ -255,18 +255,18 @@ describe('multi-level push menu playground', () => {
     getActiveMenuControl('Open Analytics menu').click();
     getActiveLevel()
       .should('have.attr', 'aria-label', 'Analytics')
-      .and('not.have.attr', 'data-entering')
-      .should(($level) => {
-        const level = $level[0];
-        expect(level).not.to.equal(undefined);
-        if (!level) return;
-        const style = getComputedStyle(level);
-        const rect = level.getBoundingClientRect();
-        expect(style.visibility).to.equal('visible');
-        expect(style.opacity).to.equal('1');
-        expect(rect.width).to.be.greaterThan(0);
-        expect(rect.height).to.be.greaterThan(0);
-      });
+      .and('not.have.attr', 'data-entering');
+    getActiveLevel().should(($level) => {
+      const level = $level[0];
+      expect(level).not.to.equal(undefined);
+      if (!level) return;
+      const style = getComputedStyle(level);
+      const rect = level.getBoundingClientRect();
+      expect(style.visibility).to.equal('visible');
+      expect(style.opacity).to.equal('1');
+      expect(rect.width).to.be.greaterThan(0);
+      expect(rect.height).to.be.greaterThan(0);
+    });
     getActiveMenuControl('Live dashboard')
       .should('be.visible')
       .should(($control) => {

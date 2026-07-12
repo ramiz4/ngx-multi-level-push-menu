@@ -272,10 +272,15 @@ describe('multi-level push menu playground', () => {
 
     closeFromOutside();
     getMenu().should('have.attr', 'data-collapsed', 'true');
-    getActiveLevel().find('.ngx-push-menu__items').should('have.attr', 'inert');
+    getActiveLevel()
+      .find('.ngx-push-menu__items')
+      .should('not.have.attr', 'inert');
     getActiveLevel()
       .find('.ngx-push-menu__item-control')
-      .should('have.attr', 'tabindex', '-1');
+      .first()
+      .should('have.attr', 'tabindex', '0');
+    getActiveLevel().find('.ngx-push-menu__item-icon').should('be.visible');
+    getActiveLevel().find('.ngx-push-menu__item-label').should('not.be.visible');
     cy.getByTestId('menu-state').should('contain.text', 'Collapsed');
 
     cy.getByTestId('expand-menu').click();

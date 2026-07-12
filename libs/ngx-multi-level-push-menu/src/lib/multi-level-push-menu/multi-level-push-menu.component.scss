@@ -382,9 +382,17 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+.ngx-push-menu--ltr.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
   .ngx-push-menu__content {
-  inset-inline-start: var(--ngx-push-menu-collapsed-handle-width);
+  right: auto;
+  left: var(--ngx-push-menu-collapsed-handle-width);
+  inline-size: calc(100% - var(--ngx-push-menu-collapsed-handle-width));
+}
+
+.ngx-push-menu--rtl.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__content {
+  right: var(--ngx-push-menu-collapsed-handle-width);
+  left: auto;
   inline-size: calc(100% - var(--ngx-push-menu-collapsed-handle-width));
 }
 

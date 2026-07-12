@@ -234,6 +234,7 @@ describe('multi-level push menu playground', () => {
     cy.get('#demo-heading').should('not.exist');
 
     expandFromHandle();
+    getBackButton().click();
     getActiveMenuControl('Overview').click();
     cy.location('pathname').should('eq', '/home');
     cy.get('#demo-heading')

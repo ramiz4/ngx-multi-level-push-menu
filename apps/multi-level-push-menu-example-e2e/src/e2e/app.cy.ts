@@ -254,7 +254,7 @@ describe('multi-level push menu playground', () => {
     cy.getByTestId('route-release-notes').scrollIntoView();
     cy.getByTestId('route-release-notes')
       .should('be.visible')
-      .and('contain.text', '20.0.7');
+      .and('contain.text', '20.1.0');
     cy.get('#demo-heading').should('not.exist');
 
     expandFromHandle();

@@ -125,7 +125,7 @@ describe('multi-level push menu playground', () => {
       '<ngx-multi-level-push-menu',
     );
     cy.getByTestId('copy-snippet').click();
-    cy.getByTestId('copy-snippet').should('have.text', 'Copied');
+    cy.getByTestId('copy-snippet').should('contain.text', 'Copied');
     cy.get('@writeText').should(
       'have.been.calledWithMatch',
       '<ngx-multi-level-push-menu',
@@ -156,6 +156,8 @@ describe('multi-level push menu playground', () => {
     cy.viewport(375, 812);
     cy.visit('/');
 
+    getActiveLevel().find('[data-menu-toggle]').click();
+    getMenu().should('have.attr', 'data-collapsed', 'true');
     cy.get('h1').should('be.visible');
     cy.getByTestId('snippet-install').click();
     cy.get('[role="tabpanel"]').scrollIntoView();

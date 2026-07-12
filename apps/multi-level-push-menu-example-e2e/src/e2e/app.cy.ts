@@ -274,7 +274,7 @@ describe('multi-level push menu playground', () => {
         expect(control).not.to.equal(undefined);
         if (!control) return;
         const rect = control.getBoundingClientRect();
-        const hit = document.elementFromPoint(
+        const hit = control.ownerDocument.elementFromPoint(
           rect.left + rect.width / 2,
           rect.top + rect.height / 2,
         );

@@ -24,8 +24,8 @@
     [attr.id]="options.menuID || null"
     [attr.dir]="options.direction"
     [attr.aria-label]="navigationLabel"
-    [attr.aria-hidden]="isCollapsed() ? 'true' : null"
-    [attr.inert]="isCollapsed() ? '' : null"
+    [attr.aria-hidden]="isCollapsed() && options.fullCollapse ? 'true' : null"
+    [attr.inert]="isCollapsed() && options.fullCollapse ? '' : null"
     ramiz4Swipe
     [swipeEnabled]="options.swipe"
     [overlapWidth]="overlapWidthPixels"
@@ -103,8 +103,10 @@
 
       <ul
         class="ngx-push-menu__items"
-        [attr.aria-hidden]="isCollapsed() ? 'true' : null"
-        [attr.inert]="isCollapsed() ? '' : null"
+        [attr.aria-hidden]="
+          isCollapsed() && options.fullCollapse ? 'true' : null
+        "
+        [attr.inert]="isCollapsed() && options.fullCollapse ? '' : null"
       >
         <li
           *ngFor="
@@ -126,7 +128,7 @@
             aria-haspopup="true"
             aria-expanded="false"
             [attr.tabindex]="
-              isLevelActive(levelIndex) && !isCollapsed() ? 0 : -1
+              isLevelActive(levelIndex) && !options.fullCollapse ? 0 : -1
             "
             (click)="openSubmenu(item, itemIndex, $event)"
             (keydown)="onItemKeydown($event, item, itemIndex)"
@@ -158,7 +160,9 @@
               [attr.aria-label]="itemAriaLabel(item)"
               [attr.aria-disabled]="item.disabled ? 'true' : null"
               [attr.tabindex]="
-                isLevelActive(levelIndex) && !isCollapsed() && !item.disabled
+                isLevelActive(levelIndex) &&
+                !options.fullCollapse &&
+                !item.disabled
                   ? 0
                   : -1
               "
@@ -186,7 +190,7 @@
                 [disabled]="item.disabled"
                 [attr.aria-label]="itemAriaLabel(item)"
                 [attr.tabindex]="
-                  isLevelActive(levelIndex) && !isCollapsed() ? 0 : -1
+                  isLevelActive(levelIndex) && !options.fullCollapse ? 0 : -1
                 "
                 (click)="activateItem(item, $event)"
                 (keydown)="onItemKeydown($event, item, itemIndex)"
@@ -241,26 +245,6 @@
       </button>
     </div>
   </nav>
-
-  <button
-    *ngIf="isCollapsed() && !options.fullCollapse"
-    type="button"
-    class="ngx-push-menu__collapsed-toggle"
-    data-menu-collapsed-toggle
-    data-menu-no-swipe
-    [attr.aria-label]="toggleLabel"
-    aria-expanded="false"
-    [attr.tabindex]="collapsedToggleTabIndex()"
-    [style.left]="options.direction === 'ltr' ? '0' : 'auto'"
-    [style.right]="options.direction === 'rtl' ? '0' : 'auto'"
-    (click)="expandMenu()"
-  >
-    <ramiz4-menu-icon
-      class="ngx-push-menu__toggle-icon"
-      aria-hidden="true"
-      [icon]="options.titleIcon"
-    ></ramiz4-menu-icon>
-  </button>
 
   <div
     *ngIf="!isCollapsed()"

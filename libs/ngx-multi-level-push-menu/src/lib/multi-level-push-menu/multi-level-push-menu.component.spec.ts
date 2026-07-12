@@ -89,28 +89,22 @@ describe('MultiLevelPushMenuComponent', () => {
     ).toBe(-1);
   });
 
-  it('keeps only the visible toggle reachable when partially collapsed', () => {
+  it('keeps the full-height icon rail reachable when partially collapsed', () => {
     component.collapseMenu();
     fixture.detectChanges();
 
     expect(
       element.querySelector<HTMLElement>('.ngx-push-menu__toggle')?.tabIndex,
-    ).toBe(-1);
-    expect(
-      element.querySelector<HTMLElement>('[data-menu-collapsed-toggle]')
-        ?.tabIndex,
     ).toBe(0);
     expect(
       Array.from(
-        element.querySelectorAll<HTMLElement>(
-          '.ngx-push-menu__item-control, .ngx-push-menu__back',
-        ),
-      ).every((control) => control.tabIndex === -1),
+        element.querySelectorAll<HTMLElement>('.ngx-push-menu__item-control'),
+      ).some((control) => control.tabIndex === 0),
     ).toBe(true);
     expect(
       element.querySelector('.ngx-push-menu__items')?.hasAttribute('inert'),
-    ).toBe(true);
-    expect(element.querySelector('nav')?.hasAttribute('inert')).toBe(true);
+    ).toBe(false);
+    expect(element.querySelector('nav')?.hasAttribute('inert')).toBe(false);
   });
 
   it('closes from the backdrop outside the navigation', () => {
@@ -250,7 +244,7 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(levelChangeSpy).toHaveBeenLastCalledWith(0);
   });
 
-  it('uses and focuses the dedicated collapsed toggle at every depth', async () => {
+  it('keeps and focuses the active level icon rail at every depth', async () => {
     const deepMenu: MultiLevelPushMenuItem[] = [
       {
         name: 'Products',
@@ -288,21 +282,20 @@ describe('MultiLevelPushMenuComponent', () => {
       element
         .querySelector<HTMLElement>('.ngx-push-menu__level[data-active="true"]')
         ?.hasAttribute('inert'),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       element.querySelector<HTMLButtonElement>(
         '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
       )?.tabIndex,
-    ).toBe(-1);
+    ).toBe(0);
     const collapsedToggle = element.querySelector<HTMLButtonElement>(
-      '[data-menu-collapsed-toggle]',
+      '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
     );
     expect(collapsedToggle?.getAttribute('aria-label')).toBe(
       'Expand Main navigation',
     );
     expect(collapsedToggle?.tabIndex).toBe(0);
-    expect(collapsedToggle?.closest('nav')).toBeNull();
-    expect(collapsedToggle?.style.left).toBe('0px');
+    expect(collapsedToggle?.closest('nav')).not.toBeNull();
     await nextAnimationFrame();
     expect(element.ownerDocument.activeElement).toBe(collapsedToggle);
 

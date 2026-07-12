@@ -51,6 +51,7 @@ describe('MultiLevelPushMenuComponent', () => {
   it('is standalone and needs no explicit provider setup', () => {
     expect(component).toBeTruthy();
     expect(element.querySelector('nav')).not.toBeNull();
+    expect(new MultiLevelPushMenuOptions().closeOnNavigation).toBe(true);
   });
 
   it('keeps the historical ramiz4 selector as a compatibility alias', () => {
@@ -94,6 +95,10 @@ describe('MultiLevelPushMenuComponent', () => {
 
     expect(
       element.querySelector<HTMLElement>('.ngx-push-menu__toggle')?.tabIndex,
+    ).toBe(-1);
+    expect(
+      element.querySelector<HTMLElement>('[data-menu-collapsed-toggle]')
+        ?.tabIndex,
     ).toBe(0);
     expect(
       Array.from(
@@ -105,6 +110,18 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(
       element.querySelector('.ngx-push-menu__items')?.hasAttribute('inert'),
     ).toBe(true);
+    expect(element.querySelector('nav')?.hasAttribute('inert')).toBe(true);
+  });
+
+  it('closes from the backdrop outside the navigation', () => {
+    const backdrop = element.querySelector<HTMLElement>('[data-menu-backdrop]');
+    expect(backdrop).not.toBeNull();
+
+    backdrop?.click();
+    fixture.detectChanges();
+
+    expect(component.collapsed).toBe(true);
+    expect(element.querySelector('[data-menu-backdrop]')).toBeNull();
   });
 
   it('keeps sibling branches isolated after repeated back navigation', () => {
@@ -180,11 +197,15 @@ describe('MultiLevelPushMenuComponent', () => {
       wrapper?.style.getPropertyValue('--ngx-push-menu-active-overlap-offset'),
     ).toBe('calc(0px + 3rem + 3rem)');
     expect(activeLevelTitle()).toBe('Analytics');
-    expect(
-      element
-        .querySelector('.ngx-push-menu__level[data-active="true"]')
-        ?.hasAttribute('data-entering'),
-    ).toBe(false);
+    const enteringLevel = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__level[data-active="true"]',
+    );
+    expect(enteringLevel?.getAttribute('data-entering')).toBe('true');
+    expect(wrapper?.classList).toContain('ngx-push-menu--entering');
+    enteringLevel?.dispatchEvent(new Event('animationend', { bubbles: true }));
+    fixture.detectChanges();
+    expect(enteringLevel?.hasAttribute('data-entering')).toBe(false);
+    expect(wrapper?.classList).not.toContain('ngx-push-menu--entering');
 
     let rails = Array.from(
       element.querySelectorAll<HTMLButtonElement>('[data-menu-rail]'),
@@ -197,6 +218,9 @@ describe('MultiLevelPushMenuComponent', () => {
       'Back to Products',
       'Back to Nexus',
     ]);
+    expect(rails.every((rail) => rail.hasAttribute('data-menu-no-swipe'))).toBe(
+      true,
+    );
 
     const levelChangeSpy = jest.spyOn(component.levelChange, 'emit');
     rails[0]?.click();
@@ -216,7 +240,7 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(levelChangeSpy).toHaveBeenLastCalledWith(0);
   });
 
-  it('uses and focuses the outer overlap rail as the collapsed depth toggle', async () => {
+  it('uses and focuses the dedicated collapsed toggle at every depth', async () => {
     const deepMenu: MultiLevelPushMenuItem[] = [
       {
         name: 'Products',
@@ -247,10 +271,9 @@ describe('MultiLevelPushMenuComponent', () => {
     const rails = Array.from(
       element.querySelectorAll<HTMLButtonElement>('[data-menu-rail]'),
     );
-    expect(rails.map((rail) => rail.tabIndex)).toEqual([-1, 0]);
+    expect(rails.map((rail) => rail.tabIndex)).toEqual([-1, -1]);
     expect(rails[0]?.hasAttribute('inert')).toBe(true);
-    expect(rails[1]?.hasAttribute('inert')).toBe(false);
-    expect(rails[1]?.getAttribute('aria-label')).toBe('Expand Main navigation');
+    expect(rails[1]?.hasAttribute('inert')).toBe(true);
     expect(
       element
         .querySelector<HTMLElement>('.ngx-push-menu__level[data-active="true"]')
@@ -261,10 +284,19 @@ describe('MultiLevelPushMenuComponent', () => {
         '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
       )?.tabIndex,
     ).toBe(-1);
+    const collapsedToggle = element.querySelector<HTMLButtonElement>(
+      '[data-menu-collapsed-toggle]',
+    );
+    expect(collapsedToggle?.getAttribute('aria-label')).toBe(
+      'Expand Main navigation',
+    );
+    expect(collapsedToggle?.tabIndex).toBe(0);
+    expect(collapsedToggle?.closest('nav')).toBeNull();
+    expect(collapsedToggle?.style.left).toBe('0px');
     await nextAnimationFrame();
-    expect(element.ownerDocument.activeElement).toBe(rails[1]);
+    expect(element.ownerDocument.activeElement).toBe(collapsedToggle);
 
-    rails[1]?.click();
+    collapsedToggle?.click();
     fixture.detectChanges();
     expect(component.collapsed).toBe(false);
     expect(activeLevelTitle()).toBe('Analytics');

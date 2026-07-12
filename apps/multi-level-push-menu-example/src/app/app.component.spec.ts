@@ -82,6 +82,65 @@ describe('AppComponent', () => {
     expect(component.lastEvent.label).toBe('Menu collapsed');
   });
 
+  it('expands the controlled menu through its collapsed handle', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    element.querySelector<HTMLElement>('[data-menu-backdrop]')?.click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.collapsed).toBe(true);
+
+    element
+      .querySelector<HTMLElement>('[data-testid="toggle-direction"]')
+      ?.click();
+    fixture.detectChanges();
+    const rtlHandle = element.querySelector<HTMLElement>(
+      '[data-menu-collapsed-toggle]',
+    );
+    expect(rtlHandle?.style.right).toBe('0px');
+
+    element.querySelector<HTMLElement>('[data-testid="mode-overlap"]')?.click();
+    fixture.detectChanges();
+    const overlapHandle = element.querySelector<HTMLElement>(
+      '[data-menu-collapsed-toggle]',
+    );
+    expect(fixture.componentInstance.options.direction).toBe('rtl');
+    expect(overlapHandle?.style.right).toBe('0px');
+
+    overlapHandle?.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.collapsed).toBe(false);
+    expect(element.querySelector('[data-menu-collapsed-toggle]')).toBeNull();
+  });
+
+  it('does not replace activation details while syncing an automatic close', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const component = fixture.componentInstance;
+    const products = component.menuItems[1];
+    const analytics = products.items?.[0];
+    const liveDashboard = analytics?.items?.[0];
+
+    if (!analytics || !liveDashboard) {
+      throw new Error('Expected the analytics path and live dashboard item');
+    }
+
+    component.onItemActivate({
+      item: liveDashboard,
+      level: 2,
+      path: [products, analytics, liveDashboard],
+      originalEvent: new MouseEvent('click'),
+    });
+    component.syncCollapsed(true);
+
+    expect(component.collapsed).toBe(true);
+    expect(component.lastEvent.kind).toBe('item');
+    expect(component.lastEvent.path).toBe(
+      'Products / Analytics / Live dashboard',
+    );
+  });
+
   it('switches between complete quick-start snippets', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const component = fixture.componentInstance;
@@ -109,7 +168,7 @@ describe('AppComponent', () => {
 
     expect(component.options.mode).toBe('cover');
     expect(component.options.direction).toBe('ltr');
-    expect(component.options.closeOnNavigation).toBe(false);
+    expect(component.options.closeOnNavigation).toBe(true);
     expect(component.theme).toBe('aurora');
     expect(component.collapsed).toBe(false);
     expect(component.lastEvent.label).toBe('Playground reset');

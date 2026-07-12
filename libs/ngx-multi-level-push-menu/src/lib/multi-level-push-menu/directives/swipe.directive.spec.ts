@@ -125,6 +125,22 @@ describe('SwipeDirective', () => {
     expect(click).toHaveBeenCalledTimes(1);
   });
 
+  it('never suppresses controls explicitly excluded from swipe handling', () => {
+    const rail = document.createElement('button');
+    rail.setAttribute('data-menu-no-swipe', '');
+    const click = jest.fn();
+    rail.addEventListener('click', click);
+    element.append(rail);
+
+    directive.onPointerDown(pointerEvent({ target: element, clientX: 0 }));
+    directive.onPointerMove(pointerEvent({ target: element, clientX: 100 }));
+    directive.onPointerUp(pointerEvent({ target: element, clientX: 100 }));
+    directive.onPointerDown(pointerEvent({ target: rail }));
+    rail.click();
+
+    expect(click).toHaveBeenCalledTimes(1);
+  });
+
   it('captures horizontal intent on the original target and blocks its drag click', () => {
     const button = document.createElement('button');
     button.setPointerCapture = jest.fn();

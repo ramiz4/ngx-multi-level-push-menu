@@ -243,6 +243,10 @@ export class AppComponent {
     this.recordState(`Menu ${collapsed ? 'collapsed' : 'expanded'}`);
   }
 
+  syncCollapsed(collapsed: boolean): void {
+    this.collapsed = collapsed;
+  }
+
   onLevelChange(level: number): void {
     this.activeLevel = level;
   }
@@ -356,7 +360,7 @@ export class AppComponent {
       mode: 'cover',
       direction: 'ltr',
       backText: 'Back',
-      closeOnNavigation: false,
+      closeOnNavigation: true,
       preserveActiveLevelOnCollapse: true,
       animationDuration: 240,
     });

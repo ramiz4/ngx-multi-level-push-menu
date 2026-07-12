@@ -70,6 +70,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   private readonly collapsedState = signal(false);
   private readonly swipingState = signal(false);
   private readonly announcementState = signal('');
+  private readonly enteringLevelKeyState = signal<string | null>(null);
 
   /** @internal Read-only template state; writable signals stay private. */
   protected readonly levels: Signal<readonly MenuLevel[]> =
@@ -80,6 +81,8 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   protected readonly isSwiping = this.swipingState.asReadonly();
   /** @internal */
   protected readonly announcement = this.announcementState.asReadonly();
+  /** @internal Decorative entry state; visibility never depends on cleanup. */
+  protected readonly enteringLevelKey = this.enteringLevelKeyState.asReadonly();
 
   @Input()
   set menu(menuItems: readonly MultiLevelPushMenuItem[] | null | undefined) {
@@ -288,46 +291,28 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
   /** @internal */
   protected isLevelAccessible(index: number): boolean {
-    return (
-      this.isLevelActive(index) &&
-      !(
-        this.isCollapsed() &&
-        this._options.mode === 'overlap' &&
-        this.activeLevelIndex > 0
-      )
-    );
+    return this.isLevelActive(index) && !this.isCollapsed();
   }
 
   /** @internal */
   protected railLabel(rail: MenuRail): string {
-    return this.isCollapsed()
-      ? `Expand ${this.navigationLabel}`
-      : `Back to ${rail.title}`;
+    return `Back to ${rail.title}`;
   }
 
   /** @internal */
   protected railTabIndex(levelIndex: number): number {
-    if (this.isCollapsed() && this._options.fullCollapse) return -1;
-    if (!this.isCollapsed()) return 0;
-    return levelIndex === 0 ? 0 : -1;
+    void levelIndex;
+    return this.isCollapsed() ? -1 : 0;
   }
 
   /** @internal */
   protected activeToggleTabIndex(levelIndex: number): number {
-    if (
-      !this.isLevelActive(levelIndex) ||
-      (this.isCollapsed() && this._options.fullCollapse)
-    ) {
-      return -1;
-    }
-    if (
-      this.isCollapsed() &&
-      this._options.mode === 'overlap' &&
-      this.activeLevelIndex > 0
-    ) {
-      return -1;
-    }
-    return 0;
+    return this.isLevelActive(levelIndex) && !this.isCollapsed() ? 0 : -1;
+  }
+
+  /** @internal */
+  protected collapsedToggleTabIndex(): number {
+    return this.isCollapsed() && !this._options.fullCollapse ? 0 : -1;
   }
 
   /** @internal */
@@ -373,11 +358,20 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       parentItemIndex: itemIndex,
     };
 
+    this.enteringLevelKeyState.set(nextLevel.key);
     this.levelsState.update((levels) => [...levels, nextLevel]);
     this.emitGroupActivation(item, originalEvent, path);
     this.emitLevelChanged();
     this.announce(`Opened ${nextLevel.title}.`);
     this.scheduleActiveLevelFocus();
+  }
+
+  /** @internal */
+  protected finishLevelEntry(key: string, event: AnimationEvent): void {
+    if (event.target !== event.currentTarget) return;
+    if (this.enteringLevelKeyState() === key) {
+      this.enteringLevelKeyState.set(null);
+    }
   }
 
   /** @internal */
@@ -439,11 +433,12 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
   /** @internal */
   protected activateRail(levelIndex: number): void {
-    if (this.isCollapsed()) {
-      this.expandMenu();
-      return;
-    }
     this.returnToDepth(levelIndex, true);
+  }
+
+  /** @internal */
+  protected closeFromOutside(): void {
+    if (!this.isCollapsed()) this.collapseMenu();
   }
 
   collapseMenu(
@@ -607,6 +602,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   private resetLevels(emit = true): void {
+    this.enteringLevelKeyState.set(null);
     const previousDepth = this.activeLevelIndex;
     this.levelsState.set([this.createRootLevel()]);
     if (emit && previousDepth !== 0) this.levelChange.emit(0);
@@ -651,6 +647,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   private returnToDepth(level: number, focusParent: boolean): void {
+    this.enteringLevelKeyState.set(null);
     const currentLevels = this.levels();
     if (currentLevels.length <= 1 || !Number.isFinite(level)) return;
 
@@ -676,6 +673,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   private rebuildStackFromPath(path: readonly MultiLevelPushMenuItem[]): void {
+    this.enteringLevelKeyState.set(null);
     const stack: MenuLevel[] = [this.createRootLevel()];
     let items = this.rootItems();
     let parentPath: MultiLevelPushMenuItem[] = [];
@@ -746,6 +744,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
   private transitionCollapsed(value: boolean, emit = true): void {
     const shouldRestoreFocus = value && this.focusIsInsideNavigation();
+    if (value) this.enteringLevelKeyState.set(null);
 
     if (value && !this._options.preserveActiveLevelOnCollapse) {
       this.resetLevels();
@@ -767,9 +766,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
     if (shouldRestoreFocus) {
       if (this._options.fullCollapse) this.scheduleContentFocus();
-      else if (this._options.mode === 'overlap' && this.activeLevelIndex > 0) {
-        this.scheduleFocus('[data-menu-rail][data-target-level="0"]', false);
-      } else this.scheduleFocus('[data-menu-toggle]');
+      else this.scheduleFocus('[data-menu-collapsed-toggle]', false);
     }
   }
 
@@ -884,7 +881,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   private scheduleActiveLevelFocus(): void {
     if (this.isCollapsed()) {
       if (this._options.fullCollapse) this.scheduleContentFocus();
-      else this.scheduleFocus('[data-menu-toggle]');
+      else this.scheduleFocus('[data-menu-collapsed-toggle]', false);
       return;
     }
 

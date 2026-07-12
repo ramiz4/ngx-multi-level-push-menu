@@ -8,9 +8,9 @@
 .ngx-push-menu {
   --ngx-push-menu-rendered-width: var(--ngx-push-menu-width, 300px);
   --ngx-push-menu-effective-width: var(--ngx-push-menu-rendered-width);
-  --ngx-push-menu-content-offset: min(
-    100%,
-    var(--ngx-push-menu-effective-width)
+  --ngx-push-menu-collapsed-handle-width: max(
+    3.5rem,
+    var(--ngx-push-menu-overlap)
   );
 
   position: relative;
@@ -19,6 +19,7 @@
   block-size: var(--ngx-push-menu-height, 100%);
   min-block-size: 0;
   overflow: hidden;
+  overflow: clip;
   color: var(--ngx-push-menu-color, #fff);
   -webkit-tap-highlight-color: transparent;
 }
@@ -28,14 +29,6 @@
     var(--ngx-push-menu-rendered-width) +
       var(--ngx-push-menu-active-overlap-offset)
   );
-}
-
-.ngx-push-menu--collapsed {
-  --ngx-push-menu-content-offset: var(--ngx-push-menu-overlap);
-}
-
-.ngx-push-menu--collapsed.ngx-push-menu--full-collapse {
-  --ngx-push-menu-content-offset: 0px;
 }
 
 .ngx-push-menu__navigation {
@@ -59,21 +52,21 @@
 }
 
 .ngx-push-menu--ltr.ngx-push-menu--collapsed .ngx-push-menu__navigation {
-  transform: translateX(calc(-100% + var(--ngx-push-menu-overlap)));
+  transform: translateX(calc(0px - var(--ngx-push-menu-effective-width)));
 }
 
 .ngx-push-menu--rtl.ngx-push-menu--collapsed .ngx-push-menu__navigation {
-  transform: translateX(calc(100% - var(--ngx-push-menu-overlap)));
+  transform: translateX(var(--ngx-push-menu-effective-width));
 }
 
 .ngx-push-menu--ltr.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
   .ngx-push-menu__navigation {
-  transform: translateX(-100%);
+  transform: translateX(calc(0px - var(--ngx-push-menu-effective-width)));
 }
 
 .ngx-push-menu--rtl.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
   .ngx-push-menu__navigation {
-  transform: translateX(100%);
+  transform: translateX(var(--ngx-push-menu-effective-width));
 }
 
 .ngx-push-menu__level {
@@ -99,7 +92,8 @@
   transform: translateX(var(--ngx-push-menu-cover-offset));
 }
 
-.ngx-push-menu--overlap .ngx-push-menu__level[data-active='false'] {
+.ngx-push-menu--overlap:not(.ngx-push-menu--entering)
+  .ngx-push-menu__level[data-active='false'] {
   visibility: hidden;
 }
 
@@ -165,6 +159,24 @@
   line-height: 1;
 }
 
+.ngx-push-menu__collapsed-toggle {
+  appearance: none;
+  position: absolute;
+  z-index: 200;
+  top: 0;
+  display: grid;
+  place-items: center;
+  inline-size: var(--ngx-push-menu-collapsed-handle-width);
+  min-inline-size: var(--ngx-push-menu-collapsed-handle-width);
+  block-size: 3.5rem;
+  padding: 0.75rem;
+  color: inherit;
+  background: var(--ngx-push-menu-active, #1f4164);
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
 .ngx-push-menu__header {
   display: flex;
   align-items: center;
@@ -190,6 +202,7 @@
 }
 
 .ngx-push-menu__toggle,
+.ngx-push-menu__collapsed-toggle,
 .ngx-push-menu__back,
 .ngx-push-menu__item-control {
   appearance: none;
@@ -202,7 +215,7 @@
   align-self: stretch;
   display: grid;
   place-items: center;
-  min-inline-size: max(3.5rem, var(--ngx-push-menu-overlap));
+  min-inline-size: var(--ngx-push-menu-collapsed-handle-width);
   padding: 0.75rem;
   color: inherit;
   background: var(--ngx-push-menu-active, #1f4164);
@@ -313,6 +326,7 @@
 }
 
 .ngx-push-menu__toggle:focus-visible,
+.ngx-push-menu__collapsed-toggle:focus-visible,
 .ngx-push-menu__back:focus-visible,
 .ngx-push-menu__item-control:focus-visible,
 .ngx-push-menu__rail:focus-visible {
@@ -326,19 +340,43 @@
 .ngx-push-menu__content {
   position: absolute;
   inset-block: 0;
-  right: 0;
-  left: var(--ngx-push-menu-content-offset);
+  inset-inline: 0;
+  z-index: 0;
+  inline-size: 100%;
   min-inline-size: 0;
   overflow: auto;
   color: initial;
-  transition:
-    right var(--ngx-push-menu-duration, 280ms) ease,
-    left var(--ngx-push-menu-duration, 280ms) ease;
+  transform: translateX(0);
+  transition: transform var(--ngx-push-menu-duration, 280ms) ease;
   -webkit-overflow-scrolling: touch;
 }
 
-.ngx-push-menu--rtl .ngx-push-menu__content {
-  right: var(--ngx-push-menu-content-offset);
+.ngx-push-menu--cover.ngx-push-menu--ltr:not(.ngx-push-menu--collapsed)
+  .ngx-push-menu__content {
+  transform: translateX(var(--ngx-push-menu-rendered-width));
+}
+
+.ngx-push-menu--cover.ngx-push-menu--rtl:not(.ngx-push-menu--collapsed)
+  .ngx-push-menu__content {
+  transform: translateX(calc(0px - var(--ngx-push-menu-rendered-width)));
+}
+
+.ngx-push-menu__backdrop {
+  position: absolute;
+  z-index: 10;
+  inset-block: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ngx-push-menu--ltr .ngx-push-menu__backdrop {
+  right: 0;
+  left: min(100%, var(--ngx-push-menu-effective-width));
+}
+
+.ngx-push-menu--rtl .ngx-push-menu__backdrop {
+  right: min(100%, var(--ngx-push-menu-effective-width));
   left: 0;
 }
 
@@ -371,6 +409,36 @@
   }
 }
 
+.ngx-push-menu--ltr .ngx-push-menu__level[data-entering='true'] {
+  animation: ngx-push-menu-enter-ltr var(--ngx-push-menu-duration, 280ms)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ngx-push-menu--rtl .ngx-push-menu__level[data-entering='true'] {
+  animation: ngx-push-menu-enter-rtl var(--ngx-push-menu-duration, 280ms)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ngx-push-menu-enter-ltr {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes ngx-push-menu-enter-rtl {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ngx-push-menu__navigation,
   .ngx-push-menu__level,
@@ -378,12 +446,17 @@
   .ngx-push-menu__item-control {
     transition-duration: 1ms;
   }
+
+  .ngx-push-menu__level[data-entering='true'] {
+    animation-duration: 1ms;
+  }
 }
 
 @media (forced-colors: active) {
   .ngx-push-menu__navigation,
   .ngx-push-menu__level,
   .ngx-push-menu__rail,
+  .ngx-push-menu__collapsed-toggle,
   .ngx-push-menu__header,
   .ngx-push-menu__back,
   .ngx-push-menu__item-control {

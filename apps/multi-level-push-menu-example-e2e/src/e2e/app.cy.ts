@@ -216,6 +216,7 @@ describe('multi-level push menu playground', () => {
   it('routes documentation items to useful about, guide and release pages', () => {
     getActiveMenuControl('About the library').click();
     cy.location('pathname').should('eq', '/about');
+    cy.getByTestId('route-about').scrollIntoView();
     cy.getByTestId('route-about')
       .should('be.visible')
       .and('contain.text', 'Accessible by default');
@@ -224,6 +225,7 @@ describe('multi-level push menu playground', () => {
     getActiveMenuControl('Open Resources menu').click();
     getActiveMenuControl('Guides').click();
     cy.location('pathname').should('eq', '/guides');
+    cy.getByTestId('route-guides').scrollIntoView();
     cy.getByTestId('route-guides')
       .should('be.visible')
       .and('contain.text', 'npm install');
@@ -231,6 +233,7 @@ describe('multi-level push menu playground', () => {
     expandFromHandle();
     getActiveMenuControl('Release notes').click();
     cy.location('pathname').should('eq', '/release-notes');
+    cy.getByTestId('route-release-notes').scrollIntoView();
     cy.getByTestId('route-release-notes')
       .should('be.visible')
       .and('contain.text', '20.0.6');

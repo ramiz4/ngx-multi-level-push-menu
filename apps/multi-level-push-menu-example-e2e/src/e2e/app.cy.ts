@@ -201,15 +201,7 @@ describe('multi-level push menu playground', () => {
     cy.location('pathname').should('eq', '/collections');
     cy.getByTestId('route-collections').scrollIntoView();
     cy.getByTestId('route-collections').should('be.visible');
-    cy.getByTestId('event-kind').should('have.text', 'item');
-    cy.getByTestId('event-label').should(
-      'contain.text',
-      'Navigate to the live dashboard example',
-    );
-    cy.getByTestId('event-path').should(
-      'have.text',
-      'Products / Analytics / Live dashboard',
-    );
+    cy.get('#demo-heading').should('not.exist');
     getMenu().should('have.attr', 'data-collapsed', 'true');
   });
 
@@ -220,6 +212,7 @@ describe('multi-level push menu playground', () => {
     cy.getByTestId('route-about')
       .should('be.visible')
       .and('contain.text', 'Accessible by default');
+    cy.get('#demo-heading').should('not.exist');
 
     expandFromHandle();
     getActiveMenuControl('Open Resources menu').click();
@@ -229,6 +222,7 @@ describe('multi-level push menu playground', () => {
     cy.getByTestId('route-guides')
       .should('be.visible')
       .and('contain.text', 'npm install');
+    cy.get('#demo-heading').should('not.exist');
 
     expandFromHandle();
     getActiveMenuControl('Release notes').click();
@@ -237,6 +231,15 @@ describe('multi-level push menu playground', () => {
     cy.getByTestId('route-release-notes')
       .should('be.visible')
       .and('contain.text', '20.0.6');
+    cy.get('#demo-heading').should('not.exist');
+
+    expandFromHandle();
+    getActiveMenuControl('Overview').click();
+    cy.location('pathname').should('eq', '/home');
+    cy.get('#demo-heading')
+      .should('be.visible')
+      .and('contain.text', 'Deep navigation');
+    cy.getByTestId('route-release-notes').should('not.exist');
   });
 
   it('keeps collapse and expand state controlled by the application', () => {

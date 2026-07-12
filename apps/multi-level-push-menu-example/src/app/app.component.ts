@@ -5,6 +5,8 @@ import {
   computed,
   inject,
   signal,
+  TemplateRef,
+  ViewChild,
 } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import {
@@ -15,6 +17,7 @@ import {
   MultiLevelPushMenuService,
 } from '@ramiz4/ngx-multi-level-push-menu';
 import { DEMO_SNIPPETS, DemoSnippet, DemoSnippetId } from './demo-snippets';
+import { OverviewContentService } from './overview-content.service';
 
 type DemoEventKind = 'ready' | 'group' | 'item' | 'state';
 type DemoTheme = 'aurora' | 'midnight';
@@ -59,6 +62,12 @@ const ICONS = {
 export class AppComponent {
   private readonly document = inject(DOCUMENT);
   private readonly menuService = inject(MultiLevelPushMenuService);
+  private readonly overviewContent = inject(OverviewContentService);
+
+  @ViewChild('overviewContent')
+  set overviewTemplate(template: TemplateRef<unknown> | undefined) {
+    if (template) this.overviewContent.register(template);
+  }
 
   readonly repositoryUrl =
     'https://github.com/ramiz4/ngx-multi-level-push-menu';

@@ -12,7 +12,6 @@
   [style.--ngx-push-menu-overlap]="overlapWidth"
   [style.--ngx-push-menu-active-overlap-offset]="activeOverlapOffset"
   [style.--ngx-push-menu-duration]="animationDuration"
-  [style.--ngx-push-menu-active-level]="activeLevelIndex"
 >
   <span class="ngx-push-menu__sr-only" aria-live="polite" aria-atomic="true">
     {{ announcement() }}
@@ -43,12 +42,10 @@
       class="ngx-push-menu__level"
       [style.--ngx-push-menu-level]="levelIndex"
       [style.--ngx-push-menu-cover-offset]="coverLevelOffset(levelIndex)"
-      [style.--ngx-push-menu-overlap-offset]="overlapLevelOffset(levelIndex)"
       [attr.data-level-index]="levelIndex"
       [attr.data-active]="isLevelActive(levelIndex)"
-      [attr.data-entering]="enteringLevelKey() === level.key ? 'true' : null"
-      [attr.aria-hidden]="isLevelActive(levelIndex) ? null : 'true'"
-      [attr.inert]="isLevelActive(levelIndex) ? null : ''"
+      [attr.aria-hidden]="isLevelAccessible(levelIndex) ? null : 'true'"
+      [attr.inert]="isLevelAccessible(levelIndex) ? null : ''"
       [attr.aria-label]="level.title"
     >
       <header class="ngx-push-menu__header">
@@ -66,12 +63,7 @@
           data-menu-toggle
           [attr.aria-label]="toggleLabel"
           [attr.aria-expanded]="!isCollapsed()"
-          [attr.tabindex]="
-            isLevelActive(levelIndex) &&
-            !(isCollapsed() && options.fullCollapse)
-              ? 0
-              : -1
-          "
+          [attr.tabindex]="activeToggleTabIndex(levelIndex)"
           (click)="toggleMenu()"
           (keydown)="onControlKeydown($event)"
         >
@@ -213,6 +205,37 @@
         </li>
       </ul>
     </section>
+
+    <div
+      *ngIf="options.mode === 'overlap' && ancestorRails.length > 0"
+      class="ngx-push-menu__rails"
+      role="group"
+      aria-label="Previous menu levels"
+    >
+      <button
+        *ngFor="let rail of ancestorRails; trackBy: trackRail"
+        type="button"
+        class="ngx-push-menu__rail"
+        data-menu-rail
+        [attr.data-target-level]="rail.levelIndex"
+        [attr.aria-label]="railLabel(rail)"
+        [attr.title]="railLabel(rail)"
+        [attr.tabindex]="railTabIndex(rail.levelIndex)"
+        [attr.aria-hidden]="
+          isCollapsed() && rail.levelIndex !== 0 ? 'true' : null
+        "
+        [attr.inert]="isCollapsed() && rail.levelIndex !== 0 ? '' : null"
+        (click)="activateRail(rail.levelIndex)"
+      >
+        <span class="ngx-push-menu__rail-header" aria-hidden="true">
+          <ramiz4-menu-icon
+            *ngIf="rail.icon"
+            class="ngx-push-menu__rail-icon"
+            [icon]="rail.icon"
+          ></ramiz4-menu-icon>
+        </span>
+      </button>
+    </div>
   </nav>
 
   <div class="ngx-push-menu__content" data-menu-content tabindex="-1">

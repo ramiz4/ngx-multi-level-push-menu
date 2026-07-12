@@ -20,6 +20,7 @@ env:
   NX_DAEMON: false
   NX_ISOLATE_PLUGINS: false
   NPM_VERSION: 11.18.0
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
 jobs:
   validate:
@@ -168,12 +169,20 @@ jobs:
           ${{ matrix.typescript }}
 
   e2e:
-    name: End-to-end (Chrome)
+    name: End-to-end (${{ matrix.label }})
     if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - browser: chrome
+            label: Chrome
+          - browser: webkit
+            label: WebKit
 
     steps:
       - name: Checkout
@@ -204,17 +213,30 @@ jobs:
           npx cypress install
           npx cypress verify
 
+      - name: Cache WebKit browser
+        if: matrix.browser == 'webkit'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-webkit-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install WebKit and Linux dependencies
+        if: matrix.browser == 'webkit'
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '0'
+        run: npx playwright install --with-deps webkit
+
       - name: Run Cypress end-to-end tests
         run: >-
           npx nx e2e multi-level-push-menu-example-e2e
           --configuration=production
-          --browser=chrome
+          --browser=${{ matrix.browser }}
 
       - name: Upload Cypress failure artifacts
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: cypress-failure-artifacts
+          name: cypress-${{ matrix.browser }}-failure-artifacts
           path: |
             dist/cypress/apps/multi-level-push-menu-example-e2e/screenshots
             dist/cypress/apps/multi-level-push-menu-example-e2e/videos

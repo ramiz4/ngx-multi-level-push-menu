@@ -60,12 +60,17 @@ The package validator inspects the built artifact, not only the source workspace
 
 On pull requests, CI also validates every commit subject and the pull-request title with Commitlint. This is part of the release contract because a squash merge normally turns the pull-request title into the default-branch commit that Semantic Release analyzes.
 
-The browser job runs separately on Node 22:
+The browser matrix runs separately on Node 22 in Chrome and WebKit:
 
 ```bash
 npx nx e2e multi-level-push-menu-example-e2e \
   --configuration=production \
   --browser=chrome
+
+npx playwright install --with-deps webkit
+npx nx e2e multi-level-push-menu-example-e2e \
+  --configuration=production \
+  --browser=webkit
 ```
 
 Production dependency auditing also runs on Node 22 with `npm audit --omit=dev --audit-level=high`. A PR-only dependency-review gate rejects newly introduced vulnerabilities rated high or critical. Treat required-check failures as release blockers and review development-only advisories during every dependency update.
@@ -158,7 +163,7 @@ Do not deploy CI artifacts produced by pull requests. The privileged workflow in
 
 ### Required repository rules
 
-Protect the default branch with pull requests, required approvals, resolved conversations, and these required checks: both `Validate` jobs, all three `Consumer` jobs, `End-to-end (Chrome)`, `Dependency review`, and `CodeQL (JavaScript/TypeScript)`. Require a linear history or squash merges, block force pushes and deletions, and prevent bypass/direct pushes. Protect the `v*` tag namespace as well, while allowing only the Release workflow's GitHub Actions identity to create release tags. Keep pull-request titles in Conventional Commit form because a squash merge uses that title as release input.
+Protect the default branch with pull requests, required approvals, resolved conversations, and these required checks: both `Validate` jobs, all three `Consumer` jobs, `End-to-end (Chrome)`, `End-to-end (WebKit)`, `Dependency review`, and `CodeQL (JavaScript/TypeScript)`. Require a linear history or squash merges, block force pushes and deletions, and prevent bypass/direct pushes. Protect the `v*` tag namespace as well, while allowing only the Release workflow's GitHub Actions identity to create release tags. Keep pull-request titles in Conventional Commit form because a squash merge uses that title as release input.
 
 The workflows target `main`, and publication additionally compares against `github.event.repository.default_branch` before receiving write or OIDC permissions. Keep `nx.json`, documentation links, and repository rules aligned with that branch.
 

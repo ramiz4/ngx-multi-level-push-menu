@@ -8,7 +8,10 @@
 .ngx-push-menu {
   --ngx-push-menu-rendered-width: var(--ngx-push-menu-width, 300px);
   --ngx-push-menu-effective-width: var(--ngx-push-menu-rendered-width);
-  --ngx-push-menu-content-offset: var(--ngx-push-menu-effective-width);
+  --ngx-push-menu-content-offset: min(
+    100%,
+    var(--ngx-push-menu-effective-width)
+  );
 
   position: relative;
   isolation: isolate;
@@ -48,7 +51,6 @@
   transition:
     transform var(--ngx-push-menu-duration, 280ms) ease,
     inline-size var(--ngx-push-menu-duration, 280ms) ease;
-  will-change: transform;
 }
 
 .ngx-push-menu--rtl .ngx-push-menu__navigation {
@@ -97,16 +99,70 @@
   transform: translateX(var(--ngx-push-menu-cover-offset));
 }
 
-.ngx-push-menu--overlap.ngx-push-menu--ltr .ngx-push-menu__level {
-  transform: translateX(var(--ngx-push-menu-overlap-offset));
+.ngx-push-menu--overlap .ngx-push-menu__level[data-active='false'] {
+  visibility: hidden;
 }
 
-.ngx-push-menu--overlap.ngx-push-menu--rtl .ngx-push-menu__level {
-  transform: translateX(var(--ngx-push-menu-overlap-offset));
+.ngx-push-menu--overlap .ngx-push-menu__level[data-active='true'] {
+  transform: none;
 }
 
 .ngx-push-menu__level[aria-hidden='true'] {
   pointer-events: none;
+}
+
+.ngx-push-menu__rails {
+  position: absolute;
+  z-index: 100;
+  inset-block: 0;
+  inset-inline-start: var(--ngx-push-menu-rendered-width);
+  display: flex;
+  inline-size: var(--ngx-push-menu-active-overlap-offset);
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.ngx-push-menu__rail {
+  appearance: none;
+  position: relative;
+  flex: 0 0 var(--ngx-push-menu-overlap);
+  inline-size: var(--ngx-push-menu-overlap);
+  min-inline-size: 0;
+  padding: 0;
+  color: inherit;
+  background: color-mix(
+    in srgb,
+    var(--ngx-push-menu-surface, #2e6196) 82%,
+    #000
+  );
+  border: 0;
+  border-inline-start: 1px solid
+    var(--ngx-push-menu-border, rgb(255 255 255 / 18%));
+  cursor: pointer;
+}
+
+.ngx-push-menu__rail:hover,
+.ngx-push-menu__rail:active {
+  background: var(--ngx-push-menu-active, #1f4164);
+}
+
+.ngx-push-menu__rail-header {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  min-block-size: 3.5rem;
+  background: rgb(0 0 0 / 8%);
+  border-block-end: 1px solid
+    var(--ngx-push-menu-border, rgb(255 255 255 / 18%));
+}
+
+.ngx-push-menu__rail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  line-height: 1;
 }
 
 .ngx-push-menu__header {
@@ -258,7 +314,8 @@
 
 .ngx-push-menu__toggle:focus-visible,
 .ngx-push-menu__back:focus-visible,
-.ngx-push-menu__item-control:focus-visible {
+.ngx-push-menu__item-control:focus-visible,
+.ngx-push-menu__rail:focus-visible {
   position: relative;
   z-index: 1;
   outline: 3px solid var(--ngx-push-menu-focus, #fff);
@@ -311,21 +368,7 @@
 @media (max-width: 48rem) {
   .ngx-push-menu {
     --ngx-push-menu-rendered-width: min(var(--ngx-push-menu-width), 90vw);
-    --ngx-push-menu-effective-width: var(--ngx-push-menu-rendered-width);
-    --ngx-push-menu-content-offset: 0px;
   }
-
-  .ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse) {
-    --ngx-push-menu-content-offset: var(--ngx-push-menu-overlap);
-  }
-}
-
-.ngx-push-menu.ngx-push-menu--ltr .ngx-push-menu__level[data-entering='true'] {
-  transform: translateX(100%);
-}
-
-.ngx-push-menu.ngx-push-menu--rtl .ngx-push-menu__level[data-entering='true'] {
-  transform: translateX(-100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -340,6 +383,7 @@
 @media (forced-colors: active) {
   .ngx-push-menu__navigation,
   .ngx-push-menu__level,
+  .ngx-push-menu__rail,
   .ngx-push-menu__header,
   .ngx-push-menu__back,
   .ngx-push-menu__item-control {

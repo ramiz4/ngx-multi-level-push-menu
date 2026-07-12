@@ -226,6 +226,7 @@
         [attr.tabindex]="railTabIndex(rail.levelIndex)"
         [attr.aria-hidden]="isCollapsed() ? 'true' : null"
         [attr.inert]="isCollapsed() ? '' : null"
+        (pointerdown)="$event.stopPropagation()"
         (click)="activateRail(rail.levelIndex)"
       >
         <span class="ngx-push-menu__rail-header" aria-hidden="true">

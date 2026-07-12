@@ -77,11 +77,10 @@ describe('multi-level push menu playground', () => {
   };
 
   const toggleDirection = (expected: 'ltr' | 'rtl') => {
-    cy.getByTestId('toggle-direction')
-      .should('be.visible')
-      .then(($toggle) => {
-        $toggle[0].click();
-      });
+    cy.getByTestId('toggle-direction').then(($toggle) => {
+      $toggle[0].scrollIntoView({ block: 'center' });
+      $toggle[0].click();
+    });
     getMenu().should('have.attr', 'data-direction', expected);
   };
 

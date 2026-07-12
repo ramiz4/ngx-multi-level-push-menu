@@ -140,7 +140,10 @@
 .ngx-push-menu__rail {
   appearance: none;
   position: relative;
+  display: flex;
   flex: 0 0 var(--ngx-push-menu-overlap);
+  align-items: flex-start;
+  justify-content: flex-start;
   inline-size: var(--ngx-push-menu-overlap);
   min-inline-size: 0;
   padding: 0;
@@ -166,6 +169,7 @@
 
 .ngx-push-menu__rail-header {
   display: grid;
+  flex: 0 0 100%;
   place-items: center;
   inline-size: 100%;
   min-block-size: 3.5rem;

@@ -178,7 +178,14 @@ describe('multi-level push menu playground', () => {
 
       rails.forEach((rail, index) => {
         const railRect = rail.getBoundingClientRect();
+        const railHeaderRect = rail
+          .querySelector<HTMLElement>('.ngx-push-menu__rail-header')
+          ?.getBoundingClientRect();
         expect(railRect.width).to.be.closeTo(40, 1);
+        expect(railHeaderRect).not.to.equal(undefined);
+        if (railHeaderRect) {
+          expect(railHeaderRect.top).to.be.closeTo(railRect.top, 1);
+        }
         if (direction === 'ltr') {
           expect(railRect.left).to.be.closeTo(activeRect.right + index * 40, 1);
         } else {

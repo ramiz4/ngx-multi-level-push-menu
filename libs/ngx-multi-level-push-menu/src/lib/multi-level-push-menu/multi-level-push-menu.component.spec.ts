@@ -218,14 +218,9 @@ describe('MultiLevelPushMenuComponent', () => {
       'Back to Products',
       'Back to Nexus',
     ]);
-    const pointerDownSpy = jest.fn();
-    element
-      .querySelector('nav')
-      ?.addEventListener('pointerdown', pointerDownSpy);
-    rails[0]?.dispatchEvent(
-      new Event('pointerdown', { bubbles: true, cancelable: true }),
+    expect(rails.every((rail) => rail.hasAttribute('data-menu-no-swipe'))).toBe(
+      true,
     );
-    expect(pointerDownSpy).not.toHaveBeenCalled();
 
     const levelChangeSpy = jest.spyOn(component.levelChange, 'emit');
     rails[0]?.click();

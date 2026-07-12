@@ -220,13 +220,13 @@
         type="button"
         class="ngx-push-menu__rail"
         data-menu-rail
+        data-menu-no-swipe
         [attr.data-target-level]="rail.levelIndex"
         [attr.aria-label]="railLabel(rail)"
         [attr.title]="railLabel(rail)"
         [attr.tabindex]="railTabIndex(rail.levelIndex)"
         [attr.aria-hidden]="isCollapsed() ? 'true' : null"
         [attr.inert]="isCollapsed() ? '' : null"
-        (pointerdown)="$event.stopPropagation()"
         (click)="activateRail(rail.levelIndex)"
       >
         <span class="ngx-push-menu__rail-header" aria-hidden="true">
@@ -245,6 +245,7 @@
     type="button"
     class="ngx-push-menu__collapsed-toggle"
     data-menu-collapsed-toggle
+    data-menu-no-swipe
     [attr.aria-label]="toggleLabel"
     aria-expanded="false"
     [attr.tabindex]="collapsedToggleTabIndex()"

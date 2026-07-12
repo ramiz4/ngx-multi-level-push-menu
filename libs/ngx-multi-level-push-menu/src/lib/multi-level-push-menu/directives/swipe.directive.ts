@@ -83,6 +83,11 @@ export class SwipeDirective implements OnDestroy {
 
   @HostListener('pointerdown', ['$event'])
   onPointerDown(event: PointerEvent): void {
+    if (this.isNoSwipeTarget(event.target)) {
+      this.clearClickSuppression();
+      return;
+    }
+
     if (
       this.pointerId !== null ||
       !event.isPrimary ||
@@ -173,6 +178,10 @@ export class SwipeDirective implements OnDestroy {
   }
 
   private onCapturedClick(event: MouseEvent): void {
+    if (this.isNoSwipeTarget(event.target)) {
+      this.clearClickSuppression();
+      return;
+    }
     if (!this.suppressNextClick) return;
     event.preventDefault();
     event.stopImmediatePropagation();
@@ -184,6 +193,14 @@ export class SwipeDirective implements OnDestroy {
     if (this.swipeEnabled === 'touchscreen') return pointerType !== 'mouse';
     if (this.swipeEnabled === 'desktop') return pointerType === 'mouse';
     return true;
+  }
+
+  private isNoSwipeTarget(target: EventTarget | null): boolean {
+    const element = target as Element | null;
+    return (
+      typeof element?.closest === 'function' &&
+      element.closest('[data-menu-no-swipe]') !== null
+    );
   }
 
   private isDirectionEnabled(direction: SwipeDirection): boolean {

@@ -87,7 +87,6 @@
   overflow: hidden;
   background: var(--ngx-push-menu-background, #336ca6);
   transition: transform var(--ngx-push-menu-duration, 280ms) ease;
-  will-change: transform;
 }
 
 .ngx-push-menu--cover.ngx-push-menu--ltr .ngx-push-menu__level {
@@ -179,7 +178,6 @@
   overscroll-behavior: contain;
   list-style: none;
   scrollbar-gutter: stable;
-  -webkit-overflow-scrolling: touch;
 }
 
 .ngx-push-menu--collapsed .ngx-push-menu__back,

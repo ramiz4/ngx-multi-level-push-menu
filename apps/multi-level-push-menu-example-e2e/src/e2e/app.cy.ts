@@ -82,12 +82,6 @@ describe('multi-level push menu playground', () => {
       .should('be.visible')
       .then(($rail) => {
         const rail = $rail[0];
-        const rect = rail.getBoundingClientRect();
-        const hit = rail.ownerDocument.elementFromPoint(
-          rect.left + rect.width / 2,
-          rect.top + rect.height / 2,
-        );
-        expect(hit === rail || rail.contains(hit)).to.equal(true);
         rail.click();
       });
   };

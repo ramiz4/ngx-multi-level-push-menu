@@ -150,41 +150,124 @@ describe('MultiLevelPushMenuComponent', () => {
     ).toBe('100%');
   });
 
-  it('renders distinct overlap offsets in both writing directions', () => {
-    fixture.componentRef.setInput(
-      'options',
-      new MultiLevelPushMenuOptions({
-        menu,
-        mode: 'overlap',
-        overlapWidth: '3rem',
-      }),
-    );
+  it('renders accessible overlap rails from the parent outward', () => {
+    const deepMenu: MultiLevelPushMenuItem[] = [
+      {
+        id: 'products',
+        name: 'Products',
+        items: [
+          {
+            id: 'analytics',
+            name: 'Analytics',
+            items: [{ name: 'Live dashboard' }],
+          },
+        ],
+      },
+    ];
+    component.options = new MultiLevelPushMenuOptions({
+      title: 'Nexus',
+      menu: deepMenu,
+      mode: 'overlap',
+      menuWidth: '18rem',
+      overlapWidth: '3rem',
+    });
     fixture.detectChanges();
-    clickControl('Alpha');
+    clickControl('Products');
+    clickControl('Analytics');
 
-    const activeLevel = element.querySelector<HTMLElement>(
-      '.ngx-push-menu__level[data-level-index="1"]',
-    );
+    const wrapper = element.querySelector<HTMLElement>('.ngx-push-menu');
     expect(
-      activeLevel?.style.getPropertyValue('--ngx-push-menu-overlap-offset'),
-    ).toBe('calc(0px + 3rem)');
+      wrapper?.style.getPropertyValue('--ngx-push-menu-active-overlap-offset'),
+    ).toBe('calc(0px + 3rem + 3rem)');
+    expect(activeLevelTitle()).toBe('Analytics');
+    expect(
+      element
+        .querySelector('.ngx-push-menu__level[data-active="true"]')
+        ?.hasAttribute('data-entering'),
+    ).toBe(false);
 
-    fixture.componentRef.setInput(
-      'options',
-      new MultiLevelPushMenuOptions({
-        menu,
-        mode: 'overlap',
-        overlapWidth: '3rem',
-        direction: 'rtl',
-      }),
+    let rails = Array.from(
+      element.querySelectorAll<HTMLButtonElement>('[data-menu-rail]'),
     );
+    expect(rails.map((rail) => rail.dataset['targetLevel'])).toEqual([
+      '1',
+      '0',
+    ]);
+    expect(rails.map((rail) => rail.getAttribute('aria-label'))).toEqual([
+      'Back to Products',
+      'Back to Nexus',
+    ]);
+
+    const levelChangeSpy = jest.spyOn(component.levelChange, 'emit');
+    rails[0]?.click();
     fixture.detectChanges();
-    const rtlActiveLevel = element.querySelector<HTMLElement>(
-      '.ngx-push-menu__level[data-level-index="1"]',
+    expect(activeLevelTitle()).toBe('Products');
+    expect(levelChangeSpy).toHaveBeenLastCalledWith(1);
+    expect(levelChangeSpy).toHaveBeenCalledTimes(1);
+
+    clickControl('Analytics');
+    rails = Array.from(
+      element.querySelectorAll<HTMLButtonElement>('[data-menu-rail]'),
     );
+    rails[1]?.click();
+    fixture.detectChanges();
+    expect(activeLevelTitle()).toBe('Nexus');
+    expect(element.querySelectorAll('[data-menu-rail]')).toHaveLength(0);
+    expect(levelChangeSpy).toHaveBeenLastCalledWith(0);
+  });
+
+  it('uses and focuses the outer overlap rail as the collapsed depth toggle', async () => {
+    const deepMenu: MultiLevelPushMenuItem[] = [
+      {
+        name: 'Products',
+        items: [
+          {
+            name: 'Analytics',
+            items: [{ name: 'Live dashboard' }],
+          },
+        ],
+      },
+    ];
+    component.options = new MultiLevelPushMenuOptions({
+      title: 'Nexus',
+      menu: deepMenu,
+      mode: 'overlap',
+      preserveActiveLevelOnCollapse: true,
+    });
+    fixture.detectChanges();
+    clickControl('Products');
+    clickControl('Analytics');
+    const activeToggle = element.querySelector<HTMLButtonElement>(
+      '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
+    );
+    activeToggle?.focus();
+    component.collapseMenu();
+    fixture.detectChanges();
+
+    const rails = Array.from(
+      element.querySelectorAll<HTMLButtonElement>('[data-menu-rail]'),
+    );
+    expect(rails.map((rail) => rail.tabIndex)).toEqual([-1, 0]);
+    expect(rails[0]?.hasAttribute('inert')).toBe(true);
+    expect(rails[1]?.hasAttribute('inert')).toBe(false);
+    expect(rails[1]?.getAttribute('aria-label')).toBe('Expand Main navigation');
     expect(
-      rtlActiveLevel?.style.getPropertyValue('--ngx-push-menu-overlap-offset'),
-    ).toBe('calc(0px - 3rem)');
+      element
+        .querySelector<HTMLElement>('.ngx-push-menu__level[data-active="true"]')
+        ?.hasAttribute('inert'),
+    ).toBe(true);
+    expect(
+      element.querySelector<HTMLButtonElement>(
+        '.ngx-push-menu__level[data-active="true"] [data-menu-toggle]',
+      )?.tabIndex,
+    ).toBe(-1);
+    await nextAnimationFrame();
+    expect(element.ownerDocument.activeElement).toBe(rails[1]);
+
+    rails[1]?.click();
+    fixture.detectChanges();
+    expect(component.collapsed).toBe(false);
+    expect(activeLevelTitle()).toBe('Analytics');
   });
 
   it('removes old levels when menu data becomes empty', () => {
@@ -457,5 +540,16 @@ describe('MultiLevelPushMenuComponent', () => {
       element.querySelector('.ngx-push-menu__level[data-active="true"]')
         ?.textContent ?? ''
     );
+  }
+
+  function nextAnimationFrame(): Promise<void> {
+    return new Promise((resolve) => {
+      const window = element.ownerDocument.defaultView;
+      if (!window) {
+        resolve();
+        return;
+      }
+      window.requestAnimationFrame(() => resolve());
+    });
   }
 });

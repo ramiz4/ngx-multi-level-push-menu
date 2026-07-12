@@ -9,7 +9,7 @@ export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
   public menu: MultiLevelPushMenuItem[] = [];
 
-  /** Sliding layout. Cover replaces parent levels; overlap keeps them visible as rails. */
+  /** Sliding layout. Cover replaces parents; overlap adds clickable ancestor rails. */
   public mode: 'cover' | 'overlap' = 'cover';
 
   /** Initialize menu in collapsed/expanded mode */
@@ -48,7 +48,7 @@ export class MultiLevelPushMenuOptions {
   /** Icon used for menu items containing sub-items - SVG content */
   public groupIcon = ANGLE_RIGHT_SVG;
 
-  /** Width of the visible menu overlap as a number of pixels or CSS length. */
+  /** Width of each ancestor rail as a number of pixels or CSS length. */
   public overlapWidth: string | number = 55;
 
   /** Legacy flag: `false` bypasses Angular Router interception for leaf links. */

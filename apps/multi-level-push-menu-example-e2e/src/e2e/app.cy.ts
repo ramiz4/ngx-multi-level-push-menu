@@ -6,6 +6,60 @@ import {
 } from '../support/app.po';
 
 describe('multi-level push menu playground', () => {
+  const assertOverlapGeometry = (
+    railLabels: readonly string[],
+    direction: 'ltr' | 'rtl' = 'ltr',
+  ) => {
+    getMenu().should(($menu) => {
+      const navigation = $menu[0]?.querySelector<HTMLElement>(
+        '.ngx-push-menu__navigation',
+      );
+      const activeLevel = $menu[0]?.querySelector<HTMLElement>(
+        '.ngx-push-menu__level[data-active="true"]',
+      );
+      const content = $menu[0]?.querySelector<HTMLElement>(
+        '.ngx-push-menu__content',
+      );
+      const rails = Array.from(
+        $menu[0]?.querySelectorAll<HTMLButtonElement>('[data-menu-rail]') ?? [],
+      );
+
+      expect(navigation).not.to.equal(null);
+      expect(activeLevel).not.to.equal(null);
+      expect(content).not.to.equal(null);
+      if (!navigation || !activeLevel || !content) return;
+
+      const navigationRect = navigation.getBoundingClientRect();
+      const activeRect = activeLevel.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+      expect(navigationRect.width).to.be.closeTo(
+        280 + railLabels.length * 40,
+        1,
+      );
+      expect(activeRect.width).to.be.closeTo(280, 1);
+      if (direction === 'ltr') {
+        expect(activeRect.left).to.be.closeTo(navigationRect.left, 1);
+        expect(contentRect.left).to.be.closeTo(navigationRect.right, 1);
+      } else {
+        expect(activeRect.right).to.be.closeTo(navigationRect.right, 1);
+        expect(contentRect.right).to.be.closeTo(navigationRect.left, 1);
+      }
+      expect(
+        rails.map((rail) => rail.getAttribute('aria-label')),
+      ).to.deep.equal(railLabels);
+
+      rails.forEach((rail, index) => {
+        const railRect = rail.getBoundingClientRect();
+        expect(railRect.width).to.be.closeTo(40, 1);
+        if (direction === 'ltr') {
+          expect(railRect.left).to.be.closeTo(activeRect.right + index * 40, 1);
+        } else {
+          expect(railRect.right).to.be.closeTo(activeRect.left - index * 40, 1);
+        }
+      });
+    });
+  };
+
   beforeEach(() => {
     cy.viewport(1280, 800);
     cy.visit('/');
@@ -160,7 +214,7 @@ describe('multi-level push menu playground', () => {
     getMenu().should('have.attr', 'data-collapsed', 'true');
     getMenu()
       .find('.ngx-push-menu__content')
-      .should('have.css', 'left', '52px');
+      .should('have.css', 'left', '40px');
     cy.get('h1').should('be.visible');
     cy.getByTestId('snippet-install').click();
     cy.get('[role="tabpanel"]').scrollIntoView();
@@ -172,19 +226,76 @@ describe('multi-level push menu playground', () => {
     });
   });
 
-  it('keeps overlap visually distinct from cover on mobile', () => {
-    cy.getByTestId('mode-overlap').click();
+  it('stacks clickable overlap rails and paints deep mobile levels immediately', () => {
     cy.viewport(375, 812);
 
     getActiveMenuControl('Open Products menu').click();
+    getMenu().find('[data-menu-rail]').should('not.exist');
     getMenu()
-      .find('.ngx-push-menu__level[data-level-index="0"]')
-      .should('have.css', 'transform', 'matrix(1, 0, 0, 1, 0, 0)');
-    getActiveLevel().should(
-      'have.css',
-      'transform',
-      'matrix(1, 0, 0, 1, 52, 0)',
-    );
+      .find('.ngx-push-menu__navigation')
+      .should('have.css', 'width', '280px');
+    getActiveMenuControl('Open Analytics menu').should('be.visible').click();
+    getActiveLevel()
+      .should('have.attr', 'aria-label', 'Analytics')
+      .and('not.have.attr', 'data-entering');
+    getActiveMenuControl('Live dashboard').should('be.visible');
+    getBackButton().click();
+    getBackButton().click();
+
+    cy.viewport(1280, 800);
+    cy.getByTestId('mode-overlap').click();
+    cy.viewport(375, 812);
+    getActiveMenuControl('Open Products menu').click();
+    getActiveLevel()
+      .should('have.attr', 'aria-label', 'Products')
+      .and('not.have.attr', 'data-entering');
     getActiveMenuControl('Open Analytics menu').should('be.visible');
+    assertOverlapGeometry(['Back to Nexus']);
+
+    getActiveMenuControl('Open Analytics menu').click();
+    getActiveLevel()
+      .should('have.attr', 'aria-label', 'Analytics')
+      .and('not.have.attr', 'data-entering')
+      .should(($level) => {
+        const level = $level[0];
+        expect(level).not.to.equal(undefined);
+        if (!level) return;
+        const style = getComputedStyle(level);
+        const rect = level.getBoundingClientRect();
+        expect(style.visibility).to.equal('visible');
+        expect(style.opacity).to.equal('1');
+        expect(rect.width).to.be.greaterThan(0);
+        expect(rect.height).to.be.greaterThan(0);
+      });
+    getActiveMenuControl('Live dashboard')
+      .should('be.visible')
+      .should(($control) => {
+        const control = $control[0];
+        expect(control).not.to.equal(undefined);
+        if (!control) return;
+        const rect = control.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        );
+        expect(hit === control || control.contains(hit)).to.equal(true);
+      });
+    assertOverlapGeometry(['Back to Products', 'Back to Nexus']);
+
+    getMenu().find('[data-menu-rail][data-target-level="1"]').click();
+    getActiveLevel().should('have.attr', 'aria-label', 'Products');
+    assertOverlapGeometry(['Back to Nexus']);
+
+    getActiveMenuControl('Open Analytics menu').click();
+    getMenu().find('[data-menu-rail][data-target-level="0"]').click();
+    getActiveLevel().should('have.attr', 'aria-label', 'Nexus');
+    getMenu().find('[data-menu-rail]').should('not.exist');
+
+    cy.viewport(1280, 800);
+    cy.getByTestId('toggle-direction').click();
+    cy.viewport(375, 812);
+    getActiveMenuControl('Open Products menu').click();
+    getActiveMenuControl('Open Analytics menu').click();
+    assertOverlapGeometry(['Back to Products', 'Back to Nexus'], 'rtl');
   });
 });

@@ -37,6 +37,13 @@ interface MenuLevel {
   readonly parentItemIndex?: number;
 }
 
+interface MenuRail {
+  readonly key: string;
+  readonly levelIndex: number;
+  readonly title: string;
+  readonly icon?: string;
+}
+
 @Component({
   selector: 'ngx-multi-level-push-menu, ramiz4-multi-level-push-menu',
   standalone: true,
@@ -58,14 +65,11 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   private hasExplicitCollapsedInput = false;
   private hasReceivedOptions = false;
   private focusFrame: number | null = null;
-  private levelEntryStartFrame: number | null = null;
-  private levelEntryEndFrame: number | null = null;
   private readonly serviceSubscription: Subscription;
   private readonly levelsState = signal<readonly MenuLevel[]>([]);
   private readonly collapsedState = signal(false);
   private readonly swipingState = signal(false);
   private readonly announcementState = signal('');
-  private readonly enteringLevelKeyState = signal<string | null>(null);
 
   /** @internal Read-only template state; writable signals stay private. */
   protected readonly levels: Signal<readonly MenuLevel[]> =
@@ -76,8 +80,6 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   protected readonly isSwiping = this.swipingState.asReadonly();
   /** @internal */
   protected readonly announcement = this.announcementState.asReadonly();
-  /** @internal */
-  protected readonly enteringLevelKey = this.enteringLevelKeyState.asReadonly();
 
   @Input()
   set menu(menuItems: readonly MultiLevelPushMenuItem[] | null | undefined) {
@@ -155,7 +157,6 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.serviceSubscription.unsubscribe();
     this.cancelPendingFocus();
-    this.cancelPendingLevelEntry();
   }
 
   get activeLevelIndex(): number {
@@ -185,6 +186,19 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   /** @internal */
   protected get activeOverlapOffset(): string {
     return this.repeatedCssLength(this.overlapWidth, this.activeLevelIndex);
+  }
+
+  /** @internal Ancestors ordered from the active panel out toward content. */
+  protected get ancestorRails(): readonly MenuRail[] {
+    return this.levels()
+      .slice(0, -1)
+      .map((level, levelIndex) => ({
+        key: level.key,
+        levelIndex,
+        title: level.title,
+        icon: level.icon,
+      }))
+      .reverse();
   }
 
   /** @internal */
@@ -234,6 +248,10 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   ): string => this.itemKey(item, index);
 
   /** @internal */
+  protected readonly trackRail = (_index: number, rail: MenuRail): string =>
+    rail.key;
+
+  /** @internal */
   protected itemLabel(item: MultiLevelPushMenuItem): string {
     return item.name || item.title || item.id || 'Untitled item';
   }
@@ -269,18 +287,53 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   /** @internal */
-  protected coverLevelOffset(index: number): string {
-    const direction = this._options.direction === 'rtl' ? -1 : 1;
-    return `${(index - this.activeLevelIndex) * direction * 100}%`;
+  protected isLevelAccessible(index: number): boolean {
+    return (
+      this.isLevelActive(index) &&
+      !(
+        this.isCollapsed() &&
+        this._options.mode === 'overlap' &&
+        this.activeLevelIndex > 0
+      )
+    );
   }
 
   /** @internal */
-  protected overlapLevelOffset(index: number): string {
-    return this.repeatedCssLength(
-      this.overlapWidth,
-      index,
-      this._options.direction === 'rtl',
-    );
+  protected railLabel(rail: MenuRail): string {
+    return this.isCollapsed()
+      ? `Expand ${this.navigationLabel}`
+      : `Back to ${rail.title}`;
+  }
+
+  /** @internal */
+  protected railTabIndex(levelIndex: number): number {
+    if (this.isCollapsed() && this._options.fullCollapse) return -1;
+    if (!this.isCollapsed()) return 0;
+    return levelIndex === 0 ? 0 : -1;
+  }
+
+  /** @internal */
+  protected activeToggleTabIndex(levelIndex: number): number {
+    if (
+      !this.isLevelActive(levelIndex) ||
+      (this.isCollapsed() && this._options.fullCollapse)
+    ) {
+      return -1;
+    }
+    if (
+      this.isCollapsed() &&
+      this._options.mode === 'overlap' &&
+      this.activeLevelIndex > 0
+    ) {
+      return -1;
+    }
+    return 0;
+  }
+
+  /** @internal */
+  protected coverLevelOffset(index: number): string {
+    const direction = this._options.direction === 'rtl' ? -1 : 1;
+    return `${(index - this.activeLevelIndex) * direction * 100}%`;
   }
 
   /** @internal */
@@ -320,9 +373,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       parentItemIndex: itemIndex,
     };
 
-    this.enteringLevelKeyState.set(nextLevel.key);
     this.levelsState.update((levels) => [...levels, nextLevel]);
-    this.scheduleLevelEntry(nextLevel.key);
     this.emitGroupActivation(item, originalEvent, path);
     this.emitLevelChanged();
     this.announce(`Opened ${nextLevel.title}.`);
@@ -383,21 +434,16 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   goBack(focusParent = true): void {
-    this.cancelPendingLevelEntry();
-    const currentLevels = this.levels();
-    if (currentLevels.length <= 1) return;
+    this.returnToDepth(this.activeLevelIndex - 1, focusParent);
+  }
 
-    const shouldRestoreFocus = focusParent && this.focusIsInsideNavigation();
-    const previous = currentLevels[currentLevels.length - 1];
-    this.levelsState.set(currentLevels.slice(0, -1));
-    this.emitLevelChanged();
-    this.announce(`Returned to ${this.activeLevel?.title || 'Menu'}.`);
-
-    if (shouldRestoreFocus && previous.parentItemIndex !== undefined) {
-      this.scheduleFocus(
-        `[data-menu-item-index="${previous.parentItemIndex}"]`,
-      );
+  /** @internal */
+  protected activateRail(levelIndex: number): void {
+    if (this.isCollapsed()) {
+      this.expandMenu();
+      return;
     }
+    this.returnToDepth(levelIndex, true);
   }
 
   collapseMenu(
@@ -561,7 +607,6 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
   }
 
   private resetLevels(emit = true): void {
-    this.cancelPendingLevelEntry();
     const previousDepth = this.activeLevelIndex;
     this.levelsState.set([this.createRootLevel()]);
     if (emit && previousDepth !== 0) this.levelChange.emit(0);
@@ -600,14 +645,37 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       if (wasCollapsed) this.scheduleActiveLevelFocus();
       return;
     }
-    this.levelsState.set(this.levels().slice(0, safeLevel + 1));
-    this.emitLevelChanged();
+    this.returnToDepth(safeLevel, false);
     this.transitionCollapsed(false);
     this.scheduleActiveLevelFocus();
   }
 
+  private returnToDepth(level: number, focusParent: boolean): void {
+    const currentLevels = this.levels();
+    if (currentLevels.length <= 1 || !Number.isFinite(level)) return;
+
+    const safeLevel = Math.max(
+      0,
+      Math.min(Math.trunc(level), this.activeLevelIndex - 1),
+    );
+    const shouldRestoreFocus = focusParent && this.focusIsInsideNavigation();
+    const firstRemovedLevel = currentLevels[safeLevel + 1];
+
+    this.levelsState.set(currentLevels.slice(0, safeLevel + 1));
+    this.emitLevelChanged();
+    this.announce(`Returned to ${this.activeLevel?.title || 'Menu'}.`);
+
+    if (
+      shouldRestoreFocus &&
+      firstRemovedLevel?.parentItemIndex !== undefined
+    ) {
+      this.scheduleFocus(
+        `[data-menu-item-index="${firstRemovedLevel.parentItemIndex}"]`,
+      );
+    }
+  }
+
   private rebuildStackFromPath(path: readonly MultiLevelPushMenuItem[]): void {
-    this.cancelPendingLevelEntry();
     const stack: MenuLevel[] = [this.createRootLevel()];
     let items = this.rootItems();
     let parentPath: MultiLevelPushMenuItem[] = [];
@@ -699,7 +767,9 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
 
     if (shouldRestoreFocus) {
       if (this._options.fullCollapse) this.scheduleContentFocus();
-      else this.scheduleFocus('[data-menu-toggle]');
+      else if (this._options.mode === 'overlap' && this.activeLevelIndex > 0) {
+        this.scheduleFocus('[data-menu-rail][data-target-level="0"]', false);
+      } else this.scheduleFocus('[data-menu-toggle]');
     }
   }
 
@@ -790,7 +860,7 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
     this.announcementState.set(message);
   }
 
-  private scheduleFocus(selector: string): void {
+  private scheduleFocus(selector: string, activeLevelOnly = true): void {
     if (!this.isBrowser) return;
     this.cancelPendingFocus();
     const window = this.document.defaultView;
@@ -801,7 +871,9 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       const activeLevel = this.host.nativeElement.querySelector<HTMLElement>(
         '.ngx-push-menu__level[data-active="true"]',
       );
-      const target = activeLevel?.querySelector<HTMLElement>(selector);
+      const target = activeLevelOnly
+        ? activeLevel?.querySelector<HTMLElement>(selector)
+        : this.host.nativeElement.querySelector<HTMLElement>(selector);
       const fallback = activeLevel?.querySelector<HTMLElement>(
         '[data-menu-back], [data-menu-toggle]',
       );
@@ -819,29 +891,6 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
     this.scheduleFocus(
       '[data-menu-item-control]:not([disabled]):not([aria-disabled="true"]):not([tabindex="-1"])',
     );
-  }
-
-  private scheduleLevelEntry(key: string): void {
-    if (!this.isBrowser) {
-      this.enteringLevelKeyState.set(null);
-      return;
-    }
-
-    const window = this.document.defaultView;
-    if (!window || typeof window.requestAnimationFrame !== 'function') {
-      this.enteringLevelKeyState.set(null);
-      return;
-    }
-
-    this.levelEntryStartFrame = window.requestAnimationFrame(() => {
-      this.levelEntryStartFrame = null;
-      this.levelEntryEndFrame = window.requestAnimationFrame(() => {
-        this.levelEntryEndFrame = null;
-        if (this.enteringLevelKeyState() === key) {
-          this.enteringLevelKeyState.set(null);
-        }
-      });
-    });
   }
 
   private scheduleContentFocus(): void {
@@ -879,18 +928,5 @@ export class MultiLevelPushMenuComponent implements OnDestroy {
       window.cancelAnimationFrame(this.focusFrame);
     }
     this.focusFrame = null;
-  }
-
-  private cancelPendingLevelEntry(): void {
-    const window = this.document.defaultView;
-    if (this.levelEntryStartFrame !== null && window) {
-      window.cancelAnimationFrame(this.levelEntryStartFrame);
-    }
-    if (this.levelEntryEndFrame !== null && window) {
-      window.cancelAnimationFrame(this.levelEntryEndFrame);
-    }
-    this.levelEntryStartFrame = null;
-    this.levelEntryEndFrame = null;
-    this.enteringLevelKeyState.set(null);
   }
 }

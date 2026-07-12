@@ -7,6 +7,7 @@ const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   allowCypressEnv: false,
+  experimentalWebKitSupport: true,
   e2e: {
     ...nxE2EPreset(projectRoot, {
       webServerCommands: {

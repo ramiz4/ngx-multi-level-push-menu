@@ -687,6 +687,14 @@ a:focus-visible {
   font-weight: 750;
 }
 
+.demo-control-help {
+  display: block;
+  margin-top: 0.55rem;
+  color: #718b85;
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+
 .demo-segmented button.is-selected {
   color: #0c5445;
   background: #fff;

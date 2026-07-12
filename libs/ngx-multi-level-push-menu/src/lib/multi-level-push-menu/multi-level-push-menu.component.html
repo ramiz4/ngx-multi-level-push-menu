@@ -10,6 +10,7 @@
   [style.--ngx-push-menu-width]="menuWidth"
   [style.--ngx-push-menu-height]="menuHeight"
   [style.--ngx-push-menu-overlap]="overlapWidth"
+  [style.--ngx-push-menu-active-overlap-offset]="activeOverlapOffset"
   [style.--ngx-push-menu-duration]="animationDuration"
   [style.--ngx-push-menu-active-level]="activeLevelIndex"
 >
@@ -42,6 +43,7 @@
       class="ngx-push-menu__level"
       [style.--ngx-push-menu-level]="levelIndex"
       [style.--ngx-push-menu-cover-offset]="coverLevelOffset(levelIndex)"
+      [style.--ngx-push-menu-overlap-offset]="overlapLevelOffset(levelIndex)"
       [attr.data-level-index]="levelIndex"
       [attr.data-active]="isLevelActive(levelIndex)"
       [attr.data-entering]="enteringLevelKey() === level.key ? 'true' : null"

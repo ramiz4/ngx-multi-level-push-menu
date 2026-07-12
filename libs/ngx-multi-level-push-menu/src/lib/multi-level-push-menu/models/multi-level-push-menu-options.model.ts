@@ -9,7 +9,7 @@ export class MultiLevelPushMenuOptions {
   /** JS array of menu items (if markup not provided) */
   public menu: MultiLevelPushMenuItem[] = [];
 
-  /** Sliding layout. Overlap automatically uses cover-style motion below 48rem. */
+  /** Sliding layout. Cover replaces parent levels; overlap keeps them visible as rails. */
   public mode: 'cover' | 'overlap' = 'cover';
 
   /** Initialize menu in collapsed/expanded mode */

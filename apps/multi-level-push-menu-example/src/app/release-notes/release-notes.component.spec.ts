@@ -17,7 +17,7 @@ describe('ReleaseNotesComponent', () => {
     expect(
       element.querySelector('[data-testid="route-release-notes"]'),
     ).not.toBeNull();
-    expect(element.textContent).toContain('20.0.6');
+    expect(element.textContent).toContain('20.0.7');
     expect(element.textContent).toContain('Smoother, continuous navigation');
   });
 });

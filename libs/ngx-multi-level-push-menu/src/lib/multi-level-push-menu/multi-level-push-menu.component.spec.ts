@@ -124,6 +124,32 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(activeLevelText()).not.toContain('Beta child');
   });
 
+  it('renders cover offsets directly instead of relying on CSS arithmetic', () => {
+    clickControl('Alpha');
+
+    const rootLevel = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__level[data-level-index="0"]',
+    );
+    const activeLevel = element.querySelector<HTMLElement>(
+      '.ngx-push-menu__level[data-level-index="1"]',
+    );
+    expect(
+      rootLevel?.style.getPropertyValue('--ngx-push-menu-cover-offset'),
+    ).toBe('-100%');
+    expect(
+      activeLevel?.style.getPropertyValue('--ngx-push-menu-cover-offset'),
+    ).toBe('0%');
+
+    component.options = new MultiLevelPushMenuOptions({
+      menu,
+      direction: 'rtl',
+    });
+    fixture.detectChanges();
+    expect(
+      rootLevel?.style.getPropertyValue('--ngx-push-menu-cover-offset'),
+    ).toBe('100%');
+  });
+
   it('removes old levels when menu data becomes empty', () => {
     clickControl('Alpha');
     expect(component.activeLevelIndex).toBe(1);

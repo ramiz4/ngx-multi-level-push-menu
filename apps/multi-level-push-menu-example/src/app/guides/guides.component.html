@@ -1,0 +1,68 @@
+<article class="demo-route" data-testid="route-guides">
+  <p class="demo-eyebrow">Integration guide</p>
+  <h2>From install to production in four steps.</h2>
+  <p>
+    The public API stays intentionally small. Import the standalone component,
+    describe a typed menu tree, bind controlled state and adapt the design with
+    CSS custom properties.
+  </p>
+
+  <ol class="demo-guide-steps">
+    <li>
+      <span>1</span>
+      <div>
+        <h3>Install</h3>
+        <p><code>npm install @ramiz4/ngx-multi-level-push-menu</code></p>
+      </div>
+    </li>
+    <li>
+      <span>2</span>
+      <div>
+        <h3>Import</h3>
+        <p>
+          Add <code>MultiLevelPushMenuComponent</code> to the component imports.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span>3</span>
+      <div>
+        <h3>Bind</h3>
+        <p>
+          Pass <code>menu</code>, <code>options</code> and optionally two-way
+          bind <code>collapsed</code>.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span>4</span>
+      <div>
+        <h3>Observe</h3>
+        <p>
+          Use typed activation outputs for analytics, authorization and
+          application state.
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="demo-code">
+    &lt;ngx-multi-level-push-menu [menu]="menuItems" [options]="options"
+    [(collapsed)]="collapsed" (itemActivate)="onActivate($event)" /&gt;
+  </div>
+
+  <nav class="demo-route-actions" aria-label="Guide links">
+    <a
+      href="https://github.com/ramiz4/ngx-multi-level-push-menu#quick-start"
+      target="_blank"
+      rel="noopener noreferrer"
+      >Read the full quick start</a
+    >
+    <a
+      href="https://github.com/ramiz4/ngx-multi-level-push-menu#configuration-reference"
+      target="_blank"
+      rel="noopener noreferrer"
+      >Configuration reference</a
+    >
+  </nav>
+</article>

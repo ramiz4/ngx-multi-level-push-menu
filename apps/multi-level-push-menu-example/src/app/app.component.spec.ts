@@ -25,6 +25,21 @@ describe('AppComponent', () => {
     ).not.toBeNull();
   });
 
+  it('provides real routes for every documentation menu item', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const component = fixture.componentInstance;
+    const resources = component.menuItems.find(
+      (item) => item.id === 'resources',
+    );
+    const about = component.menuItems.find((item) => item.id === 'about');
+
+    expect(resources?.items?.map((item) => item.link)).toEqual([
+      '/guides',
+      '/release-notes',
+    ]);
+    expect(about?.link).toBe('/about');
+  });
+
   it('updates display options immutably from the playground controls', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const component = fixture.componentInstance;

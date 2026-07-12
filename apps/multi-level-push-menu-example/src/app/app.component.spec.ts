@@ -100,7 +100,15 @@ describe('AppComponent', () => {
     );
     expect(rtlHandle?.style.right).toBe('0px');
 
-    rtlHandle?.click();
+    element.querySelector<HTMLElement>('[data-testid="mode-overlap"]')?.click();
+    fixture.detectChanges();
+    const overlapHandle = element.querySelector<HTMLElement>(
+      '[data-menu-collapsed-toggle]',
+    );
+    expect(fixture.componentInstance.options.direction).toBe('rtl');
+    expect(overlapHandle?.style.right).toBe('0px');
+
+    overlapHandle?.click();
     fixture.detectChanges();
 
     expect(fixture.componentInstance.collapsed).toBe(false);

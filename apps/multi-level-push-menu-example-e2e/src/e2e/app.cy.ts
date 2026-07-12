@@ -16,11 +16,35 @@ describe('multi-level push menu playground', () => {
       if (!handle) return;
 
       const handleRect = handle.getBoundingClientRect();
+      const wrapperRect = $menu[0]
+        .querySelector<HTMLElement>('.ngx-push-menu')
+        ?.getBoundingClientRect();
+      const offsetParentRect = (
+        handle.offsetParent as HTMLElement | null
+      )?.getBoundingClientRect();
+      const details = JSON.stringify({
+        direction: $menu.attr('data-direction'),
+        handle: {
+          left: handleRect.left,
+          right: handleRect.right,
+          width: handleRect.width,
+        },
+        inlineStyle: handle.getAttribute('style'),
+        computedLeft: getComputedStyle(handle).left,
+        computedRight: getComputedStyle(handle).right,
+        menu: { left: menuRect.left, right: menuRect.right },
+        wrapper: wrapperRect
+          ? { left: wrapperRect.left, right: wrapperRect.right }
+          : null,
+        offsetParent: offsetParentRect
+          ? { left: offsetParentRect.left, right: offsetParentRect.right }
+          : null,
+      });
       expect(handleRect.width).to.be.closeTo(56, 1);
       if ($menu.attr('data-direction') === 'rtl') {
-        expect(handleRect.right).to.be.closeTo(menuRect.right, 1);
+        expect(handleRect.right, details).to.be.closeTo(menuRect.right, 1);
       } else {
-        expect(handleRect.left).to.be.closeTo(menuRect.left, 1);
+        expect(handleRect.left, details).to.be.closeTo(menuRect.left, 1);
       }
     });
   };

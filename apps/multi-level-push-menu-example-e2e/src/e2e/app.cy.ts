@@ -532,5 +532,12 @@ describe('multi-level push menu playground', () => {
     getActiveMenuControl('Open Products menu').click();
     getActiveMenuControl('Open Analytics menu').click();
     assertOverlapGeometry(['Back to Products', 'Back to Nexus'], 'rtl');
+
+    closeFromOutside();
+    getBackButton().should('be.visible').and('have.attr', 'tabindex', '0');
+    getActiveMenuControl('Live dashboard')
+      .should('be.visible')
+      .find('.ngx-push-menu__item-icon')
+      .should('be.visible');
   });
 });

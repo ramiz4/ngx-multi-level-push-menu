@@ -87,9 +87,13 @@
         [ngClass]="options.backItemClass"
         data-menu-control
         data-menu-back
-        [attr.aria-hidden]="isCollapsed() ? 'true' : null"
-        [attr.inert]="isCollapsed() ? '' : null"
-        [attr.tabindex]="isLevelActive(levelIndex) && !isCollapsed() ? 0 : -1"
+        [attr.aria-hidden]="
+          isCollapsed() && options.fullCollapse ? 'true' : null
+        "
+        [attr.inert]="isCollapsed() && options.fullCollapse ? '' : null"
+        [attr.tabindex]="
+          isLevelActive(levelIndex) && !options.fullCollapse ? 0 : -1
+        "
         (click)="goBack()"
         (keydown)="onControlKeydown($event)"
       >
@@ -98,7 +102,7 @@
           aria-hidden="true"
           [icon]="options.backItemIcon"
         ></ramiz4-menu-icon>
-        <span>{{ options.backText }}</span>
+        <span class="ngx-push-menu__back-label">{{ options.backText }}</span>
       </button>
 
       <ul
@@ -134,10 +138,9 @@
             (keydown)="onItemKeydown($event, item, itemIndex)"
           >
             <ramiz4-menu-icon
-              *ngIf="item.icon"
               class="ngx-push-menu__item-icon"
               aria-hidden="true"
-              [icon]="item.icon"
+              [icon]="item.icon || options.defaultItemIcon"
             ></ramiz4-menu-icon>
             <span class="ngx-push-menu__item-label">{{ itemLabel(item) }}</span>
             <ramiz4-menu-icon
@@ -170,10 +173,9 @@
               (keydown)="onItemKeydown($event, item, itemIndex)"
             >
               <ramiz4-menu-icon
-                *ngIf="item.icon"
                 class="ngx-push-menu__item-icon"
                 aria-hidden="true"
-                [icon]="item.icon"
+                [icon]="item.icon || options.defaultItemIcon"
               ></ramiz4-menu-icon>
               <span class="ngx-push-menu__item-label">{{
                 itemLabel(item)
@@ -196,10 +198,9 @@
                 (keydown)="onItemKeydown($event, item, itemIndex)"
               >
                 <ramiz4-menu-icon
-                  *ngIf="item.icon"
                   class="ngx-push-menu__item-icon"
                   aria-hidden="true"
-                  [icon]="item.icon"
+                  [icon]="item.icon || options.defaultItemIcon"
                 ></ramiz4-menu-icon>
                 <span class="ngx-push-menu__item-label">{{
                   itemLabel(item)

@@ -254,7 +254,7 @@
   scrollbar-gutter: stable;
 }
 
-.ngx-push-menu--collapsed .ngx-push-menu__back,
+.ngx-push-menu--collapsed.ngx-push-menu--full-collapse .ngx-push-menu__back,
 .ngx-push-menu--collapsed.ngx-push-menu--full-collapse .ngx-push-menu__items {
   visibility: hidden;
   pointer-events: none;
@@ -271,6 +271,8 @@
 .ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
   .ngx-push-menu__title,
 .ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__back-label,
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
   .ngx-push-menu__item-label,
 .ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
   .ngx-push-menu__group-icon {
@@ -279,6 +281,13 @@
 
 .ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
   .ngx-push-menu__item-control {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0.75rem;
+}
+
+.ngx-push-menu--collapsed:not(.ngx-push-menu--full-collapse)
+  .ngx-push-menu__back {
   justify-content: center;
   gap: 0;
   padding-inline: 0.75rem;

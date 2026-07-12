@@ -6,13 +6,33 @@ import {
 } from '../support/app.po';
 
 describe('multi-level push menu playground', () => {
+  const assertCollapsedHandleSettled = () => {
+    getMenu().should(($menu) => {
+      const menuRect = $menu[0].getBoundingClientRect();
+      const handle = $menu[0].querySelector<HTMLElement>(
+        '[data-menu-collapsed-toggle]',
+      );
+      expect(handle).not.to.equal(null);
+      if (!handle) return;
+
+      const handleRect = handle.getBoundingClientRect();
+      expect(handleRect.width).to.be.closeTo(56, 1);
+      if ($menu.attr('data-direction') === 'rtl') {
+        expect(handleRect.right).to.be.closeTo(menuRect.right, 1);
+      } else {
+        expect(handleRect.left).to.be.closeTo(menuRect.left, 1);
+      }
+    });
+  };
+
   const closeFromOutside = () => {
     getMenu().find('[data-menu-backdrop]').click();
     getMenu().should('have.attr', 'data-collapsed', 'true');
-    cy.wait(260);
+    assertCollapsedHandleSettled();
   };
 
   const expandFromHandle = () => {
+    assertCollapsedHandleSettled();
     getMenu().find('[data-menu-collapsed-toggle]').should('be.visible').click();
     getMenu().should('have.attr', 'data-collapsed', 'false');
   };

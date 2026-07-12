@@ -280,7 +280,9 @@ describe('multi-level push menu playground', () => {
       .first()
       .should('have.attr', 'tabindex', '0');
     getActiveLevel().find('.ngx-push-menu__item-icon').should('be.visible');
-    getActiveLevel().find('.ngx-push-menu__item-label').should('not.be.visible');
+    getActiveLevel()
+      .find('.ngx-push-menu__item-label')
+      .should('not.be.visible');
     cy.getByTestId('menu-state').should('contain.text', 'Collapsed');
 
     cy.getByTestId('expand-menu').click();

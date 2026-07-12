@@ -1,13 +1,48 @@
 <article class="demo-route" data-testid="route-about">
-  <p class="demo-eyebrow">Built for real applications</p>
-  <h2>Navigation without framework friction.</h2>
+  <p class="demo-eyebrow">Why this library exists</p>
+  <h2>Deep navigation without framework friction.</h2>
   <p>
-    Nexus is the demo product; the menu is the real story. It keeps rendering,
-    state and keyboard behavior together while leaving routing and domain data
-    in your application.
+    ngx-multi-level-push-menu turns a typed menu tree into accessible,
+    responsive navigation. Your application keeps ownership of routing, state,
+    content and design tokens; the library handles the difficult interaction
+    details.
   </p>
-  <div class="demo-code">
-    &lt;ngx-multi-level-push-menu [menu]="menuItems" [options]="options"
-    [(collapsed)]="collapsed" (itemActivate)="onActivate($event)" /&gt;
+
+  <div class="demo-feature-grid">
+    <section class="demo-feature">
+      <span>01</span>
+      <h3>Accessible by default</h3>
+      <p>Keyboard navigation, focus restoration and meaningful ARIA state.</p>
+    </section>
+    <section class="demo-feature">
+      <span>02</span>
+      <h3>Angular-native</h3>
+      <p>
+        Standalone-first, typed outputs, SSR-safe and compatible with NgModule.
+      </p>
+    </section>
+    <section class="demo-feature">
+      <span>03</span>
+      <h3>Design-system ready</h3>
+      <p>
+        CSS custom properties, custom SVG icons and no visual dependency
+        lock-in.
+      </p>
+    </section>
   </div>
+
+  <nav class="demo-route-actions" aria-label="Library links">
+    <a
+      href="https://github.com/ramiz4/ngx-multi-level-push-menu"
+      target="_blank"
+      rel="noopener noreferrer"
+      >View the source</a
+    >
+    <a
+      href="https://www.npmjs.com/package/@ramiz4/ngx-multi-level-push-menu"
+      target="_blank"
+      rel="noopener noreferrer"
+      >Open on npm</a
+    >
+  </nav>
 </article>

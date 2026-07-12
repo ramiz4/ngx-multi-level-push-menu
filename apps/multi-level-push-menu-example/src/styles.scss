@@ -866,6 +866,121 @@ a:focus-visible {
   white-space: pre;
 }
 
+.demo-route-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.demo-route-actions a {
+  display: inline-flex;
+  min-height: 2.8rem;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  border: 1px solid #cfe2dc;
+  border-radius: 0.75rem;
+  color: #0d5546;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.demo-route-actions a:hover {
+  border-color: #62b99f;
+  box-shadow: 0 0.5rem 1.25rem rgb(15 96 75 / 9%);
+}
+
+.demo-guide-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-guide-steps li {
+  display: flex;
+  min-width: 0;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #dfebe7;
+  border-radius: 1rem;
+  background: #f9fcfb;
+}
+
+.demo-guide-steps li > span {
+  display: grid;
+  flex: 0 0 2rem;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  color: #effff9;
+  background: #168665;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.demo-guide-steps h3,
+.demo-release-list h3 {
+  margin: 0;
+  color: #214a43;
+  font-size: 0.95rem;
+}
+
+.demo-guide-steps p,
+.demo-release-list p {
+  margin: 0.35rem 0 0;
+  color: #66817b;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.demo-guide-steps code {
+  overflow-wrap: anywhere;
+  color: #12624f;
+  font-size: 0.74rem;
+}
+
+.demo-release-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.demo-release-list section {
+  padding: 1rem;
+  border: 1px solid #dfebe7;
+  border-radius: 1rem;
+  background: #f9fcfb;
+}
+
+.demo-release-list section > div {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.65rem;
+}
+
+.demo-release-list strong {
+  color: #168665;
+  font-size: 0.78rem;
+}
+
+.demo-release-list span {
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  color: #0d5546;
+  background: #daf4ea;
+  font-size: 0.6rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .demo-footer {
   display: flex;
   justify-content: space-between;
@@ -905,7 +1020,8 @@ a:focus-visible {
 
   .demo-toolbar,
   .demo-behaviors,
-  .demo-feature-grid {
+  .demo-feature-grid,
+  .demo-guide-steps {
     grid-template-columns: 1fr;
   }
 

@@ -172,7 +172,7 @@ export class AppComponent {
           id: 'guides',
           name: 'Guides',
           icon: ICONS.guide,
-          link: '/credits',
+          link: '/guides',
           data: {
             kind: 'route',
             description: 'Navigate to implementation guides',
@@ -182,9 +182,10 @@ export class AppComponent {
           id: 'release-notes',
           name: 'Release notes',
           icon: ICONS.spark,
+          link: '/release-notes',
           data: {
-            kind: 'action',
-            description: 'Handle an action without a router link',
+            kind: 'route',
+            description: 'See the latest library improvements',
           },
         },
       ],
@@ -193,7 +194,7 @@ export class AppComponent {
       id: 'about',
       name: 'About the library',
       icon: ICONS.about,
-      link: '/about-us',
+      link: '/about',
       data: {
         kind: 'route',
         description: 'Learn why this component is different',

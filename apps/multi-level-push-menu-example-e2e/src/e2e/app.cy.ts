@@ -16,9 +16,8 @@ describe('multi-level push menu playground', () => {
       if (!handle) return;
 
       const handleRect = handle.getBoundingClientRect();
-      const wrapperRect = $menu[0]
-        .querySelector<HTMLElement>('.ngx-push-menu')
-        ?.getBoundingClientRect();
+      const wrapper = $menu[0].querySelector<HTMLElement>('.ngx-push-menu');
+      const wrapperRect = wrapper?.getBoundingClientRect();
       const offsetParentRect = (
         handle.offsetParent as HTMLElement | null
       )?.getBoundingClientRect();
@@ -34,7 +33,11 @@ describe('multi-level push menu playground', () => {
         computedRight: getComputedStyle(handle).right,
         menu: { left: menuRect.left, right: menuRect.right },
         wrapper: wrapperRect
-          ? { left: wrapperRect.left, right: wrapperRect.right }
+          ? {
+              left: wrapperRect.left,
+              right: wrapperRect.right,
+              scrollLeft: wrapper?.scrollLeft,
+            }
           : null,
         offsetParent: offsetParentRect
           ? { left: offsetParentRect.left, right: offsetParentRect.right }

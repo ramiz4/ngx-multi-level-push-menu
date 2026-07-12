@@ -19,6 +19,7 @@
   block-size: var(--ngx-push-menu-height, 100%);
   min-block-size: 0;
   overflow: hidden;
+  overflow: clip;
   color: var(--ngx-push-menu-color, #fff);
   -webkit-tap-highlight-color: transparent;
 }

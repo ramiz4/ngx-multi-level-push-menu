@@ -243,6 +243,10 @@ export class AppComponent {
     this.recordState(`Menu ${collapsed ? 'collapsed' : 'expanded'}`);
   }
 
+  syncCollapsed(collapsed: boolean): void {
+    this.collapsed = collapsed;
+  }
+
   onLevelChange(level: number): void {
     this.activeLevel = level;
   }

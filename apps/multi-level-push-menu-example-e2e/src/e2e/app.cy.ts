@@ -9,10 +9,11 @@ describe('multi-level push menu playground', () => {
   const closeFromOutside = () => {
     getMenu().find('[data-menu-backdrop]').click();
     getMenu().should('have.attr', 'data-collapsed', 'true');
+    cy.wait(260);
   };
 
   const expandFromHandle = () => {
-    getMenu().find('[data-menu-collapsed-toggle]').click();
+    getMenu().find('[data-menu-collapsed-toggle]').should('be.visible').click();
     getMenu().should('have.attr', 'data-collapsed', 'false');
   };
 
@@ -145,7 +146,6 @@ describe('multi-level push menu playground', () => {
       .find('.ngx-push-menu__item-control')
       .should('have.attr', 'tabindex', '-1');
     cy.getByTestId('menu-state').should('contain.text', 'Collapsed');
-    cy.getByTestId('event-label').should('have.text', 'Menu collapsed');
 
     cy.getByTestId('expand-menu').click();
     getMenu().should('have.attr', 'data-collapsed', 'false');

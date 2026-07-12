@@ -82,6 +82,32 @@ describe('AppComponent', () => {
     expect(component.lastEvent.label).toBe('Menu collapsed');
   });
 
+  it('does not replace activation details while syncing an automatic close', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const component = fixture.componentInstance;
+    const products = component.menuItems[1];
+    const analytics = products.items?.[0];
+    const liveDashboard = analytics?.items?.[0];
+
+    if (!analytics || !liveDashboard) {
+      throw new Error('Expected the analytics path and live dashboard item');
+    }
+
+    component.onItemActivate({
+      item: liveDashboard,
+      level: 2,
+      path: [products, analytics, liveDashboard],
+      originalEvent: new MouseEvent('click'),
+    });
+    component.syncCollapsed(true);
+
+    expect(component.collapsed).toBe(true);
+    expect(component.lastEvent.kind).toBe('item');
+    expect(component.lastEvent.path).toBe(
+      'Products / Analytics / Live dashboard',
+    );
+  });
+
   it('switches between complete quick-start snippets', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const component = fixture.componentInstance;

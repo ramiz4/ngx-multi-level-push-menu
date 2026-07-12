@@ -9,7 +9,7 @@
   [menu]="menuItems"
   [options]="options"
   [collapsed]="collapsed"
-  (collapsedChange)="setCollapsed($event)"
+  (collapsedChange)="syncCollapsed($event)"
   (itemActivate)="onItemActivate($event)"
   (groupActivate)="onGroupActivate($event)"
   (levelChange)="onLevelChange($event)"

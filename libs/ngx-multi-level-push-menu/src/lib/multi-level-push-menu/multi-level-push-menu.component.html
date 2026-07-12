@@ -23,8 +23,8 @@
     [attr.id]="options.menuID || null"
     [attr.dir]="options.direction"
     [attr.aria-label]="navigationLabel"
-    [attr.aria-hidden]="isCollapsed() && options.fullCollapse ? 'true' : null"
-    [attr.inert]="isCollapsed() && options.fullCollapse ? '' : null"
+    [attr.aria-hidden]="isCollapsed() ? 'true' : null"
+    [attr.inert]="isCollapsed() ? '' : null"
     ramiz4Swipe
     [swipeEnabled]="options.swipe"
     [overlapWidth]="overlapWidthPixels"
@@ -237,25 +237,24 @@
         </span>
       </button>
     </div>
-
-    <button
-      *ngIf="isCollapsed() && !options.fullCollapse"
-      type="button"
-      class="ngx-push-menu__collapsed-toggle"
-      data-menu-collapsed-toggle
-      [attr.aria-label]="toggleLabel"
-      aria-expanded="false"
-      [attr.tabindex]="collapsedToggleTabIndex()"
-      (pointerdown)="$event.stopPropagation()"
-      (click)="expandMenu()"
-    >
-      <ramiz4-menu-icon
-        class="ngx-push-menu__toggle-icon"
-        aria-hidden="true"
-        [icon]="options.titleIcon"
-      ></ramiz4-menu-icon>
-    </button>
   </nav>
+
+  <button
+    *ngIf="isCollapsed() && !options.fullCollapse"
+    type="button"
+    class="ngx-push-menu__collapsed-toggle"
+    data-menu-collapsed-toggle
+    [attr.aria-label]="toggleLabel"
+    aria-expanded="false"
+    [attr.tabindex]="collapsedToggleTabIndex()"
+    (click)="expandMenu()"
+  >
+    <ramiz4-menu-icon
+      class="ngx-push-menu__toggle-icon"
+      aria-hidden="true"
+      [icon]="options.titleIcon"
+    ></ramiz4-menu-icon>
+  </button>
 
   <div
     *ngIf="!isCollapsed()"

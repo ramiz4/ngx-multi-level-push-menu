@@ -110,6 +110,7 @@ describe('MultiLevelPushMenuComponent', () => {
     expect(
       element.querySelector('.ngx-push-menu__items')?.hasAttribute('inert'),
     ).toBe(true);
+    expect(element.querySelector('nav')?.hasAttribute('inert')).toBe(true);
   });
 
   it('closes from the backdrop outside the navigation', () => {
@@ -287,13 +288,7 @@ describe('MultiLevelPushMenuComponent', () => {
       'Expand Main navigation',
     );
     expect(collapsedToggle?.tabIndex).toBe(0);
-    const navigation = element.querySelector('nav');
-    const pointerDownSpy = jest.fn();
-    navigation?.addEventListener('pointerdown', pointerDownSpy);
-    collapsedToggle?.dispatchEvent(
-      new Event('pointerdown', { bubbles: true, cancelable: true }),
-    );
-    expect(pointerDownSpy).not.toHaveBeenCalled();
+    expect(collapsedToggle?.closest('nav')).toBeNull();
     await nextAnimationFrame();
     expect(element.ownerDocument.activeElement).toBe(collapsedToggle);
 

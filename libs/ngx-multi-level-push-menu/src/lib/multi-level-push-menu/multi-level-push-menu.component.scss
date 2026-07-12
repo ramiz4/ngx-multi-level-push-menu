@@ -51,22 +51,11 @@
 }
 
 .ngx-push-menu--ltr.ngx-push-menu--collapsed .ngx-push-menu__navigation {
-  transform: translateX(
-    calc(
-      0px - var(--ngx-push-menu-effective-width) +
-        var(--ngx-push-menu-collapsed-handle-width)
-    )
-  );
+  transform: translateX(calc(0px - var(--ngx-push-menu-effective-width)));
 }
 
 .ngx-push-menu--rtl.ngx-push-menu--collapsed .ngx-push-menu__navigation {
-  transform: translateX(
-    calc(
-      var(--ngx-push-menu-effective-width) - var(
-          --ngx-push-menu-collapsed-handle-width
-        )
-    )
-  );
+  transform: translateX(var(--ngx-push-menu-effective-width));
 }
 
 .ngx-push-menu--ltr.ngx-push-menu--collapsed.ngx-push-menu--full-collapse
@@ -173,8 +162,7 @@
   appearance: none;
   position: absolute;
   z-index: 200;
-  inset-block-start: 0;
-  inset-inline-end: 0;
+  top: 0;
   display: grid;
   place-items: center;
   inline-size: var(--ngx-push-menu-collapsed-handle-width);
@@ -186,6 +174,14 @@
   border: 0;
   border-radius: 0;
   cursor: pointer;
+}
+
+.ngx-push-menu--ltr > .ngx-push-menu__collapsed-toggle {
+  left: 0;
+}
+
+.ngx-push-menu--rtl > .ngx-push-menu__collapsed-toggle {
+  right: 0;
 }
 
 .ngx-push-menu__header {

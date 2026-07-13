@@ -47,7 +47,7 @@
     "@angular/common": "~20.3.26",
     "@angular/compiler": "~20.3.26",
     "@angular/core": "~20.3.26",
-    "@angular/forms": "~20.3.26",
+    "@angular/forms": "~22.0.6",
     "@angular/platform-browser": "~20.3.26",
     "@angular/platform-server": "~20.3.26",
     "@angular/router": "~20.3.26",

@@ -99,7 +99,7 @@
     "nx": "~23.0.2",
     "playwright-webkit": "1.61.1",
     "postcss-preset-env": "^10.1.6",
-    "prettier": "~3.8.1",
+    "prettier": "~3.9.5",
     "semantic-release": "25.0.6",
     "ts-jest": "~29.4.6",
     "ts-node": "^10.9.2",

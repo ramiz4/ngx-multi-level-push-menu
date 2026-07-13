@@ -49,7 +49,7 @@
     "@angular/core": "~20.3.26",
     "@angular/forms": "~20.3.26",
     "@angular/platform-browser": "~20.3.26",
-    "@angular/platform-server": "~20.3.26",
+    "@angular/platform-server": "~22.0.6",
     "@angular/router": "~20.3.26",
     "rxjs": "^7.8.2",
     "tslib": "^2.3.0",

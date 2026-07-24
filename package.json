@@ -62,7 +62,7 @@
     "@angular-eslint/eslint-plugin": "~20.7.0",
     "@angular-eslint/eslint-plugin-template": "~20.7.0",
     "@angular-eslint/template-parser": "~20.7.0",
-    "@angular/cli": "~20.3.32",
+    "@angular/cli": "~21.0.4",
     "@angular/compiler-cli": "~20.3.26",
     "@angular/language-service": "~20.3.26",
     "@angular/platform-browser-dynamic": "~20.3.26",
